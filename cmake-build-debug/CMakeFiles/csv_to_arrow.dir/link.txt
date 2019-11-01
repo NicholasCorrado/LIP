@@ -1,0 +1,1 @@
+/Library/Developer/CommandLineTools/usr/bin/c++  -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/csv_to_arrow.dir/main.cpp.o CMakeFiles/csv_to_arrow.dir/select.cpp.o  -o csv_to_arrow /usr/local/Cellar/apache-arrow/0.15.0/lib/libarrow.dylib 
