@@ -1,1 +1,7 @@
-benchmarks/*
+*
+!README.md
+!*.cpp
+!*.h
+!doc/*.tex
+!.gitignore
+
