@@ -1,3 +1,0 @@
-/Users/corrado/CLionProjects/csv_to_arrow/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/corrado/CLionProjects/csv_to_arrow/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/corrado/CLionProjects/csv_to_arrow/cmake-build-debug/CMakeFiles/csv_to_arrow.dir
