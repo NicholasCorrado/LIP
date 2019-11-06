@@ -1,0 +1,122 @@
+        % % Title and author(s)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{Topics in Database Management Systems Project Report: Skipping Filters is Better}
+\author{Nicholas Corrado \and Xiating Ouyang}
+\date{}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[11pt]{article}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %
+% % The next command allows your in import encapsulated
+% % postscript files, .epsf or .eps files, which
+% % contain vector graphic image data.
+% %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx}
+%\usepackage{charter,eulervm}
+
+%\renewcommand{\baselinestretch}{1.5}
+\setcounter{secnumdepth}{3} % default value for 'report' class is "2"
+\usepackage{amsthm,amsmath,amssymb,upgreek,marvosym,mathtools}
+\usepackage{array}
+\usepackage{makeidx}  % allows for indexgeneration
+\usepackage{paralist}
+\usepackage{subfig}
+\usepackage{tabularx}
+\usepackage{tabu}
+\usepackage{comment}
+\usepackage[nottoc]{tocbibind}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage[pdftex,breaklinks,colorlinks,citecolor={blue}, linkcolor={blue},urlcolor=Maroon]{hyperref}
+\usepackage{tkz-graph}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=25mm,
+ top=20mm,
+ right=25mm,
+ }
+\usetikzlibrary{automata, positioning,arrows,shapes,decorations.pathmorphing}
+
+ \tikzset{
+->, % makes the edges directed
+>=stealth, % makes the arrow heads bold
+node distance=3cm, % specifies the minimum distance between two nodes. Change if necessary.
+every state/.style={thick, fill=gray!10}, % sets the properties for each ’state’ node
+initial text=$ $, % sets the text that appears on the start arrow
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{reduction}{Reduction}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{scolium}{Scolium}[section]   %% And a not so common one.
+\newtheorem{definition}{Definition}[section]
+\newtheorem{conjecture}{Conjecture}[section]
+\newtheorem{corollary}{Corollary}[section]
+%\newenvironment{proof}{{\sc Proof:}}{~\hfill QED}
+\newenvironment{AMS}{}{}
+\newenvironment{keywords}{}{}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\newcommand{\todo}{(TO BE CONTINUED...)}
+
+\newcommand{\paris}[1]{{\color{blue} Paris: [{#1}]}}
+
+
+\newcommand{\trans}[1]{
+	#1^\mathsf{T}
+}
+
+\newcommand{\db}{$\mathbf{db}$}
+\newcommand{\sjfq}{\texttt{sjfCQA}}
+\newcommand{\bcq}{\texttt{bcq}}
+\newcommand{\problem}[1]{\textsc{certainty}($#1$)}
+\newcommand{\FO}{$\mathbf{FO}$}
+\newcommand{\PTIME}{$\mathbf{P}$}
+\newcommand{\LSPACE}{$\mathbf{L}$}
+\newcommand{\coNP}{$\mathbf{coNP}$}
+\newcommand{\und}[1]{\underline{#1}}
+\newcommand{\NL}{$\mathbf{NL}$}
+\newcommand{\JOIN}{\bowtie}
+
+\begin{document}
+\newpage
+\maketitle
+
+
+\abstract{}
+
+
+\section{Introduction}
+
+Performing join operations on database management systems based on Star Schema is a fundamental and task in industry. \textit{Lookahead Information Passing (LIP)} is a technique that constructs a set of Bloom Filters on the dimension tables and adaptively applies them in certain sequence on the fact table, provably as efficient and robust as computing the join according to the optimal joining sequence \cite{zhu2017looking}. However, the cost is the huge amount of memory and cache used to store the set of LIP filters: Replacing the LIP filters in cache for a new LIP filter causes significant delay, and if the new LIP filter is not selective skipping it might improve the performance.
+
+This project aims at investigating the effect of skipping certain LIP filter on improving the performance of LIP, and derive a theoretical guarantee on the performance of LIP against the optimal joining sequence.
+
+
+
+\section{Lookahead Information Passing}
+
+Let $F$ be the fact table and $D_i$ the dimension tables for $1 \leq i \leq n$. We denote the number of facts in $F$ and each $D_i$ as $|F|$ and $|D_i|$. A LIP filter on $D_i$ is implemented using a Bloom filter, with false positive rate $\varepsilon$. The selectivity $\sigma_i$ of $D_i$ on fact table $F$ is given by $\sigma_i = |D_i \JOIN_{k_i} F| / |F|,$ where $k_i$ is the foreign key of $D_i$ in $F$. 
+
+
+The LIP algorithm proceeds by first partition the fact table $F$ into a sequence of $n$ disjoint facts $F_i$ (with possibly different sizes). Initialize each $\sigma_i = 0$. Then for each $t = 1, 2, \dots n$, sort the LIP filters in ascending order of $\sigma_i$ and apply 
+
+
+
+\section{Skipping LIP Filters}
+
+
+\section{Experiments}
+
+
+\section{Concluding remarks}
+
+
+
+
+\bibliography{rep}{}
+\bibliographystyle{plain}
+
+\end{document}
