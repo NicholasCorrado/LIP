@@ -19,7 +19,7 @@ void select(std::shared_ptr<arrow::Table> table, std::string select_field, std::
     std::shared_ptr<arrow::Schema> result_schema = table->schema();
 
     arrow::Status status;
-    arrow::TableBatchReader r;
+    //arrow::TableBatchReader r;
 }
 
 void select_old(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value) {

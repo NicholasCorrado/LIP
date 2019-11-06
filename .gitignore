@@ -2,6 +2,7 @@
 !README.md
 !*.cpp
 !*.h
-!doc/*.tex
+!doc/rep.tex
+!doc/rep.bib
 !.gitignore
 
