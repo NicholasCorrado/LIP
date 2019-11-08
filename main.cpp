@@ -45,11 +45,11 @@ void write_to_file(std::string path, std::shared_ptr<arrow::Table> table) {
  */
 int main() {
 
-    std::string file_path_customer  = "/Users/corrado/SQL-benchmark-data-generator/ssbgen/customer.tbl";
-    std::string file_path_date      = "/Users/corrado/SQL-benchmark-data-generator/ssbgen/date.tbl";
-    std::string file_path_lineorder = "/Users/corrado/SQL-benchmark-data-generator/ssbgen/lineorder.tbl";
-    std::string file_path_part      = "/Users/corrado/SQL-benchmark-data-generator/ssbgen/part.tbl";
-    std::string file_path_supplier  = "/Users/corrado/SQL-benchmark-data-generator/ssbgen/supplier.tbl";
+    std::string file_path_customer  = "./benchmark/customer.tbl";
+    std::string file_path_date      = "./benchmark/date.tbl";
+    std::string file_path_lineorder = "./benchmark/lineorder.tbl";
+    std::string file_path_part      = "./benchmark/part.tbl";
+    std::string file_path_supplier  = "./benchmark/supplier.tbl";
 
 
     std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
@@ -85,11 +85,11 @@ int main() {
     std::cout<<"part->num_rows() = " << part->num_rows() << std::endl;
     std::cout<<"supplier->num_rows() = " << supplier->num_rows() << std::endl;
 
-    write_to_file("/Users/corrado/cs764project/customer.arrow", customer);
-    write_to_file("/Users/corrado/cs764project/date.arrow", date);
-    write_to_file("/Users/corrado/cs764project/lineorder.arrow", lineorder);
-    write_to_file("/Users/corrado/cs764project/supplier.arrow", supplier);
-    write_to_file("/Users/corrado/cs764project/part.arrow", part);
+    write_to_file("./arrow-output/customer.arrow", customer);
+    write_to_file("./arrow-output/date.arrow", date);
+    write_to_file("./arrow-output/lineorder.arrow", lineorder);
+    write_to_file("./arrow-output/supplier.arrow", supplier);
+    write_to_file("./arrow-output/part.arrow", part);
 
 }
 

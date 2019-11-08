@@ -100,6 +100,7 @@ This project aims at investigating the effect of skipping certain LIP filter on 
 
 Let $F$ be the fact table and $D_i$ the dimension tables for $1 \leq i \leq n$. We denote the number of facts in $F$ and each $D_i$ as $|F|$ and $|D_i|$. A LIP filter on $D_i$ is implemented using a Bloom filter, with false positive rate $\varepsilon$. The true selectivity $\sigma_i$ of $D_i$ on fact table $F$ is given by $\sigma_i = |D_i \JOIN_{k_i} F| / |F|,$ where $k_i$ is the foreign key of $D_i$ in $F$. The \texttt{LIP-join} algorithm, depicted in Figure \ref{fig:lip}, computes the indices of tuples in $F$ that pass the filtering of each Bloom filter of $D_i$.
 
+The partition in \cite{zhu2017looking} satisfies that $|F_{t+1}| = 2|F_{t}|$ at line 5, and the algorithm approximates the true selectiveness $\sigma_i$ of each dimension $D_i$ using $pass[i]/count[i]$, the aggregated selectiveness since the beginning.
 
 \begin{figure}[h!]
 	\centering
@@ -111,22 +112,34 @@ Let $F$ be the fact table and $D_i$ the dimension tables for $1 \leq i \leq n$. 
  			\\
 			{\sc Output}: Indices of tuples in $F$ that pass the filtering
 			\begin{tabbing}
-				Aaa\=aaA\=Aaa\=Aaa\=MMMAAAAAAAAAAAAAAAAAAAAAAAAA\=A \kill
+				Aaa\=aaA\=Aaa\=Aaa\=Aaa\=AAAAAAAAAAAAAAAAAAAAAAAAA\=A \kill
 				1.\> Initialize $I = \emptyset$
 				\\
-				2.\> 
+				2.\> {\bf foreach } filter $f$ {\bf do}
 				\\
-				3.\> Partition $F = \bigcup_{1 \leq t \leq T}F_t$. 
+				3.\>\> $count[f] \leftarrow 0$
 				\\
-				4.\> {\bf for } $t = 1, 2, \dots, T$ {\bf do} 
+				4.\>\> $pass[f] \leftarrow 0$ 
 				\\
-				\>\> sort $f_i$ in nondesending order of $\sigma_i$
+				5.\> Partition $F = \bigcup_{1 \leq t \leq T}F_t$. 
 				\\
-				\>\> {\bf foreach } filter $f_i$ in that order {\bf do}
+				6.\> {\bf foreach } fact block $F_t$ {\bf do} 
 				\\
-				\>\>\> {\bf foreach} index $j \in F_t$ {\bf do}
+				7.\>\> {\bf foreach } filter $f$ in order {\bf do}
 				\\
-				\>\>\>\> add $j$ to $I$ if $f_i$ contains $F_t[j]$
+				8.\>\>\> {\bf foreach} index $j \in F_t$ {\bf do}
+				\\
+				9.\>\>\>\> $count[f] \leftarrow count[f] + 1$
+				\\
+				10.\>\>\>\> {\bf if }$f$ contains $F_t[j]$ 
+				\\
+				11.\>\>\>\>\> $I \leftarrow I \cup \{j\}$ 
+				\\
+				12.\>\>\>\>\> $pass[f] \leftarrow pass[f] + 1$
+				\\
+				13.\>\> {\bf sort} filters $f$ in nondesending order of $pass[f]/count[f]$
+				\\
+				14.\> {\bf return } $I$
 			\end{tabbing}  
 		\end{minipage}
 	};
