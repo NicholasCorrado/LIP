@@ -5,17 +5,26 @@
 #include<math.h>
 #include<vector>
 #include<algorithm>
+#include <chrono>
 
-#define MAX_SEED 65535
+#include "BloomFilter.h"
+
+
+
 #define FALSE_POSITIVE_RATE 0.001
+#define MAX_SEED 65535
 #define S 4
 
+/*
+	
+	HASH ARE BELOW
 
-using namespace std;
+
+*/
 
 
 
-#define	FORCE_INLINE inline __attribute__((always_inline))
+#define FORCE_INLINE inline __attribute__((always_inline))
 
 inline uint32_t rotl32 ( uint32_t x, int8_t r )
 {
@@ -27,8 +36,8 @@ inline uint64_t rotl64 ( uint64_t x, int8_t r )
   return (x << r) | (x >> (64 - r));
 }
 
-#define	ROTL32(x,y)	rotl32(x,y)
-#define ROTL64(x,y)	rotl64(x,y)
+#define ROTL32(x,y) rotl32(x,y)
+#define ROTL64(x,y) rotl64(x,y)
 
 #define BIG_CONSTANT(x) (x##LLU)
 
@@ -131,113 +140,144 @@ void MurmurHash3_x86_32 ( const void * key, int len,
 } 
 
 
-unsigned int MurmurHash(const void* x, int seed) {
+
+
+
+unsigned int MurmurHash(const void* x, int seed){
+	int len = 4;
 	unsigned int ret;
-	MurmurHash3_x86_32 (x, 4, seed, &ret);
+	MurmurHash3_x86_32 (x, len, seed, &ret );
 	return ret;
+}
+
+unsigned int MurmurHashStr(const std::string x, int seed){
+	int len = x.length();
+
+	unsigned int ret;
+
+	char* tmp = (char*)malloc(len * sizeof(char));
+
+	strcpy(tmp, x.c_str());
+
+	MurmurHash3_x86_32 (tmp, len, seed, &ret );
+	
+	free(tmp);
+	return ret;
+
 }
 
 
 
 
 
-class BloomFilter{
 
-private:
-	int numberOfCells;
-	int numberOfHashes;
-	bool* cells;
-	int* seeds;
-	
 
-	int count = 0;
-	int pass = 0;
 
-public:
 
-	
+/* 
 
-	double getFilterRate(){
-		if (count > 0) 
-			return 1.0 * pass / count;
-		else
-			return 1;
+	BLOOM FILTERS ARE BELOW
+
+*/
+
+
+
+
+
+double BloomFilter::getFilterRate(){
+	if (count > 0) 
+		return 1.0 * pass / count;
+	else
+		return 1;
+}
+void BloomFilter::incrementCount(){
+	count++;
+}
+
+void BloomFilter::incrementPass(){
+	pass++;
+}
+
+BloomFilter::BloomFilter(std::vector<int> elements){
+	int n = elements.size();
+	numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
+	numberOfCells = int(n * numberOfHashes / log(2));
+
+	cells = (bool*)malloc(numberOfCells * sizeof(bool));
+	for(int i = 0; i < numberOfCells; ++i){
+		cells[i] = false;
 	}
 
-	void incrementCount(){
-		count++;
-	}
-
-	void incrementPass(){
-		pass++;
-	}
-
-	BloomFilter(vector<int> elements){
-		int n = elements.size();
-		numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
-		numberOfCells = int(n * numberOfHashes / log(2));
-
-		cells = (bool*)malloc(numberOfCells * sizeof(bool));
-		for(int i = 0; i < numberOfCells; ++i){
-			cells[i] = false;
-		}
-
-		seeds = (int*)malloc(numberOfHashes * sizeof(int));
-		for(int i = 0; i < numberOfHashes; ++i){
-			seeds[i] = rand() % MAX_SEED;
-		}
-
-
-		for(int i = 0; i < n; ++i){
-			insert(&elements[i]);
-		}
+	seeds = (int*)malloc(numberOfHashes * sizeof(int));
+	for(int i = 0; i < numberOfHashes; ++i){
+		seeds[i] = rand() % MAX_SEED;
 	}
 
 
-	BloomFilter(vector<string> elements){
-		int n = elements.size();
-		numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
-		numberOfCells = int(n * numberOfHashes / log(2));
-
-		cells = (bool*)malloc(numberOfCells * sizeof(bool));
-		for(int i = 0; i < numberOfCells; ++i){
-			cells[i] = false;
-		}
-
-		seeds = (int*)malloc(numberOfHashes * sizeof(int));
-		for(int i = 0; i < numberOfHashes; ++i){
-			seeds[i] = rand() % MAX_SEED;
-		}
+	for(int i = 0; i < n; ++i){
+		insert(&elements[i]);
+	}
+}
 
 
-		for(int i = 0; i < n; ++i){
-			insert(&elements[i]);
-		}
+BloomFilter::BloomFilter(std::vector<std::string> elements){
+	int n = elements.size();
+	numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
+	numberOfCells = int(n * numberOfHashes / log(2));
+
+	cells = (bool*)malloc(numberOfCells * sizeof(bool));
+	for(int i = 0; i < numberOfCells; ++i){
+		cells[i] = false;
+	}
+
+	seeds = (int*)malloc(numberOfHashes * sizeof(int));
+	for(int i = 0; i < numberOfHashes; ++i){
+		seeds[i] = rand() % MAX_SEED;
 	}
 
 
-	void insert(const void* value){
-		for(int i = 0; i < numberOfHashes; ++i){
-			int index = MurmurHash(value, seeds[i]) % numberOfCells;
-			cells[index] = true;
-		}
+	for(int i = 0; i < n; ++i){
+		insert(elements[i]);
 	}
+}
 
-	bool search(const void* value){
-		for(int i = 0; i < numberOfHashes; ++i){
-			int index = MurmurHash(value, seeds[i]) % numberOfCells;
-			if (!cells[index]) return false;
-		}
-		return true;
+
+void BloomFilter::insert(const void* value){
+	for(int i = 0; i < numberOfHashes; ++i){
+		int index = MurmurHash(value, seeds[i]) % numberOfCells;
+		cells[index] = true;
 	}
-};
+}
+
+void BloomFilter::insert(std::string value){
+	for(int i = 0; i < numberOfHashes; ++i){
+		int index = MurmurHashStr(value, seeds[i]) % numberOfCells;
+		cells[index] = true;
+	}
+}
+
+bool BloomFilter::search(int value){
+	for(int i = 0; i < numberOfHashes; ++i){
+		int index = MurmurHash(&value, seeds[i]) % numberOfCells;
+		if (!cells[index]) return false;
+	}
+	return true;
+}
+
+bool BloomFilter::search(std::string value){
+	for(int i = 0; i < numberOfHashes; ++i){
+		int index = MurmurHashStr(value, seeds[i]) % numberOfCells;
+		if (!cells[index]) return false;
+	}
+	return true;
+}
 
 
 
 int test_false_positive(){
 
-	vector<int> integers;
-	map<int, bool> m;
+	std::vector<int> integers;
+	std::map<int, bool> m;
 	
 	int input_size = 10000;
 	int test_sequence_size = 1000000;
@@ -259,14 +299,14 @@ int test_false_positive(){
 
 		if (m.count(test) == 0){
 			cnt ++;
-			if (bf->search(&test)){
+			if (bf->search(test)){
 				fp++;
 			}
 		}
 
 	}
-	cout << fp << " " << cnt<< endl;
-	cout << 1.0 * (fp) / cnt << endl;
+	std::cout << fp << " " << cnt<< std::endl;
+	std::cout << 1.0 * (fp) / cnt << std::endl;
 	return 0;
 }
 
@@ -278,14 +318,13 @@ bool comp( BloomFilter *lhs,  BloomFilter *rhs)
 
 
 void sort_filters(){
-	vector<int> integers;
+	std::vector<int> integers;
 	
 	int input_size = S;	
 
 
 	BloomFilter* bf[S];
 	for(int i = 0; i < S; ++i){
-		cout << i << endl;
 		for(int i = 0; i < input_size; ++i){
 			int val = rand() % MAX_SEED;
 			integers.push_back(val);
@@ -304,28 +343,87 @@ void sort_filters(){
 
 			for(int i = 0; i < S; ++i){
 				bf[i] -> incrementCount();
-				if (bf[i] -> search(&test)){
+				if (bf[i] -> search(test)){
 					bf[i] -> incrementPass();
 				}
 			}
 		}
 		
-		sort(bf, bf + S, comp);
-		cout << "Round #" << round << endl;
+		std::sort(bf, bf + S, comp);
+		std::cout << "Round #" << round << std::endl;
 		for(int i = 0; i < S; ++i){
-			cout << bf[i] -> getFilterRate() <<  " " ;
+			std::cout << bf[i] -> getFilterRate() <<  " " ;
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
 	
 }
 
 
+std::string gen_random_str(const int len) {
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    std::string ret = "";
+
+
+    for (int i = 0; i < len; ++i) {
+        ret = ret + alphanum[rand() % (sizeof(alphanum) - 1)];
+    }
+
+  	return ret;
+}
+
+
+int test_random_string(){
+
+	std::vector<std::string> strings;
+	std::map<std::string, bool> m;
+	
+	int input_size = 10000;
+	int test_sequence_size = 100;
+
+	int length = 100;
+
+	std::cout << "INSERTING" << std::endl;
+	for(int i = 0; i < input_size; ++i){
+		std::string val = gen_random_str(length);
+		m[val] = true;
+		//cout << val << endl;
+		strings.push_back(val);
+	}
+
+	BloomFilter* bf = new BloomFilter(strings);
+
+	int cnt = 0;
+	int fp = 0;
+
+	for(int i = 0; i < test_sequence_size; ++i){
+		std::string test = gen_random_str(length);
+		//cout << test << endl;
+		int res = m.count(test);
+		if (res == 0){
+			cnt ++;
+
+			bool res2 = bf -> search(test);
+			if (res2){
+				fp++;
+			}
+		}
+	}
+	std::cout << fp << " " << cnt<< std::endl;
+	std::cout << 1.0 * (fp) / cnt << std::endl;
+
+	return 0;
+
+}
+
 
 int main(){
-
-	//test_false_positive();
+	test_false_positive();
 	sort_filters();
+	test_random_string();
 	return 0;
 
 }

@@ -164,6 +164,19 @@ We implemented the traditional hash-join algorithm, the \texttt{LIP-join} algori
 \section{Experiments}
 
 
+\begin{comment}
+\section{Deploying lookahead filters in distributed systems}
+
+In this section we discuss a method to deploy the LIP filters in distributed systems. This method incorporates LIP and the \textsc{hypercube} algorithm \cite{zhu2017looking,}.
+
+
+Let $p$ be the number of machines available. Let $k_i$ be the primary key of $D_i$, and each tuple in the fact table $F$ possesses a foreign key to each $D_i$. Suppose $p = \prod_{1 \leq i \leq n} p_i$,  and then we label each of the $p$ machines with a coordinate $(x_1, x_2, \dots, x_n)$ where each $1 \leq x_i \leq p_i$.
+
+We first pick $n$ hash functions $h_i$ such that the range of each $h_i$ is $\{1, 2, \dots, p_i\}$. Then for each dimension table $D_i$ and for each primary key $k_i$ in $D_i$, we send $k_i$ to all machines with $i$-th component being $h_i(k_i)$. 
+
+\end{comment}
+
+
 \section{Concluding remarks}
 
 
