@@ -3,6 +3,7 @@
 #include<vector>
 #include<string>
 
+
 class BloomFilter{
 
 private:
@@ -16,13 +17,13 @@ private:
 	int pass;
 
 public:
-	double getFilterRate();
-	void incrementCount();
-	void incrementPass();
-
 	BloomFilter();
 	BloomFilter(std::vector<int> elements);
 	BloomFilter(std::vector<std::string> elements);
+	
+	double getFilterRate();
+	void incrementCount();
+	void incrementPass();
 
 
 	void insert(int value);

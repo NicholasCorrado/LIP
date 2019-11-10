@@ -446,7 +446,7 @@ int test_random_string(){
 }
 
 
-int main(){
+int local_main(){
 	test_false_positive();
 	//sort_filters();
 	test_random_string();

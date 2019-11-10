@@ -1,8 +1,6 @@
 #include <iostream>
 #include <arrow/api.h>
 #include "BuildFilter.h"
-#include "BloomFilter.h"
-#include "select.h"
 
 
 // Currently only supports queries on columns with string data.
@@ -17,7 +15,7 @@ BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::
     // record batch; it sets the output batch to nullptr and returns Status::OK(). Hence, we must also check that the
     // output batch is not nullptr.
 
-    vector<std::string> strings;
+    std::vector<std::string> strings;
 
     BloomFilter* bf = new BloomFilter();
 
@@ -32,7 +30,7 @@ BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::
                 auto col = std::static_pointer_cast<arrow::StringArray>(in_batch->GetColumnByName(select_field));
 
                 for (int i=0; i<col->length(); i++) {
-                	string attr = col->GetString(i);
+                	std::string attr = col->GetString(i);
                     if ( EvaluatePredicate(attr, value, op) ) {
                         bf -> insert(attr);
                     }
