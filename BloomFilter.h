@@ -12,19 +12,20 @@ private:
 	int* seeds;
 	
 
-	int count = 0;
-	int pass = 0;
+	int count;
+	int pass;
 
 public:
 	double getFilterRate();
 	void incrementCount();
 	void incrementPass();
 
+	BloomFilter();
 	BloomFilter(std::vector<int> elements);
 	BloomFilter(std::vector<std::string> elements);
 
 
-	void insert(const void* value);
+	void insert(int value);
 	void insert(std::string value);
 
 	bool search(int value);
