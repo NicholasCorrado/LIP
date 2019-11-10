@@ -382,11 +382,10 @@ int test_random_string(){
 	std::map<std::string, bool> m;
 	
 	int input_size = 10000;
-	int test_sequence_size = 100;
+	int test_sequence_size = 10000000;
 
 	int length = 100;
 
-	std::cout << "INSERTING" << std::endl;
 	for(int i = 0; i < input_size; ++i){
 		std::string val = gen_random_str(length);
 		m[val] = true;
@@ -400,12 +399,14 @@ int test_random_string(){
 	int fp = 0;
 
 	for(int i = 0; i < test_sequence_size; ++i){
+		if (i % (test_sequence_size / 100) == 0){
+			std::cout << 100 * i / test_sequence_size << "%" << std::endl;
+		}
 		std::string test = gen_random_str(length);
 		//cout << test << endl;
 		int res = m.count(test);
 		if (res == 0){
 			cnt ++;
-
 			bool res2 = bf -> search(test);
 			if (res2){
 				fp++;
@@ -416,13 +417,12 @@ int test_random_string(){
 	std::cout << 1.0 * (fp) / cnt << std::endl;
 
 	return 0;
-
 }
 
 
 int main(){
 	test_false_positive();
-	sort_filters();
+	//sort_filters();
 	test_random_string();
 	return 0;
 
