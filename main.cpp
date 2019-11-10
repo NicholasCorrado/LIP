@@ -9,9 +9,12 @@
 #include <arrow/stl.h>
 #include <arrow/ipc/api.h>
 #include "main.h"
+#include "select.h"
 
 #include <tuple>
 
+// If you successfully read the csv files but fail to write the arrow files, it might be because the arrow-output
+// directory does not exist.
 void write_to_file(std::string path, std::shared_ptr<arrow::Table> table) {
 
     std::shared_ptr<arrow::io::OutputStream> os;
@@ -45,11 +48,11 @@ void write_to_file(std::string path, std::shared_ptr<arrow::Table> table) {
  */
 int main() {
 
-    std::string file_path_customer  = "./benchmark/customer.tbl";
-    std::string file_path_date      = "./benchmark/date.tbl";
-    std::string file_path_lineorder = "./benchmark/lineorder.tbl";
-    std::string file_path_part      = "./benchmark/part.tbl";
-    std::string file_path_supplier  = "./benchmark/supplier.tbl";
+    std::string file_path_customer  = "../benchmark/customer.tbl";
+    std::string file_path_date      = "../benchmark/date.tbl";
+    std::string file_path_lineorder = "../benchmark/lineorder.tbl";
+    std::string file_path_part      = "../benchmark/part.tbl";
+    std::string file_path_supplier  = "../benchmark/supplier.tbl";
 
 
     std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
@@ -85,12 +88,14 @@ int main() {
     std::cout<<"part->num_rows() = " << part->num_rows() << std::endl;
     std::cout<<"supplier->num_rows() = " << supplier->num_rows() << std::endl;
 
-    write_to_file("./arrow-output/customer.arrow", customer);
-    write_to_file("./arrow-output/date.arrow", date);
-    write_to_file("./arrow-output/lineorder.arrow", lineorder);
-    write_to_file("./arrow-output/supplier.arrow", supplier);
-    write_to_file("./arrow-output/part.arrow", part);
+    write_to_file("../arrow-output/customer.arrow", customer);
+    write_to_file("../arrow-output/date.arrow", date);
+    write_to_file("../arrow-output/lineorder.arrow", lineorder);
+    write_to_file("../arrow-output/supplier.arrow", supplier);
+    write_to_file("../arrow-output/part.arrow", part);
 
+    std::shared_ptr<arrow::Table> result_table = Select(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
+    PrintTable(result_table);
 }
 
 
@@ -122,9 +127,7 @@ std::shared_ptr<arrow::Table>
     std::shared_ptr<arrow::Table> table;
     status = reader->Read(&table);
 
-    if(!status.ok()) {
-        std::cout << "Error reading csv into table." << std::endl;
-    }
+    EvaluateStatus(status);
 
     return table;
 }
