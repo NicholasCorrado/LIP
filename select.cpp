@@ -6,9 +6,12 @@
 #include <arrow/api.h>
 #include "select.h"
 
-// Currently only supports queries on columns with string data.
-std::shared_ptr<arrow::Table>
-Select(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, Operator op) {
+
+// I can't think of an elegant way to make the select function work for arbitrary data types, so for now, I simply
+// overload the function. This isn't so bad, since the default data types are string and int64.
+
+// Select on a column with string data
+std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, Operator op) {
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
@@ -23,35 +26,18 @@ Select(std::shared_ptr<arrow::Table> table, std::string select_field, std::strin
     // record batch; it sets the output batch to nullptr and returns Status::OK(). Hence, we must also check that the
     // output batch is not nullptr.
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
-        int type = table->schema()->GetFieldByName(select_field)->type()->id();
 
         // Arrays must be downcasted to a concrete array type before we can access the array items. Note that the
         // method used to access item i of an array depend on the data type, e.g. GetString(i) for StringArray vs
         // Value(i) for Int64Array (and any other int array).
-        switch (type) {
-            case arrow::Type::type::STRING: {
-                auto col = std::static_pointer_cast<arrow::StringArray>(in_batch->GetColumnByName(select_field));
+        auto col = std::static_pointer_cast<arrow::StringArray>(in_batch->GetColumnByName(select_field));
 
-                for (int i=0; i<col->length(); i++) {
-                    if ( EvaluatePredicate(col->GetString(i), value, op) ) {
-                        AddRowToRecordBatch(i, in_batch, out_batch_builder);
-                    }
-                }
-                break;
+        for (int i=0; i<col->length(); i++) {
+            if ( EvaluatePredicate(col->GetString(i), value, op) ) {
+                AddRowToRecordBatch(i, in_batch, out_batch_builder);
             }
-                /*
-                case arrow::Type::type::INT64: {
-                    auto col = std::static_pointer_cast<arrow::Int64Array>(in_batch->GetColumnByName(select_field));
-
-                    for (int i=0; i<col->length(); i++) {
-                        if ( EvaluatePredicate(col->Value(i), value, op) )) {
-                            AddRowToRecordBatch(i, in_batch, out_batch_builder);
-                        }
-                    }
-                    break;
-                }
-                */
         }
+
         std::shared_ptr<arrow::RecordBatch> out_batch;
 
         status = out_batch_builder->Flush(true, &out_batch);
@@ -66,6 +52,47 @@ Select(std::shared_ptr<arrow::Table> table, std::string select_field, std::strin
 
     return result_table;
 }
+
+
+// Select on a column with integer data
+std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, std::string select_field, long long value, Operator op) {
+
+
+    arrow::Status status;
+    std::shared_ptr<arrow::RecordBatch> in_batch;
+    std::unique_ptr<arrow::RecordBatchBuilder> out_batch_builder;
+    std::vector<std::shared_ptr<arrow::RecordBatch>> out_batches;
+
+    status = arrow::RecordBatchBuilder::Make(table->schema(), arrow::default_memory_pool(), &out_batch_builder);
+    EvaluateStatus(status);
+    auto* reader = new arrow::TableBatchReader(*table);
+
+    while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
+
+        auto col = std::static_pointer_cast<arrow::Int64Array>(in_batch->GetColumnByName(select_field));
+
+        for (int i=0; i<col->length(); i++) {
+            if ( EvaluatePredicate(col->Value(i), value, op) ) {
+                AddRowToRecordBatch(i, in_batch, out_batch_builder);
+            }
+        }
+
+        std::shared_ptr<arrow::RecordBatch> out_batch;
+
+        status = out_batch_builder->Flush(true, &out_batch);
+        EvaluateStatus(status);
+
+        out_batches.push_back(out_batch);
+    }
+
+    std::shared_ptr<arrow::Table> result_table;
+    status = arrow::Table::FromRecordBatches(out_batches, &result_table);
+    EvaluateStatus(status);
+
+    return result_table;
+}
+
+
 
 void AddRowToRecordBatch(int row, std::shared_ptr<arrow::RecordBatch>& in_batch, std::unique_ptr<arrow::RecordBatchBuilder>& out_batch_builder) {
 
@@ -107,7 +134,7 @@ bool EvaluatePredicate(T data, T value, Operator op) {
 
 void EvaluateStatus(arrow::Status status) {
     if (!status.ok()) {
-        std::cout << "ah" << std::endl;
+        std::cout << status.message() << std::endl;
     }
 }
 

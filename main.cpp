@@ -46,6 +46,8 @@ void write_to_file(std::string path, std::shared_ptr<arrow::Table> table) {
  * main SHOULD accept files as arguments. First argument is the path to the fact table. All following arguments are
  * the paths to dimension tables.
  */
+
+
 int main() {
 
     std::string file_path_customer  = "../benchmark/customer.tbl";
@@ -58,9 +60,10 @@ int main() {
     std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
                                                    "MKT SEGMENT"};
     std::vector<std::string> date_schema        = {"DATE KEY", "DATE", "DAY OF WEEK", "MONTH", "YEAR", "YEAR MONTH NUM",
-                                                   "YEAR MONTH", "DAY NUM IN WEEK", "DAY NUM IN MONTH", "MONTH NUM IN YEAR",
-                                                   "WEEK NUM IN YEAR", "SELLING SEASON", "LAST DAY IN WEEK FL",
-                                                   "LAST DAT IN MONTH FL", "HOLIDAY FL", "WEEKDAY FL", "DAY NUM YEAR"};
+                                                   "YEAR MONTH", "DAY NUM IN WEEK", "DAY NUM IN MONTH", "DAY NUM IN YEAR",
+                                                   "MONTH NUM IN YEAR","WEEK NUM IN YEAR", "SELLING SEASON",
+                                                   "LAST DAY IN WEEK FL", "LAST DAT IN MONTH FL", "HOLIDAY FL",
+                                                   "WEEKDAY FL"};
     std::vector<std::string> lineorder_schema   = {"ORDER KEY", "LINE NUMBER", "CUST KEY", "PART KEY", "SUPP KEY",
                                                    "ORDER DATE", "ORD PRIORITY", "SHIP PRIORITY", "QUANTITY",
                                                    "EXTENDED PRICE", "ORD TOTAL PRICE", "DISCOUNT", "REVENUE",
@@ -94,7 +97,11 @@ int main() {
     write_to_file("../arrow-output/supplier.arrow", supplier);
     write_to_file("../arrow-output/part.arrow", part);
 
-    std::shared_ptr<arrow::Table> result_table = Select(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
+    std::shared_ptr<arrow::Table> result_table;
+    //result_table = Select(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
+    //PrintTable(result_table);
+
+    result_table = Select(date, "YEAR", 1992, Operator::EQUAL);
     PrintTable(result_table);
 }
 

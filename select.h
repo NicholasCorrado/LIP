@@ -27,6 +27,7 @@ enum Operator {
 ///
 /// \return the result of the query wrapped in std::shared_ptr<arrow::Table>
 std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, Operator op);
+std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, std::string select_field, long long value, Operator op);
 
 /// \brief Copy a row from one record batch into a batch builder. Used to
 ///
