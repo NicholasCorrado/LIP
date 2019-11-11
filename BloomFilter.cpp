@@ -198,7 +198,7 @@ unsigned int MurmurHashStr(const std::string x, int seed){
 /*
 	Return the current filter rate = pass/count;
 */
-double BloomFilter::getFilterRate(){
+double BloomFilter::GetFilterRate(){
 	if (count > 0) 
 		return 1.0 * pass / count;
 	else
@@ -209,7 +209,7 @@ double BloomFilter::getFilterRate(){
 /*
 	Increment the count variable
 */
-void BloomFilter::incrementCount(){
+void BloomFilter::IncrementCount(){
 	count++;
 }
 
@@ -217,7 +217,7 @@ void BloomFilter::incrementCount(){
 /*
 	Increment the pass variable
 */
-void BloomFilter::incrementPass(){
+void BloomFilter::IncrementPass(){
 	pass++;
 }
 
@@ -229,7 +229,7 @@ void BloomFilter::incrementPass(){
 	We assume by default the number of elements to be inserted is 500000.
 */
 BloomFilter::BloomFilter(){
-	reset();
+	Reset();
 	int n = DEFAULT_INSERT;
 	numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
 	numberOfCells = int(n * numberOfHashes / log(2));
@@ -253,8 +253,8 @@ BloomFilter::BloomFilter(){
 	Number of cells and hash functions are calculated from the false 
 	positve rate.
 */
-BloomFilter::BloomFilter(std::vector<int> elements){
-	reset();
+BloomFilter::BloomFilter(std::vector<long long> elements){
+	Reset();
 	int n = elements.size();
 	numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
 	numberOfCells = int(n * numberOfHashes / log(2));
@@ -271,7 +271,7 @@ BloomFilter::BloomFilter(std::vector<int> elements){
 
 
 	for(int i = 0; i < n; ++i){
-		insert(elements[i]);
+		Insert(elements[i]);
 	}
 }
 
@@ -283,7 +283,7 @@ BloomFilter::BloomFilter(std::vector<int> elements){
 	positve rate.
 */
 BloomFilter::BloomFilter(std::vector<std::string> elements){
-	reset();
+	Reset();
 	int n = elements.size();
 	numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
 	numberOfCells = int(n * numberOfHashes / log(2));
@@ -300,7 +300,7 @@ BloomFilter::BloomFilter(std::vector<std::string> elements){
 
 
 	for(int i = 0; i < n; ++i){
-		insert(elements[i]);
+		Insert(elements[i]);
 	}
 }
 
@@ -310,7 +310,7 @@ BloomFilter::BloomFilter(std::vector<std::string> elements){
 
 */
 
-void BloomFilter::reset(){
+void BloomFilter::Reset(){
 	pass = 0;
 	count = 0;
 }
@@ -319,7 +319,7 @@ void BloomFilter::reset(){
 /*
 	Insert an integer to the bloom filter
 */
-void BloomFilter::insert(int value){
+void BloomFilter::Insert(long long value){
 	for(int i = 0; i < numberOfHashes; ++i){
 		int index = MurmurHash(&value, seeds[i]) % numberOfCells;
 		cells[index] = true;
@@ -329,7 +329,7 @@ void BloomFilter::insert(int value){
 /*
 	Insert a string to the Bloom filter
 */
-void BloomFilter::insert(std::string value){
+void BloomFilter::Insert(std::string value){
 	for(int i = 0; i < numberOfHashes; ++i){
 		int index = MurmurHashStr(value, seeds[i]) % numberOfCells;
 		cells[index] = true;
@@ -341,7 +341,7 @@ void BloomFilter::insert(std::string value){
 	Search for a int value in the bloom filter and return true if found,
 	false otherwise.	
 */
-bool BloomFilter::search(int value){
+bool BloomFilter::Search(long long value){
 	for(int i = 0; i < numberOfHashes; ++i){
 		int index = MurmurHash(&value, seeds[i]) % numberOfCells;
 		if (!cells[index]) return false;
@@ -354,7 +354,7 @@ bool BloomFilter::search(int value){
 	Search for a string in the bloom filter and return true if found,
 	false otherwise.	
 */
-bool BloomFilter::search(std::string value){
+bool BloomFilter::Search(std::string value){
 	for(int i = 0; i < numberOfHashes; ++i){
 		int index = MurmurHashStr(value, seeds[i]) % numberOfCells;
 		if (!cells[index]) return false;
@@ -372,15 +372,15 @@ bool BloomFilter::search(std::string value){
 
 int test_false_positive(){
 
-	std::vector<int> integers;
-	std::map<int, bool> m;
+	std::vector<long long> integers;
+	std::map<long long, bool> m;
 	
 	int input_size = 10000;
 	int test_sequence_size = 1000000;
 
 
 	for(int i = 0; i < input_size; ++i){
-		int val = rand() % MAX_SEED;
+		long long val = rand() % MAX_SEED;
 		m[val] = true;
 		integers.push_back(val);
 	}
@@ -390,12 +390,12 @@ int test_false_positive(){
 	int cnt = 0;
 	int fp = 0;
 	for(int i = 0; i < test_sequence_size; ++i){
-		int test = rand() % MAX_SEED;
+		long long test = rand() % MAX_SEED;
 		cnt ++;
 
 		if (m.count(test) == 0){
 			cnt ++;
-			if (bf->search(test)){
+			if (bf->Search(test)){
 				fp++;
 			}
 		}
@@ -412,9 +412,9 @@ int test_false_positive(){
 /*
 	Compare function comparing the filter rate.
 */
-bool comp( BloomFilter *lhs,  BloomFilter *rhs)
+bool BloomFilterCompare( BloomFilter *lhs,  BloomFilter *rhs)
 {
-  return lhs -> getFilterRate() < rhs -> getFilterRate();
+  return lhs -> GetFilterRate() < rhs -> GetFilterRate();
 }
 
 
@@ -423,7 +423,7 @@ bool comp( BloomFilter *lhs,  BloomFilter *rhs)
 	Sample test program to test adaptive filters.
 */
 void sort_filters(){
-	std::vector<int> integers;
+	std::vector<long long> integers;
 	
 	int input_size = S;	
 
@@ -431,7 +431,7 @@ void sort_filters(){
 	BloomFilter* bf[S];
 	for(int i = 0; i < S; ++i){
 		for(int i = 0; i < input_size; ++i){
-			int val = rand() % MAX_SEED;
+			long long val = rand() % MAX_SEED;
 			integers.push_back(val);
 		}
 		bf[i] = new BloomFilter(integers);
@@ -444,20 +444,20 @@ void sort_filters(){
 
 	for(int round = 0; round < test_size / block; ++round){
 		for(int j = 0; j < block; ++j){
-			int test = rand() % MAX_SEED;
+			long long test = rand() % MAX_SEED;
 
 			for(int i = 0; i < S; ++i){
-				bf[i] -> incrementCount();
-				if (bf[i] -> search(test)){
-					bf[i] -> incrementPass();
+				bf[i] -> IncrementCount();
+				if (bf[i] -> Search(test)){
+					bf[i] -> IncrementPass();
 				}
 			}
 		}
 		
-		std::sort(bf, bf + S, comp);
+		std::sort(bf, bf + S, BloomFilterCompare);
 		std::cout << "Round #" << round << std::endl;
 		for(int i = 0; i < S; ++i){
-			std::cout << bf[i] -> getFilterRate() <<  " " ;
+			std::cout << bf[i] -> GetFilterRate() <<  " " ;
 		}
 		std::cout << std::endl;
 	}
@@ -526,7 +526,7 @@ int test_random_string(){
 		int res = m.count(test);
 		if (res == 0){
 			cnt ++;
-			bool res2 = bf -> search(test);
+			bool res2 = bf -> Search(test);
 			if (res2){
 				fp++;
 			}

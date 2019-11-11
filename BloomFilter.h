@@ -18,17 +18,17 @@ private:
 
 public:
 	BloomFilter();
-	BloomFilter(std::vector<int> elements);
+	BloomFilter(std::vector<long long> elements);
 	BloomFilter(std::vector<std::string> elements);
 	
-	double getFilterRate();
-	void incrementCount();
-	void incrementPass();
-	void reset();
+	double GetFilterRate();
+	void IncrementCount();
+	void IncrementPass();
+	void Reset();
 
-	void insert(int value);
-	void insert(std::string value);
+	void Insert(long long value);
+	void Insert(std::string value);
 
-	bool search(int value);
-	bool search(std::string value);
+	bool Search(long long value);
+	bool Search(std::string value);
 };

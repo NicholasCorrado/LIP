@@ -8,3 +8,6 @@
 
 
 BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, Operator op);
+
+BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long long value, Operator op);
+

@@ -141,20 +141,20 @@ int main_xiating(){
     supplier    = build_table(file_path_supplier,  pool, supplier_schema);
 
     
-    BloomFilter* bf = BuildFilter(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
+    BloomFilter* bf = BuildFilter(date, "YEAR", 1994, Operator::LESS_EQUAL);
     
-    std::string s1 = "asdf";
-    std::cout << bf -> search(s1) << std::endl;
-    std::string s2 = "AUTOMOBILE";
-    std::cout << bf -> search(s2) << std::endl;
+    long long s1 = 1994;
+    std::cout << bf -> Search(s1) << std::endl;
+    long long s2 = 1993;
+    std::cout << bf -> Search(s2) << std::endl;
     return 0;
 }
 
 
 int main(){
-    main_nick();
+    //main_nick();
 
-    //main_xiating();
+    main_xiating();
     return 0;
 }
 
