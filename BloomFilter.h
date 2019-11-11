@@ -24,7 +24,7 @@ public:
 	double getFilterRate();
 	void incrementCount();
 	void incrementPass();
-
+	void reset();
 
 	void insert(int value);
 	void insert(std::string value);

@@ -4,6 +4,19 @@
 
 
 // Currently only supports queries on columns with string data.
+/*
+	Given a table, a attribute field name and the selective criterion, return a Bloom
+	Filter of all the attributes satisfyingg the criterion.
+
+	Input:
+		table - the table to be selected from (e.g. dimension table)
+		select_field - the field (attribute) column name
+		value - the value to be compared
+		op - the operator, e.g. =, <, >
+
+	Return
+		A Bloomfilter bf of all the attributes passing the selection
+*/
 BloomFilter* 
 BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, Operator op) {
 

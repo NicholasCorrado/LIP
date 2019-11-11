@@ -19,8 +19,12 @@
 
 /*
 	
-	HASH ARE BELOW
+	HASH BELOW
 
+	We use Murmurhash.
+
+	The following code is accessible at 
+		https://github.com/aappleby/smhasher/tree/master/src
 
 */
 
@@ -144,6 +148,11 @@ void MurmurHash3_x86_32 ( const void * key, int len,
 
 
 
+/*
+	Function to hash an integer, with a seed.
+	returns a hash.
+*/
+
 
 unsigned int MurmurHash(const void* x, int seed){
 	int len = 4;
@@ -151,6 +160,12 @@ unsigned int MurmurHash(const void* x, int seed){
 	MurmurHash3_x86_32 (x, len, seed, &ret );
 	return ret;
 }
+
+
+/*
+	Function to hash a string, with a seed.
+	returns a hash.
+*/
 
 unsigned int MurmurHashStr(const std::string x, int seed){
 	int len = x.length();
@@ -171,11 +186,6 @@ unsigned int MurmurHashStr(const std::string x, int seed){
 
 
 
-
-
-
-
-
 /* 
 
 	BLOOM FILTERS ARE BELOW
@@ -185,25 +195,41 @@ unsigned int MurmurHashStr(const std::string x, int seed){
 
 
 
-
+/*
+	Return the current filter rate = pass/count;
+*/
 double BloomFilter::getFilterRate(){
 	if (count > 0) 
 		return 1.0 * pass / count;
 	else
 		return 1;
 }
+
+
+/*
+	Increment the count variable
+*/
 void BloomFilter::incrementCount(){
 	count++;
 }
 
+
+/*
+	Increment the pass variable
+*/
 void BloomFilter::incrementPass(){
 	pass++;
 }
 
 
+
+/*
+	Constructor to initialize an empty Bloomfilter to be inserted.
+
+	We assume by default the number of elements to be inserted is 500000.
+*/
 BloomFilter::BloomFilter(){
-	count = 0;
-	pass = 0;
+	reset();
 	int n = DEFAULT_INSERT;
 	numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
 	numberOfCells = int(n * numberOfHashes / log(2));
@@ -220,9 +246,15 @@ BloomFilter::BloomFilter(){
 }
 
 
+
+
+/*
+	Constructor to initialize a Bloomfilter for a vector of integers.
+	Number of cells and hash functions are calculated from the false 
+	positve rate.
+*/
 BloomFilter::BloomFilter(std::vector<int> elements){
-	count = 0;
-	pass = 0;
+	reset();
 	int n = elements.size();
 	numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
 	numberOfCells = int(n * numberOfHashes / log(2));
@@ -244,9 +276,14 @@ BloomFilter::BloomFilter(std::vector<int> elements){
 }
 
 
+
+/*
+	Constructor to initialize a Bloomfilter for a vector of string.
+	Number of cells and hash functions are calculated from the false 
+	positve rate.
+*/
 BloomFilter::BloomFilter(std::vector<std::string> elements){
-	count = 0;
-	pass = 0;
+	reset();
 	int n = elements.size();
 	numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
 	numberOfCells = int(n * numberOfHashes / log(2));
@@ -268,6 +305,20 @@ BloomFilter::BloomFilter(std::vector<std::string> elements){
 }
 
 
+/*
+	Reset the count and pass counter
+
+*/
+
+void BloomFilter::reset(){
+	pass = 0;
+	count = 0;
+}
+
+
+/*
+	Insert an integer to the bloom filter
+*/
 void BloomFilter::insert(int value){
 	for(int i = 0; i < numberOfHashes; ++i){
 		int index = MurmurHash(&value, seeds[i]) % numberOfCells;
@@ -275,6 +326,9 @@ void BloomFilter::insert(int value){
 	}
 }
 
+/*
+	Insert a string to the Bloom filter
+*/
 void BloomFilter::insert(std::string value){
 	for(int i = 0; i < numberOfHashes; ++i){
 		int index = MurmurHashStr(value, seeds[i]) % numberOfCells;
@@ -282,6 +336,11 @@ void BloomFilter::insert(std::string value){
 	}
 }
 
+
+/*
+	Search for a int value in the bloom filter and return true if found,
+	false otherwise.	
+*/
 bool BloomFilter::search(int value){
 	for(int i = 0; i < numberOfHashes; ++i){
 		int index = MurmurHash(&value, seeds[i]) % numberOfCells;
@@ -290,6 +349,11 @@ bool BloomFilter::search(int value){
 	return true;
 }
 
+
+/*
+	Search for a string in the bloom filter and return true if found,
+	false otherwise.	
+*/
 bool BloomFilter::search(std::string value){
 	for(int i = 0; i < numberOfHashes; ++i){
 		int index = MurmurHashStr(value, seeds[i]) % numberOfCells;
@@ -299,6 +363,12 @@ bool BloomFilter::search(std::string value){
 }
 
 
+
+
+
+/*
+	Sample test program to test the false positive rate.
+*/
 
 int test_false_positive(){
 
@@ -337,12 +407,21 @@ int test_false_positive(){
 }
 
 
+
+
+/*
+	Compare function comparing the filter rate.
+*/
 bool comp( BloomFilter *lhs,  BloomFilter *rhs)
 {
   return lhs -> getFilterRate() < rhs -> getFilterRate();
 }
 
 
+
+/*
+	Sample test program to test adaptive filters.
+*/
 void sort_filters(){
 	std::vector<int> integers;
 	
@@ -386,6 +465,14 @@ void sort_filters(){
 }
 
 
+
+/*
+	Generate a random string of a specified length
+	Input: 
+		len - the desired length of the random string
+	Output:
+		a random string of the specified length
+*/
 std::string gen_random_str(const int len) {
     static const char alphanum[] =
         "0123456789"
@@ -402,6 +489,12 @@ std::string gen_random_str(const int len) {
 }
 
 
+
+
+/*
+	Sample test program to test the random string false positive
+	rate.
+*/
 int test_random_string(){
 
 	std::vector<std::string> strings;
