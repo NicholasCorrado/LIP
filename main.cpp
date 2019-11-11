@@ -4,14 +4,13 @@
 #include <iostream>
 #include <map>
 
+#include <arrow/api.h>
 #include <arrow/io/api.h>
 #include <arrow/csv/api.h>
 #include <arrow/stl.h>
 #include <arrow/ipc/api.h>
 #include "main.h"
-//#include "select.h"
 #include "BuildFilter.h"
-#include <tuple>
 
 // If you successfully read the csv files but fail to write the arrow files, it might be because the arrow-output
 // directory does not exist.
@@ -59,8 +58,9 @@ int main_nick() {
                                                    "MKT SEGMENT"};
     std::vector<std::string> date_schema        = {"DATE KEY", "DATE", "DAY OF WEEK", "MONTH", "YEAR", "YEAR MONTH NUM",
                                                    "YEAR MONTH", "DAY NUM IN WEEK", "DAY NUM IN MONTH", "MONTH NUM IN YEAR",
+                                                   "DAY NUM IN YEAR",
                                                    "WEEK NUM IN YEAR", "SELLING SEASON", "LAST DAY IN WEEK FL",
-                                                   "LAST DAT IN MONTH FL", "HOLIDAY FL", "WEEKDAY FL", "DAY NUM YEAR"};
+                                                   "LAST DAT IN MONTH FL", "HOLIDAY FL", "WEEKDAY FL", };
     std::vector<std::string> lineorder_schema   = {"ORDER KEY", "LINE NUMBER", "CUST KEY", "PART KEY", "SUPP KEY",
                                                    "ORDER DATE", "ORD PRIORITY", "SHIP PRIORITY", "QUANTITY",
                                                    "EXTENDED PRICE", "ORD TOTAL PRICE", "DISCOUNT", "REVENUE",
@@ -94,7 +94,11 @@ int main_nick() {
     write_to_file("../arrow-output/supplier.arrow", supplier);
     write_to_file("../arrow-output/part.arrow", part);
 
-    std::shared_ptr<arrow::Table> result_table = Select(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
+    std::shared_ptr<arrow::Table> result_table;
+    //result_table = Select(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
+    //PrintTable(result_table);
+
+    result_table = Select(date, "YEAR", 1994, Operator::EQUAL);
     PrintTable(result_table);
 
     return 0;
@@ -148,9 +152,9 @@ int main_xiating(){
 
 
 int main(){
-    // main_nick();
+    main_nick();
 
-    main_xiating();
+    //main_xiating();
     return 0;
 }
 
