@@ -141,11 +141,11 @@ int main_xiating(){
     supplier    = build_table(file_path_supplier,  pool, supplier_schema);
 
     
-    BloomFilter* bf = BuildFilter(date, "YEAR", 1994, Operator::LESS_EQUAL);
+    BloomFilter* bf = BuildFilter(date, "YEAR", 1994, Operator::EQUAL);
     
     long long s1 = 1994;
     std::cout << bf -> Search(s1) << std::endl;
-    long long s2 = 1993;
+    long long s2 = 1995;
     std::cout << bf -> Search(s2) << std::endl;
     return 0;
 }
