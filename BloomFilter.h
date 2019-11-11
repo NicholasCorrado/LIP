@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<vector>
 #include<string>
-#include "hash.h"
+
 
 class BloomFilter{
 
@@ -13,19 +13,20 @@ private:
 	int* seeds;
 	
 
-	int count = 0;
-	int pass = 0;
+	int count;
+	int pass;
 
 public:
+	BloomFilter();
+	BloomFilter(std::vector<int> elements);
+	BloomFilter(std::vector<std::string> elements);
+	
 	double getFilterRate();
 	void incrementCount();
 	void incrementPass();
+	void reset();
 
-	BloomFilter(std::vector<int> elements);
-	BloomFilter(std::vector<std::string> elements);
-
-
-	void insert(const void* value);
+	void insert(int value);
 	void insert(std::string value);
 
 	bool search(int value);

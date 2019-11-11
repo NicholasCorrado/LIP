@@ -9,8 +9,8 @@
 #include <arrow/stl.h>
 #include <arrow/ipc/api.h>
 #include "main.h"
-#include "select.h"
-
+//#include "select.h"
+#include "BuildFilter.h"
 #include <tuple>
 
 // If you successfully read the csv files but fail to write the arrow files, it might be because the arrow-output
@@ -46,9 +46,7 @@ void write_to_file(std::string path, std::shared_ptr<arrow::Table> table) {
  * main SHOULD accept files as arguments. First argument is the path to the fact table. All following arguments are
  * the paths to dimension tables.
  */
-
-
-int main() {
+int main_nick() {
 
     std::string file_path_customer  = "../benchmark/customer.tbl";
     std::string file_path_date      = "../benchmark/date.tbl";
@@ -60,10 +58,9 @@ int main() {
     std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
                                                    "MKT SEGMENT"};
     std::vector<std::string> date_schema        = {"DATE KEY", "DATE", "DAY OF WEEK", "MONTH", "YEAR", "YEAR MONTH NUM",
-                                                   "YEAR MONTH", "DAY NUM IN WEEK", "DAY NUM IN MONTH", "DAY NUM IN YEAR",
-                                                   "MONTH NUM IN YEAR","WEEK NUM IN YEAR", "SELLING SEASON",
-                                                   "LAST DAY IN WEEK FL", "LAST DAT IN MONTH FL", "HOLIDAY FL",
-                                                   "WEEKDAY FL"};
+                                                   "YEAR MONTH", "DAY NUM IN WEEK", "DAY NUM IN MONTH", "MONTH NUM IN YEAR",
+                                                   "WEEK NUM IN YEAR", "SELLING SEASON", "LAST DAY IN WEEK FL",
+                                                   "LAST DAT IN MONTH FL", "HOLIDAY FL", "WEEKDAY FL", "DAY NUM YEAR"};
     std::vector<std::string> lineorder_schema   = {"ORDER KEY", "LINE NUMBER", "CUST KEY", "PART KEY", "SUPP KEY",
                                                    "ORDER DATE", "ORD PRIORITY", "SHIP PRIORITY", "QUANTITY",
                                                    "EXTENDED PRICE", "ORD TOTAL PRICE", "DISCOUNT", "REVENUE",
@@ -97,14 +94,65 @@ int main() {
     write_to_file("../arrow-output/supplier.arrow", supplier);
     write_to_file("../arrow-output/part.arrow", part);
 
-    std::shared_ptr<arrow::Table> result_table;
-    //result_table = Select(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
-    //PrintTable(result_table);
-
-    result_table = Select(date, "YEAR", 1992, Operator::EQUAL);
+    std::shared_ptr<arrow::Table> result_table = Select(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
     PrintTable(result_table);
+
+    return 0;
 }
 
+
+int main_xiating(){
+    std::string file_path_customer  = "../benchmark/customer.tbl";
+    std::string file_path_date      = "../benchmark/date.tbl";
+    std::string file_path_lineorder = "../benchmark/lineorder.tbl";
+    std::string file_path_part      = "../benchmark/part.tbl";
+    std::string file_path_supplier  = "../benchmark/supplier.tbl";
+
+
+    std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
+                                                   "MKT SEGMENT"};
+    std::vector<std::string> date_schema        = {"DATE KEY", "DATE", "DAY OF WEEK", "MONTH", "YEAR", "YEAR MONTH NUM",
+                                                   "YEAR MONTH", "DAY NUM IN WEEK", "DAY NUM IN MONTH", "MONTH NUM IN YEAR",
+                                                   "WEEK NUM IN YEAR", "SELLING SEASON", "LAST DAY IN WEEK FL",
+                                                   "LAST DAT IN MONTH FL", "HOLIDAY FL", "WEEKDAY FL", "DAY NUM YEAR"};
+    std::vector<std::string> lineorder_schema   = {"ORDER KEY", "LINE NUMBER", "CUST KEY", "PART KEY", "SUPP KEY",
+                                                   "ORDER DATE", "ORD PRIORITY", "SHIP PRIORITY", "QUANTITY",
+                                                   "EXTENDED PRICE", "ORD TOTAL PRICE", "DISCOUNT", "REVENUE",
+                                                   "SUPPLY COST", "TAX", "COMMIT DATE", "SHIP MODE"};
+    std::vector<std::string> part_schema        = {"PART KEY", "NAME", "MFGR", "CATEGORY", "BRAND", "COLOR", "TYPE", "SIZE", "CONTAINER"};
+    std::vector<std::string> supplier_schema    = {"SUPP KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE"};
+
+    std::shared_ptr<arrow::Table> customer;
+    std::shared_ptr<arrow::Table> date;
+    std::shared_ptr<arrow::Table> lineorder;
+    std::shared_ptr<arrow::Table> part;
+    std::shared_ptr<arrow::Table> supplier;
+
+    arrow::MemoryPool *pool = arrow::default_memory_pool();
+
+    customer    = build_table(file_path_customer,  pool, customer_schema);
+    date        = build_table(file_path_date,      pool, date_schema);
+    lineorder   = build_table(file_path_lineorder, pool, lineorder_schema);
+    part        = build_table(file_path_part,      pool, part_schema);
+    supplier    = build_table(file_path_supplier,  pool, supplier_schema);
+
+    
+    BloomFilter* bf = BuildFilter(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
+    
+    std::string s1 = "asdf";
+    std::cout << bf -> search(s1) << std::endl;
+    std::string s2 = "AUTOMOBILE";
+    std::cout << bf -> search(s2) << std::endl;
+    return 0;
+}
+
+
+int main(){
+    // main_nick();
+
+    main_xiating();
+    return 0;
+}
 
 std::shared_ptr<arrow::Table>
         build_table(const std::string& file_path, arrow::MemoryPool *pool, std::vector<std::string> &schema) {
