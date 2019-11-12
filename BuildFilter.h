@@ -11,5 +11,7 @@ BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, std::string select
 
 BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long long value, Operator op);
 
+BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long long lo_value, long long hi_value) {
+
 bool BloomFilterCompare( BloomFilter *lhs,  BloomFilter *rhs);
 
