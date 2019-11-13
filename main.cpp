@@ -12,7 +12,7 @@
 #include "main.h"
 #include "BuildFilter.h"
 
-#include "Join.h"
+
 
 
 // If you successfully read the csv files but fail to write the arrow files, it might be because the arrow-output
@@ -149,7 +149,7 @@ int main_xiating(){
 
     std::vector<std::string> foreign_keys = {"CUST KEY", "DATE KEY", "PART KEY", "SUPP KEY"};
 
-    Join(customer, "CUST KEY", lineorder, "CUST KEY");
+    // Join(lineorder, "CUST KEY", customer, "CUST KEY");
 
     // BloomFilter* bf_customer = BuildFilter(customer, "REGION", "AMERICA", Operator::EQUAL, "CUST KEY", "CUST KEY");
     // BloomFilter* bf_date = BuildFilter(date, "YEAR", 1992, 1994, "DATE KEY", "ORDER DATE");
