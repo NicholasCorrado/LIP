@@ -2,10 +2,9 @@
 // Created by Nicholas Corrado on 11/9/19.
 //
 
-#ifndef CSV_TO_ARROW_CPP_SELECT_H
-#define CSV_TO_ARROW_CPP_SELECT_H
+#ifndef SELECT_H
+#define SELECT_H
 
-#endif //CSV_TO_ARROW_CPP_SELECT_H
 
 enum Operator {
     EQUAL,
@@ -48,3 +47,6 @@ bool EvaluatePredicate(T data, T value, Operator op);
 void EvaluateStatus(arrow::Status status);
 
 void PrintTable(std::shared_ptr<arrow::Table> table);
+
+
+#endif

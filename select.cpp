@@ -56,8 +56,7 @@ std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, std::s
 
 // Select on a column with integer data
 std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, std::string select_field, long long value, Operator op) {
-
-
+    
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
     std::unique_ptr<arrow::RecordBatchBuilder> out_batch_builder;
@@ -72,7 +71,7 @@ std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, std::s
         auto col = std::static_pointer_cast<arrow::Int64Array>(in_batch->GetColumnByName(select_field));
 
         for (int i=0; i<col->length(); i++) {
-            if ( EvaluatePredicate(col->Value(i), value, op) ) {
+            if (EvaluatePredicate(col->Value(i), value, op) ) {
                 AddRowToRecordBatch(i, in_batch, out_batch_builder);
             }
         }
@@ -96,7 +95,7 @@ std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, std::s
 
 void AddRowToRecordBatch(int row, std::shared_ptr<arrow::RecordBatch>& in_batch, std::unique_ptr<arrow::RecordBatchBuilder>& out_batch_builder) {
 
-    for (int i; i<out_batch_builder->schema()->num_fields(); i++) {
+    for (int i = 0; i<out_batch_builder->schema()->num_fields(); i++) {
         arrow::ArrayBuilder* builder = out_batch_builder->GetField(i);
         int type = out_batch_builder->schema()->field(i)->type()->id();
 

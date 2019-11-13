@@ -1,3 +1,6 @@
+#ifndef BLOOM_FILTER_H
+#define BLOOM_FILTER_H
+
 #include<iostream>
 #include<stdlib.h>
 #include<vector>
@@ -35,3 +38,5 @@ public:
 	bool Search(long long value);
 	bool Search(std::string value);
 };
+
+#endif

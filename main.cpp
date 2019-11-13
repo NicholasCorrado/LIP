@@ -11,7 +11,7 @@
 #include <arrow/ipc/api.h>
 #include "main.h"
 #include "BuildFilter.h"
-
+#include "Join.h"
 
 
 
@@ -50,11 +50,11 @@ void write_to_file(std::string path, std::shared_ptr<arrow::Table> table) {
  */
 int main_nick() {
 
-    std::string file_path_customer  = "../benchmark/customer.tbl";
-    std::string file_path_date      = "../benchmark/date.tbl";
-    std::string file_path_lineorder = "../benchmark/lineorder.tbl";
-    std::string file_path_part      = "../benchmark/part.tbl";
-    std::string file_path_supplier  = "../benchmark/supplier.tbl";
+    std::string file_path_customer  = "../../benchmark/customer.tbl";
+    std::string file_path_date      = "../../benchmark/date.tbl";
+    std::string file_path_lineorder = "../../benchmark/lineorder.tbl";
+    std::string file_path_part      = "../../benchmark/part.tbl";
+    std::string file_path_supplier  = "../../benchmark/supplier.tbl";
 
 
     std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
@@ -109,11 +109,11 @@ int main_nick() {
 
 
 int main_xiating(){
-    std::string file_path_customer  = "../benchmark/customer.tbl";
-    std::string file_path_date      = "../benchmark/date.tbl";
-    std::string file_path_lineorder = "../benchmark/lineorder.tbl";
-    std::string file_path_part      = "../benchmark/part.tbl";
-    std::string file_path_supplier  = "../benchmark/supplier.tbl";
+    std::string file_path_customer  = "../../benchmark/customer.tbl";
+    std::string file_path_date      = "../../benchmark/date.tbl";
+    std::string file_path_lineorder = "../../benchmark/lineorder.tbl";
+    std::string file_path_part      = "../../benchmark/part.tbl";
+    std::string file_path_supplier  = "../../benchmark/supplier.tbl";
 
 
     std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
@@ -149,8 +149,9 @@ int main_xiating(){
 
     std::vector<std::string> foreign_keys = {"CUST KEY", "DATE KEY", "PART KEY", "SUPP KEY"};
 
-    // Join(lineorder, "CUST KEY", customer, "CUST KEY");
+    std::vector<long long> ret = HashJoin(lineorder, "CUST KEY", customer, "CUST KEY");
 
+    std::cout << ret.size() << std::endl;
     // BloomFilter* bf_customer = BuildFilter(customer, "REGION", "AMERICA", Operator::EQUAL, "CUST KEY", "CUST KEY");
     // BloomFilter* bf_date = BuildFilter(date, "YEAR", 1992, 1994, "DATE KEY", "ORDER DATE");
     // BloomFilter* bf_part = BuildFilter(part, "COLOR", "dark", Operator::EQUAL, "PART KEY", "PART KEY");
@@ -169,8 +170,13 @@ int main_xiating(){
     // // The Status outcome object returned by ReadNext() does NOT return an error when you are already at the final
     // // record batch; it sets the output batch to nullptr and returns Status::OK(). Hence, we must also check that the
     // // output batch is not nullptr.
+    // std::shared_ptr<arrow::Table> result_table;
+    //result_table = Select(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
+    //PrintTable(result_table);
 
-
+    // result_table = Select(date, "YEAR", 1994, Operator::EQUAL);
+    //PrintTable(result_table);
+    // std::cout << result_table -> num_rows() << std::endl;
     // int block_size = 64;
 
     // while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
