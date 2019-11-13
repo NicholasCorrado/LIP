@@ -12,7 +12,7 @@ private:
 	bool* cells;
 	int* seeds;
 	
-
+	std::string foreign_key;
 	int count;
 	int pass;
 
@@ -26,6 +26,9 @@ public:
 	void IncrementPass();
 	void Reset();
 
+	void SetForeignKey(std::string fk);
+	std::string GetForeignKey();
+	
 	void Insert(long long value);
 	void Insert(std::string value);
 

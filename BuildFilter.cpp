@@ -16,7 +16,7 @@
 		A Bloomfilter bf of all the attributes passing the selection
 */
 BloomFilter* 
-BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, Operator op) {
+BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, Operator op, std::string key_field, std::string foreign_key) {
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
@@ -24,6 +24,8 @@ BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::
     auto* reader = new arrow::TableBatchReader(*table);
 
     BloomFilter* bf = new BloomFilter();
+
+    bf -> SetForeignKey(foreign_key);
     // The Status outcome object returned by ReadNext() does NOT return an error when you are already at the final
     // record batch; it sets the output batch to nullptr and returns Status::OK(). Hence, we must also check that the
     // output batch is not nullptr.
@@ -33,11 +35,11 @@ BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::
         // method used to access item i of an array depend on the data type, e.g. GetString(i) for StringArray vs
         // Value(i) for Int64Array (and any other int array).
         auto col = std::static_pointer_cast<arrow::StringArray>(in_batch->GetColumnByName(select_field));
-
+        auto key_col = std::static_pointer_cast<arrow::Int64Array>(in_batch->GetColumnByName(key_field));
         for (int i=0; i<col->length(); i++) {
             std::string attr = col -> GetString(i);
             if ( EvaluatePredicate(attr, value, op) ) {
-                bf -> Insert(attr);
+                bf -> Insert(key_col -> Value(i));
             }
         }
     }
@@ -60,7 +62,7 @@ BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::
         A Bloomfilter bf of all the attributes passing the selection
 */
 BloomFilter* 
-BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long long value, Operator op) {
+BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long long value, Operator op, std::string key_field, std::string foreign_key) {
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
@@ -68,6 +70,7 @@ BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long 
     auto* reader = new arrow::TableBatchReader(*table);
 
     BloomFilter* bf = new BloomFilter();
+    bf -> SetForeignKey(foreign_key);
     // The Status outcome object returned by ReadNext() does NOT return an error when you are already at the final
     // record batch; it sets the output batch to nullptr and returns Status::OK(). Hence, we must also check that the
     // output batch is not nullptr.
@@ -77,11 +80,12 @@ BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long 
         // method used to access item i of an array depend on the data type, e.g. GetString(i) for StringArray vs
         // Value(i) for Int64Array (and any other int array).
         auto col = std::static_pointer_cast<arrow::Int64Array>(in_batch->GetColumnByName(select_field));
-
+        auto key_col = std::static_pointer_cast<arrow::Int64Array>(in_batch->GetColumnByName(key_field));
+        
         for (int i=0; i<col->length(); i++) {
             long long attr = col->Value(i);
             if ( EvaluatePredicate(attr, value, op) ) {
-                bf -> Insert(attr);
+                bf -> Insert(key_col -> Value(i));
             }
         }
     }
@@ -105,7 +109,7 @@ BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long 
         A Bloomfilter bf of all the attributes passing the selection
 */
 BloomFilter* 
-BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long long lo_value, long long hi_value) {
+BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long long lo_value, long long hi_value, std::string key_field, std::string foreign_key) {
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
@@ -113,6 +117,7 @@ BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long 
     auto* reader = new arrow::TableBatchReader(*table);
 
     BloomFilter* bf = new BloomFilter();
+    bf -> SetForeignKey(foreign_key);
     // The Status outcome object returned by ReadNext() does NOT return an error when you are already at the final
     // record batch; it sets the output batch to nullptr and returns Status::OK(). Hence, we must also check that the
     // output batch is not nullptr.
@@ -122,11 +127,13 @@ BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long 
         // method used to access item i of an array depend on the data type, e.g. GetString(i) for StringArray vs
         // Value(i) for Int64Array (and any other int array).
         auto col = std::static_pointer_cast<arrow::Int64Array>(in_batch->GetColumnByName(select_field));
-
+        auto key_col = std::static_pointer_cast<arrow::Int64Array>(in_batch->GetColumnByName(key_field));
+        
         for (int i=0; i<col->length(); i++) {
             long long attr = col->Value(i);
             if ( lo_value <= attr  && attr <= hi_value ) {
-                bf -> Insert(attr);
+
+                bf -> Insert(key_col -> Value(i));
             }
         }
     }

@@ -222,6 +222,17 @@ void BloomFilter::IncrementPass(){
 }
 
 
+void BloomFilter::SetForeignKey(std::string fk){
+	foreign_key = fk;
+}
+
+std::string BloomFilter::GetForeignKey(){
+	return foreign_key;
+}
+	
+
+
+
 
 /*
 	Constructor to initialize an empty Bloomfilter to be inserted.

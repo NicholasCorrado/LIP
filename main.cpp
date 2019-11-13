@@ -12,6 +12,9 @@
 #include "main.h"
 #include "BuildFilter.h"
 
+#include "Join.h"
+
+
 // If you successfully read the csv files but fail to write the arrow files, it might be because the arrow-output
 // directory does not exist.
 void write_to_file(std::string path, std::shared_ptr<arrow::Table> table) {
@@ -141,12 +144,49 @@ int main_xiating(){
     supplier    = build_table(file_path_supplier,  pool, supplier_schema);
 
     
-    BloomFilter* bf = BuildFilter(date, "YEAR", 1994, Operator::EQUAL);
+    // BloomFilter* bf = BuildFilter(date, "YEAR", 1994, Operator::EQUAL, "DATE KEY");
     
-    long long s1 = 1994;
-    std::cout << bf -> Search(s1) << std::endl;
-    long long s2 = 1995;
-    std::cout << bf -> Search(s2) << std::endl;
+
+    std::vector<std::string> foreign_keys = {"CUST KEY", "DATE KEY", "PART KEY", "SUPP KEY"};
+
+    Join(customer, "CUST KEY", lineorder, "CUST KEY");
+
+    // BloomFilter* bf_customer = BuildFilter(customer, "REGION", "AMERICA", Operator::EQUAL, "CUST KEY", "CUST KEY");
+    // BloomFilter* bf_date = BuildFilter(date, "YEAR", 1992, 1994, "DATE KEY", "ORDER DATE");
+    // BloomFilter* bf_part = BuildFilter(part, "COLOR", "dark", Operator::EQUAL, "PART KEY", "PART KEY");
+    // BloomFilter* bf_supplier = BuildFilter(supplier, "REGION", "AMERICA", Operator::EQUAL, "SUPP KEY", "SUPP KEY");
+
+
+    // BloomFilter* bf[4] = {bf_customer, bf_date, bf_part, bf_supplier};
+    // int size = 4;
+
+    // ITERATE THROUGH THE FACT TABLE
+    // arrow::Status status;
+    // std::shared_ptr<arrow::RecordBatch> in_batch;
+    
+    // auto* reader = new arrow::TableBatchReader(*lineorder);
+
+    // // The Status outcome object returned by ReadNext() does NOT return an error when you are already at the final
+    // // record batch; it sets the output batch to nullptr and returns Status::OK(). Hence, we must also check that the
+    // // output batch is not nullptr.
+
+
+    // int block_size = 64;
+
+    // while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
+    //     std::sort(bf, bf+size, BloomFilterCompare);
+    //     std::cout << bf[i_filter] -> GetFilterRate() << " ";
+        
+    //     for (int i=0; i<col->length(); i++) {
+    //         long long attr = col->Value(i);
+            
+    //         std::cout << attr << std::endl;
+           
+    //     }
+    // }
+
+    
+    // std::cout << std::endl;
     return 0;
 }
 
