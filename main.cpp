@@ -17,33 +17,28 @@
 
 #include "JoinExecutor.h"
 
+
 // If you successfully read the csv files but fail to write the arrow files, it might be because the arrow-output
 // directory does not exist.
-void write_to_file(std::string path, std::shared_ptr<arrow::Table> table) {
+void write_to_file(const char* path, std::shared_ptr<arrow::Table> &table) {
 
-    std::shared_ptr<arrow::io::OutputStream> os;
-    std::shared_ptr<arrow::ipc::RecordBatchWriter> writer;
+    std::shared_ptr<arrow::io::FileOutputStream> file;
+    std::shared_ptr<arrow::ipc::RecordBatchWriter> record_batch_writer;
     arrow::Status status;
 
-    status = arrow::io::FileOutputStream::Open(path,&os);
+    status = arrow::io::FileOutputStream::Open(path,&file);
+    EvaluateStatus(status);
 
-    if(!status.ok()) {
-        std::cout << "Error opening output stream." << std::endl;
+    status = arrow::ipc::RecordBatchFileWriter::Open(&*file, table->schema()).status();
+
+    if (status.ok()) {
+        record_batch_writer = arrow::ipc::RecordBatchFileWriter::Open(&*file, table->schema()).ValueOrDie();
     }
+    status = record_batch_writer->WriteTable(*table);
+    EvaluateStatus(status);
 
-    writer = arrow::ipc::RecordBatchFileWriter::Open(&*os,table->schema()).ValueOrDie();
-    status = writer->WriteTable(*table);
-
-    if(!status.ok()) {
-        std::cout << "Error writing table." << std::endl;
-    }
-
-    status = writer->Close();
-
-    if(!status.ok()) {
-        std::cout << "Error closing writer." << std::endl;
-    }
-
+    status = record_batch_writer->Close();
+    EvaluateStatus(status);
 }
 
 /*
@@ -118,7 +113,7 @@ int main_nick() {
     BloomFilter* bf_date = BuildFilter(date, "YEAR", value, value2, "DATE KEY", "ORDER DATE");
     std::shared_ptr<arrow::Table> ret = HashJoin(lineorder, "CUST KEY", customer, "CUST KEY");
 
-    std::cout << ret -> num_rows() << std::endl;
+    //std::cout << ret -> num_rows() << std::endl;
 
     return 0;
 }
@@ -228,9 +223,9 @@ int main_xiating(){
 
 
 int main(){
-    // main_nick();
+    main_nick();
 
-    main_xiating();
+    //main_xiating();
     return 0;
 }
 
