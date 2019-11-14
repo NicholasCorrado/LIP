@@ -12,6 +12,8 @@
 #include "main.h"
 #include "BuildFilter.h"
 #include "Join.h"
+#include "util/util.h"
+#include "select.h"
 
 
 
@@ -50,11 +52,11 @@ void write_to_file(std::string path, std::shared_ptr<arrow::Table> table) {
  */
 int main_nick() {
 
-    std::string file_path_customer  = "../../benchmark/customer.tbl";
-    std::string file_path_date      = "../../benchmark/date.tbl";
-    std::string file_path_lineorder = "../../benchmark/lineorder.tbl";
-    std::string file_path_part      = "../../benchmark/part.tbl";
-    std::string file_path_supplier  = "../../benchmark/supplier.tbl";
+    std::string file_path_customer  = "benchmark/customer.tbl";
+    std::string file_path_date      = "benchmark/date.tbl";
+    std::string file_path_lineorder = "benchmark/lineorder.tbl";
+    std::string file_path_part      = "benchmark/part.tbl";
+    std::string file_path_supplier  = "benchmark/supplier.tbl";
 
 
     std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
@@ -91,18 +93,32 @@ int main_nick() {
     std::cout<<"part->num_rows() = " << part->num_rows() << std::endl;
     std::cout<<"supplier->num_rows() = " << supplier->num_rows() << std::endl;
 
-    write_to_file("../arrow-output/customer.arrow", customer);
-    write_to_file("../arrow-output/date.arrow", date);
-    write_to_file("../arrow-output/lineorder.arrow", lineorder);
-    write_to_file("../arrow-output/supplier.arrow", supplier);
-    write_to_file("../arrow-output/part.arrow", part);
+    write_to_file("arrow-output/customer.arrow", customer);
+    write_to_file("arrow-output/date.arrow", date);
+    write_to_file("arrow-output/lineorder.arrow", lineorder);
+    write_to_file("arrow-output/supplier.arrow", supplier);
+    write_to_file("arrow-output/part.arrow", part);
 
     std::shared_ptr<arrow::Table> result_table;
     //result_table = Select(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
     //PrintTable(result_table);
 
-    result_table = Select(date, "YEAR", 1994, Operator::EQUAL);
+    //result_table = Select(date, "YEAR", 1994, Operator::EQUAL);
+    arrow::NumericScalar<arrow::Int64Type> myscalar(1992);
+    auto value = std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(myscalar);
+    arrow::NumericScalar<arrow::Int64Type> myscalar2(1994);
+    auto value2 = std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(myscalar);
+    arrow::NumericScalar<arrow::Int64Type> myscalar3(10);
+    auto size = std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(myscalar);
+
+    result_table = Select(date, "YEAR", value, arrow::compute::CompareOperator::EQUAL);
     PrintTable(result_table);
+
+    BloomFilter* bf_part = BuildFilter(part, "SIZE", size,arrow::compute::CompareOperator::GREATER_EQUAL,"PART KEY", "PART KEY");
+    BloomFilter* bf_date = BuildFilter(date, "YEAR", value, value2, "DATE KEY", "ORDER DATE");
+    std::vector<long long> ret = HashJoin(lineorder, "CUST KEY", customer, "CUST KEY");
+
+    std::cout << ret.size() << std::endl;
 
     return 0;
 }
@@ -143,7 +159,7 @@ int main_xiating(){
     part        = build_table(file_path_part,      pool, part_schema);
     supplier    = build_table(file_path_supplier,  pool, supplier_schema);
 
-    
+
     // BloomFilter* bf = BuildFilter(date, "YEAR", 1994, Operator::EQUAL, "DATE KEY");
     
 
@@ -164,7 +180,7 @@ int main_xiating(){
     // ITERATE THROUGH THE FACT TABLE
     // arrow::Status status;
     // std::shared_ptr<arrow::RecordBatch> in_batch;
-    
+
     // auto* reader = new arrow::TableBatchReader(*lineorder);
 
     // // The Status outcome object returned by ReadNext() does NOT return an error when you are already at the final
@@ -182,25 +198,25 @@ int main_xiating(){
     // while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
     //     std::sort(bf, bf+size, BloomFilterCompare);
     //     std::cout << bf[i_filter] -> GetFilterRate() << " ";
-        
+
     //     for (int i=0; i<col->length(); i++) {
     //         long long attr = col->Value(i);
-            
+
     //         std::cout << attr << std::endl;
-           
+
     //     }
     // }
 
-    
+
     // std::cout << std::endl;
     return 0;
 }
 
 
 int main(){
-    //main_nick();
+    main_nick();
 
-    main_xiating();
+    //main_xiating();
     return 0;
 }
 

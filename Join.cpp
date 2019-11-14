@@ -1,4 +1,5 @@
 #include "Join.h"
+#include "util/util.h"
 
 std::vector<long long> HashJoin(std::shared_ptr<arrow::Table> left_table, std::string left_field, std::shared_ptr<arrow::Table> right_table, std::string right_field) {
 
@@ -8,8 +9,12 @@ std::vector<long long> HashJoin(std::shared_ptr<arrow::Table> left_table, std::s
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
-    
-    EvaluateStatus(status);
+
+    // Instantiate things needed for a call to Compare()
+    arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
+    arrow::compute::CompareOptions compare_options(arrow::compute::CompareOperator::EQUAL);
+    auto* filter = new arrow::compute::Datum();
+
     auto* reader = new arrow::TableBatchReader(*left_table);
 
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
