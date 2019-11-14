@@ -1,10 +1,10 @@
         % % Title and author(s)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{Topics in Database Management Systems Project Report: Skipping Filters is Better}
+\title{Topics in Database Management Systems Project Report: Skipping Filters is Almost Optimal}
 \author{Nicholas Corrado \and Xiating Ouyang}
 \date{}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\documentclass[11pt]{article}
+\documentclass[10pt,twocolumn]{article}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %
 % % The next command allows your in import encapsulated
@@ -14,7 +14,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{graphicx}
 %\usepackage{charter,eulervm}
-
+\usepackage{simpleConference}
 %\renewcommand{\baselinestretch}{1.5}
 \setcounter{secnumdepth}{3} % default value for 'report' class is "2"
 \usepackage{amsthm,amsmath,amssymb,upgreek,marvosym,mathtools}
@@ -90,19 +90,22 @@ initial text=$ $, % sets the text that appears on the start arrow
 
 \section{Introduction}
 
-Performing join operations on database management systems based on Star Schema is a fundamental and task in industry. \textit{Lookahead Information Passing (LIP)} is a technique that constructs a set of Bloom Filters on the dimension tables and adaptively applies them in certain sequence on the fact table, provably as efficient and robust as computing the join according to the optimal joining sequence \cite{zhu2017looking}. However, the cost is the huge amount of memory and cache used to store the set of LIP filters: Replacing the LIP filters in cache for a new LIP filter causes significant delay, and if the new LIP filter is not selective skipping it might improve the performance.
+Performing join operations in database management systems based on Star Schema is increasingly becoming a fundamental task in modern data industries. Various efforts have been spent on building a reliable query optimizer. However, the current optimizers may still produce highly inefficient query plans which involves processing unnecessarily gigantic intermediate tables \cite{leis2015good,rabl2013variations}. \textit{Lookahead Information Passing (LIP)} aggressively uses Bloom Filters to filter the fact tables to effectively reduce the sizes of the intermediate tables, provably as efficient and robust as computing the join using the optimal query plan \cite{zhu2017looking}. 
+
+
+However, the cost of LIP is the huge amount of memory and cache used to store the set of LIP filters: Replacing the LIP filters in cache for a new LIP filter causes significant delay, and if the new LIP filter is not selective skipping it might improve the performance.
 
 This project aims at investigating the effect of skipping certain LIP filter on improving the performance of LIP, and if possible, derive a theoretical guarantee on the performance of LIP against the optimal joining sequence. 
 
 
 
-\section{Lookahead Information Passing}
+\section{Lookahead Information Passing (LIP)}
 
-Let $F$ be the fact table and $D_i$ the dimension tables for $1 \leq i \leq n$. We denote the number of facts in $F$ and each $D_i$ as $|F|$ and $|D_i|$. A LIP filter on $D_i$ is implemented using a Bloom filter, with false positive rate $\varepsilon$. The true selectivity $\sigma_i$ of $D_i$ on fact table $F$ is given by $\sigma_i = |D_i \JOIN_{k_i} F| / |F|,$ where $k_i$ is the foreign key of $D_i$ in $F$. The \texttt{LIP-join} algorithm, depicted in Figure \ref{fig:lip}, computes the indices of tuples in $F$ that pass the filtering of each Bloom filter of $D_i$.
+Let $F$ be the fact table and $D_i$ the dimension tables for $1 \leq i \leq n$. We denote the number of facts in $F$ and each $D_i$ as $|F|$ and $|D_i|$. A LIP filter on $D_i$ is implemented using a Bloom filter, with false positive rate $\varepsilon$. The true selectivity $\sigma_i$ of $D_i$ on fact table $F$ is given by $\sigma_i = |D_i \JOIN_{pk_i = fk_i} F| / |F|,$ where $pk_i$ is the primary key of $D_i$ and $fk_i$ is the foreign key of $D_i$ in $F$. The \texttt{LIP-join} algorithm, depicted in Figure \ref{fig:lip}, computes the indices of tuples in $F$ that pass the filtering of each Bloom filter of $D_i$. Note that there is an innate false positive rate $\varepsilon$ associated with each Bloom Filter, and thus the set of indices is a superset of the true set of indices of tuples appearing in the final join result.
 
 The partition in \cite{zhu2017looking} satisfies that $|F_{t+1}| = 2|F_{t}|$ at line 5, and the algorithm approximates the true selectiveness $\sigma_i$ of each dimension $D_i$ using $pass[i]/count[i]$, the aggregated selectiveness since the beginning.
 
-\begin{figure}[h!]
+\begin{figure*}[h!]
 	\centering
 	\tikz\path (0,0) node[draw, text width=.8\textwidth, rectangle, inner xsep=20pt, inner ysep=10pt]{
 		\begin{minipage}[t!]{\textwidth}
@@ -145,23 +148,45 @@ The partition in \cite{zhu2017looking} satisfies that $|F_{t+1}| = 2|F_{t}|$ at 
 	};
 	\caption{The LIP algorithm for computing the joins.}
 	\label{fig:lip}
-\end{figure}
+\end{figure*}
 
 
-\subsection{Discussion}
+\subsection{Discussions}
+
+LIP algorithm in Figure \ref{fig:lip} estimates the selectivity of each filter using statistics from the very beginning, which is inefficient for certain distribution and physical layout of data. Consider some filter $f$ that is very selective for the first $t_0$ iterations at line 6 and not selective for the remaining iterations. (For example, a filter $f$ filtering for \texttt{year} $\geq 2017$ and the \texttt{Date} table is sorted in \texttt{year}.) In this case, LIP would obtain a good estimate of the selectivity of $f$ during the first $t_0$ iterations, and thus tend to apply $f$ early in the remaining iterations. However, it is in fact more efficient to postpone applying $f$ in the remaining iterations, despite $f$ has good selectivity in the first $t_0$ iterations. One remedy to this is to only ``remember" the hit/miss statistics of each filter over the previous $t^*$ iterations, mitigating the effect of such long-term influence.
+
+
+Experimental results suggest that the speedup achieved by using LIP is concave with respect to the number of LIP filters used. Such concavity arises largely due to the fact that when more filters are applied, the cache is constantly replacing the filters, resulting a replacement overhead. 
+
+
+\section{Our Work}
+
+We are building a \textit{minimal} prototype of a database system on top of apache arrow supporting only selection and join as the basic operations using hash-join and LIP-join to model any database system. Then we will implement our revised versions of LIP-join and measure the performance. 
+
+The dataset is obtained from the Star Schema Benchmark \cite{o2009star}. We will hard-code each queries in \cite{o2009star} to measure the join processing time.
 
 
 
-\section{Skipping LIP Filters}
 
-In this section, we present our modified \texttt{LIP-join-skip} algorithm and discuss some implementation details.
+\section{Current Progress}
 
-\subsection{Implementation}
+We are implementing a traditional hash-join algorithm and the \texttt{LIP-join} algorithm on top of apache arrow in C++. The code is available at \url{https://github.com/NicholasCorrado/CS764}. Our implementation is meant to be a prototype to model any database system running hash-join and LIP-join and experiment with multiple variants of LIP. 
 
-We implemented the traditional hash-join algorithm, the \texttt{LIP-join} algorithm and our modified \texttt{LIP-joip-skip} on top of apache arrow in C++. The code is available at \url{https://github.com/NicholasCorrado/CS764}.
+We have finished implementing the hash-join algorithm and the LIP filters.
 
 
-\section{Experiments}
+\section*{Acknowledgement}
+The authors wish to thank Prof.\ Jignesh Patel for constant feedback on this project and Kevin for helping us in coding with apache arrow.
+% \section{Skipping LIP Filters}
+
+% In this section, we present our modified \texttt{LIP-join-skip} algorithm and discuss some implementation details.
+
+% \subsection{Implementation}
+
+% We implemented the traditional hash-join algorithm, the \texttt{LIP-join} algorithm and our modified \texttt{LIP-joip-skip} on top of apache arrow in C++. The code is available at \url{https://github.com/NicholasCorrado/CS764}.
+
+
+% \section{Experiments}
 
 
 \begin{comment}
@@ -177,8 +202,11 @@ We first pick $n$ hash functions $h_i$ such that the range of each $h_i$ is $\{1
 \end{comment}
 
 
-\section{Concluding remarks}
+% \section{Concluding remarks}
 
+\section{Future works}
+
+Once we finish implementing hash-join and LIP-join, we will start testing our proposed variants of LIP and evaluate their performance against the optimal joining sequence of hash-join. Since the project is aimed at improving LIP, we will measure the performance of the optimal hash-join sequence by enumerating all joining sequences, and compare our revised LIP algorithm against it. 
 
 
 

@@ -7,7 +7,10 @@
 
 
 
-SelectExecutorCompare::SelectExecutorCompare(std::shared_ptr<arrow::Table> _dim_table, std::string _select_field, int _value, arrow::compute::CompareOperator _op){
+SelectExecutorCompare::SelectExecutorCompare(std::shared_ptr<arrow::Table> _dim_table, 
+												std::string _select_field, 
+												long long _value, 
+												arrow::compute::CompareOperator _op){
 	dim_table = _dim_table;
 	select_field = _select_field;
 
@@ -32,16 +35,23 @@ std::shared_ptr<arrow::Table> SelectExecutorCompare::select(){
 
 
 
-SelectExecutorBetween::SelectExecutorBetween(std::shared_ptr<arrow::Table> _dim_table, std::string _select_field, long long _hi_value, long long _lo_value){
+SelectExecutorBetween::SelectExecutorBetween(std::shared_ptr<arrow::Table> _dim_table, 
+												std::string _select_field, 
+												long long _lo_value, 
+												long long _hi_value){
 	dim_table = _dim_table;
 	select_field = _select_field;
-	hi_value = _hi_value;
-	lo_value = _lo_value;
+
+	arrow::NumericScalar<arrow::Int64Type> lo_scalar(_lo_value);
+    lo_value = std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(lo_scalar);
+	
+	arrow::NumericScalar<arrow::Int64Type> hi_scalar(_hi_value);
+    hi_value = std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(hi_scalar);
 }
 
 std::shared_ptr<arrow::Table> SelectExecutorBetween::select(){
 	std::shared_ptr<arrow::Table> ret;
-	//ret = Select(dim_table, select_field, lo_value, hi_value);
+	ret = SelectBetween(dim_table, select_field, lo_value, hi_value);
 	return ret;
 }
 
@@ -54,13 +64,15 @@ std::shared_ptr<arrow::Table> SelectExecutorBetween::select(){
 // }
 
 
-JoinExecutor::JoinExecutor(SelectExecutor* _s_exe, std::string _dim_primary_key){
+JoinExecutor::JoinExecutor(SelectExecutor* _s_exe, 
+							std::string _dim_primary_key, 
+							std::string _fact_foreign_key){
+	fact_foreign_key = _fact_foreign_key;
 	dim_primary_key = _dim_primary_key;
 	select_exe = _s_exe;
 }
 
-std::shared_ptr<arrow::Table> JoinExecutor::join(std::shared_ptr<arrow::Table> fact_table, 
-													std::string fact_foreign_key){
+std::shared_ptr<arrow::Table> JoinExecutor::join(std::shared_ptr<arrow::Table> fact_table){
 
 	std::shared_ptr<arrow::Table> dim_table_selected = select_exe -> select();
 	std::shared_ptr<arrow::Table> ret;

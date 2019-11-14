@@ -6,7 +6,10 @@
 #include "select.h"
 #include "util/util.h"
 
-std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, std::string select_field, std::shared_ptr<arrow::Scalar> value, arrow::compute::CompareOperator op) {
+std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, 
+                                        std::string select_field, 
+                                        std::shared_ptr<arrow::Scalar> value, 
+                                        arrow::compute::CompareOperator op) {
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
@@ -47,6 +50,27 @@ std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, std::s
 
     return result_table;
 }
+
+
+std::shared_ptr<arrow::Table> SelectBetween(std::shared_ptr<arrow::Table> table, 
+                                                std::string select_field, 
+                                                std::shared_ptr<arrow::Scalar> lo, 
+                                                std::shared_ptr<arrow::Scalar> hi){
+
+
+
+    std::shared_ptr<arrow::Table> result_table = table;
+
+    arrow::compute::CompareOperator geq = arrow::compute::CompareOperator::GREATER_EQUAL;
+    result_table = Select(result_table, select_field, lo, geq);
+
+    arrow::compute::CompareOperator leq = arrow::compute::CompareOperator::LESS_EQUAL;
+    result_table = Select(result_table, select_field, hi, leq);
+
+    return result_table;
+}
+
+
 
 // Arrow currently does not support vectorized string comparison. Nevertheless, we can still use this function to run
 // select queries on columns with string data if we really wanted to.

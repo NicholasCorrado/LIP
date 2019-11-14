@@ -166,12 +166,12 @@ int main_xiating(){
 
     
     SelectExecutor* date_s_exe = new SelectExecutorCompare(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
-    JoinExecutor* j_exe = new JoinExecutor(date_s_exe, "DATE KEY");
+    JoinExecutor* j_exe = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
 
 
     //std::vector<std::string> foreign_keys = {"ORDER DATE"};
 
-    std::shared_ptr<arrow::Table> result_table = j_exe -> join(lineorder, "ORDER DATE");
+    std::shared_ptr<arrow::Table> result_table = j_exe -> join(lineorder);
     
     std::cout << result_table->num_rows() << std::endl;
 
