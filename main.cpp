@@ -236,11 +236,8 @@ std::shared_ptr<arrow::Table>
 
     std::shared_ptr<arrow::io::ReadableFile> infile;
     status = arrow::io::ReadableFile::Open(file_path, pool, &infile);
-
-    if(!status.ok()) {
-        std::cout << "Error reading file." << std::endl;
-    }
-
+    EvaluateStatus(status);
+    
     auto read_options = arrow::csv::ReadOptions::Defaults();
     read_options.column_names = schema;
     auto parse_options = arrow::csv::ParseOptions::Defaults();
@@ -249,14 +246,10 @@ std::shared_ptr<arrow::Table>
 
     std::shared_ptr<arrow::csv::TableReader> reader;
     status = arrow::csv::TableReader::Make(arrow::default_memory_pool(), infile, read_options, parse_options, convert_options, &reader);
-
-    if(!status.ok()) {
-        std::cout << "Error creating TableReader." << std::endl;
-    }
+    EvaluateStatus(status);
 
     std::shared_ptr<arrow::Table> table;
     status = reader->Read(&table);
-
     EvaluateStatus(status);
 
     return table;
