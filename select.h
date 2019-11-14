@@ -5,14 +5,9 @@
 #ifndef SELECT_H
 #define SELECT_H
 
+#include <arrow/api.h>
+#include <arrow/compute/api.h>
 
-enum Operator {
-    EQUAL,
-    LESS,
-    LESS_EQUAL,
-    GREATER,
-    GREATER_EQUAL,
-};
 
 /// \brief Performs a simple select query of the following form:
 /// SELECT *
@@ -25,28 +20,8 @@ enum Operator {
 /// \param op comparison operator in the select predicate
 ///
 /// \return the result of the query wrapped in std::shared_ptr<arrow::Table>
-std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, Operator op);
-std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, std::string select_field, long long value, Operator op);
-
-/// \brief Copy a row from one record batch into a batch builder. Used to
-///
-/// \param row row index of a row we want to copy from in_batch
-/// \param in_batch record batch from which we want to copy a row
-/// \param out_batch_builder batch builder to which we are adding a row.
-void AddRowToRecordBatch(int row,  std::shared_ptr<arrow::RecordBatch>& in_batch, std::unique_ptr<arrow::RecordBatchBuilder>& out_batch_builder);
-
-/// \brief Evaluate the following statement: data [op] value
-///
-/// \param data data from a column
-/// \param value value to which we are comparing data
-/// \param op
-/// \return true if (data [op] value) == true, otherwise false
-template <typename T>
-bool EvaluatePredicate(T data, T value, Operator op);
-
-void EvaluateStatus(arrow::Status status);
-
-void PrintTable(std::shared_ptr<arrow::Table> table);
+//std::shared_ptr<arrow::Table> SelectString(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, Operator op);
+std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, std::string select_field, std::shared_ptr<arrow::Scalar> value, arrow::compute::CompareOperator op);
 
 
 #endif
