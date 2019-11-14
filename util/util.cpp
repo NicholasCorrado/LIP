@@ -16,8 +16,7 @@ void PrintTable(std::shared_ptr<arrow::Table> table) {
     std::shared_ptr<arrow::RecordBatch> batch;
     arrow::Status status;
 
-    status = reader->ReadNext(&batch);
-    while (batch != nullptr) {
+    while (reader->ReadNext(&batch).ok() && batch != nullptr) {
         for (int row=0; row < batch->num_rows(); row++) {
             for (int i = 0; i < batch->schema()->num_fields(); i++) {
 
