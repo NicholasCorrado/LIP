@@ -28,7 +28,7 @@ std::string SelectParam::GetSelectField(){
 
 
 
-SelectParamInt::SelectParamInt(std::shared_ptr<arrow::Table> _dimTable, std::string _select_field, long long _value, Operator _op){
+SelectParamInt::SelectParamInt(std::shared_ptr<arrow::Table> _dimTable, std::string _select_field, long long _value, arrow::compute::CompareOperator _op){
 	SetType(SelectType::TYPE_INT);
 	SetDimTable(_dimTable);
 	SetSelectField(_select_field);
@@ -40,7 +40,7 @@ long long SelectParamInt::GetValue(){
 	return value;
 }
 
-Operator SelectParamInt::GetOperator(){
+arrow::compute::CompareOperator SelectParamInt::GetOperator(){
 	return op;
 }
 
@@ -52,7 +52,7 @@ void SelectParamInt::PrintParam(){
 }
 
 
-SelectParamString::SelectParamString(std::shared_ptr<arrow::Table> _dimTable, std::string _select_field, std::string _value, Operator _op){
+SelectParamString::SelectParamString(std::shared_ptr<arrow::Table> _dimTable, std::string _select_field, std::string _value, arrow::compute::CompareOperator _op){
 	SetType(SelectType::TYPE_STRING);
 	SetDimTable(_dimTable);
 	SetSelectField(_select_field);
@@ -64,7 +64,7 @@ std::string SelectParamString::GetValue(){
 	return value;
 }
 
-Operator SelectParamString::GetOperator(){
+arrow::compute::CompareOperator SelectParamString::GetOperator(){
 	return op;
 }
 

@@ -116,9 +116,9 @@ int main_nick() {
 
     BloomFilter* bf_part = BuildFilter(part, "SIZE", size,arrow::compute::CompareOperator::GREATER_EQUAL,"PART KEY", "PART KEY");
     BloomFilter* bf_date = BuildFilter(date, "YEAR", value, value2, "DATE KEY", "ORDER DATE");
-    std::vector<long long> ret = HashJoin(lineorder, "CUST KEY", customer, "CUST KEY");
+    std::shared_ptr<arrow::Table> ret = HashJoin(lineorder, "CUST KEY", customer, "CUST KEY");
 
-    std::cout << ret.size() << std::endl;
+    std::cout << ret -> num_rows() << std::endl;
 
     return 0;
 }

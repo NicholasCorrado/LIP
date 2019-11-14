@@ -41,11 +41,11 @@ public:
 class SelectParamInt : public SelectParam{
 private:
 	long long value;
-	Operator op;
+	arrow::compute::CompareOperator op;
 public:
-	SelectParamInt(std::shared_ptr<arrow::Table> _dimTable, std::string _select_field, long long _value, Operator _op);
+	SelectParamInt(std::shared_ptr<arrow::Table> _dimTable, std::string _select_field, long long _value, arrow::compute::CompareOperator _op);
 	long long GetValue();
-	Operator GetOperator();
+	arrow::compute::CompareOperator GetOperator();
 	void PrintParam();
 };
 
@@ -53,11 +53,11 @@ public:
 class SelectParamString : public SelectParam{
 private:
 	std::string value;
-	Operator op;
+	arrow::compute::CompareOperator op;
 public:
-	SelectParamString(std::shared_ptr<arrow::Table> _dimTable, std::string _select_field, std::string _value, Operator _op);
+	SelectParamString(std::shared_ptr<arrow::Table> _dimTable, std::string _select_field, std::string _value, arrow::compute::CompareOperator _op);
 	std::string GetValue();
-	Operator GetOperator();
+	arrow::compute::CompareOperator GetOperator();
 	void PrintParam();
 };
 
