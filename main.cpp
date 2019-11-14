@@ -13,7 +13,7 @@
 #include "BuildFilter.h"
 #include "Join.h"
 
-
+#include "JoinParam.h"
 
 // If you successfully read the csv files but fail to write the arrow files, it might be because the arrow-output
 // directory does not exist.
@@ -144,14 +144,28 @@ int main_xiating(){
     supplier    = build_table(file_path_supplier,  pool, supplier_schema);
 
     
-    // BloomFilter* bf = BuildFilter(date, "YEAR", 1994, Operator::EQUAL, "DATE KEY");
+
     
 
-    std::vector<std::string> foreign_keys = {"CUST KEY", "DATE KEY", "PART KEY", "SUPP KEY"};
+    
+    SelectParam* sp = new SelectParamBetween(customer, "CUST KEY", 10, 20);
+    sp -> PrintParam();
 
-    std::vector<long long> ret = HashJoin(lineorder, "CUST KEY", customer, "CUST KEY");
 
-    std::cout << ret.size() << std::endl;
+
+
+    // ALWAYS LEFT JOIN FACT TABLE AND RIGHT JOIN CUSTOMER TABLE
+    // std::shared_ptr<arrow::Table> result_table;
+
+    // result_table = HashJoin(lineorder, "CUST KEY", Select(customer, "REGION", "AMERICA", Operator::EQUAL), "CUST KEY");
+
+    // std::cout << result_table -> num_rows() << std::endl;
+    
+
+
+    // BLOOM FILTER IN THE FOLLOWING
+
+
     // BloomFilter* bf_customer = BuildFilter(customer, "REGION", "AMERICA", Operator::EQUAL, "CUST KEY", "CUST KEY");
     // BloomFilter* bf_date = BuildFilter(date, "YEAR", 1992, 1994, "DATE KEY", "ORDER DATE");
     // BloomFilter* bf_part = BuildFilter(part, "COLOR", "dark", Operator::EQUAL, "PART KEY", "PART KEY");
@@ -167,12 +181,6 @@ int main_xiating(){
     
     // auto* reader = new arrow::TableBatchReader(*lineorder);
 
-    // // The Status outcome object returned by ReadNext() does NOT return an error when you are already at the final
-    // // record batch; it sets the output batch to nullptr and returns Status::OK(). Hence, we must also check that the
-    // // output batch is not nullptr.
-    // std::shared_ptr<arrow::Table> result_table;
-    //result_table = Select(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
-    //PrintTable(result_table);
 
     // result_table = Select(date, "YEAR", 1994, Operator::EQUAL);
     //PrintTable(result_table);
@@ -190,9 +198,7 @@ int main_xiating(){
            
     //     }
     // }
-
     
-    // std::cout << std::endl;
     return 0;
 }
 
