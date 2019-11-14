@@ -7,6 +7,7 @@
 #include<string>
 #include <arrow/api.h>
 #include "select.h"
+#include "BuildFilter.h"
 #include <map>
 
 
@@ -17,6 +18,7 @@ public:
 	std::shared_ptr<arrow::Table> dim_table;
 	std::string select_field;
 	virtual std::shared_ptr<arrow::Table> select() = 0;
+	virtual BloomFilter* ConstructFilterNoFK(std::string dim_primary_key) = 0;
 };
 
 
@@ -31,6 +33,7 @@ public:
 							long long _value, 
 							arrow::compute::CompareOperator _op);
 	std::shared_ptr<arrow::Table> select();
+	BloomFilter* ConstructFilterNoFK(std::string dim_primary_key);
 };
 
 
@@ -44,6 +47,7 @@ public:
 							long long _lo_value, 
 							long long _hi_value);
 	std::shared_ptr<arrow::Table> select();
+	BloomFilter* ConstructFilterNoFK(std::string dim_primary_key);
 };
 
 
@@ -59,6 +63,7 @@ public:
 					std::string _dim_primary_key, 
 					std::string fact_foreign_key);
 	std::shared_ptr<arrow::Table> join(std::shared_ptr<arrow::Table> fact_table);
+	BloomFilter* ConstructFilter();
 };
 
 

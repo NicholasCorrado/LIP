@@ -16,7 +16,11 @@
 		A Bloomfilter bf of all the attributes passing the selection
 */
 BloomFilter* 
-BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::shared_ptr<arrow::Scalar> value, arrow::compute::CompareOperator op, std::string key_field, std::string foreign_key) {
+BuildFilter(std::shared_ptr<arrow::Table> table, 
+                std::string select_field, 
+                std::shared_ptr<arrow::Scalar> value, 
+                arrow::compute::CompareOperator op, 
+                std::string key_field) {
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
@@ -25,7 +29,6 @@ BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::
 
     BloomFilter* bf = new BloomFilter();
 
-    bf -> SetForeignKey(foreign_key);
 
     // Instantiate things needed for a call to Compare()
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
@@ -117,8 +120,11 @@ BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long 
 
 
 BloomFilter*
-BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::shared_ptr<arrow::Scalar> lo_value,
-        std::shared_ptr<arrow::Scalar> hi_value, std::string key_field, std::string foreign_key) {
+BuildFilter(std::shared_ptr<arrow::Table> table, 
+                std::string select_field, 
+                std::shared_ptr<arrow::Scalar> lo_value,
+                std::shared_ptr<arrow::Scalar> hi_value, 
+                std::string key_field) {
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
@@ -126,7 +132,6 @@ BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::
     auto* reader = new arrow::TableBatchReader(*table);
 
     BloomFilter* bf = new BloomFilter();
-    bf -> SetForeignKey(foreign_key);
 
     // Instantiate things needed for a call to Compare()
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
