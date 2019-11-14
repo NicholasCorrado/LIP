@@ -13,7 +13,6 @@ SelectExecutorCompare::SelectExecutorCompare(std::shared_ptr<arrow::Table> _dim_
 
 	arrow::NumericScalar<arrow::Int64Type> myscalar(_value);
     value = std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(myscalar);
-    
 	op = _op;
 }
 
@@ -55,13 +54,14 @@ std::shared_ptr<arrow::Table> SelectExecutorBetween::select(){
 // }
 
 
-JoinExecutor::JoinExecutor(std::string _fact_foreign_key, std::string _dim_primary_key, SelectExecutor* _s_exe){
-	fact_foreign_key = _fact_foreign_key;
+JoinExecutor::JoinExecutor(SelectExecutor* _s_exe, std::string _dim_primary_key){
 	dim_primary_key = _dim_primary_key;
 	select_exe = _s_exe;
 }
 
-std::shared_ptr<arrow::Table> JoinExecutor::join(std::shared_ptr<arrow::Table> fact_table){
+std::shared_ptr<arrow::Table> JoinExecutor::join(std::shared_ptr<arrow::Table> fact_table, 
+													std::string fact_foreign_key){
+
 	std::shared_ptr<arrow::Table> dim_table_selected = select_exe -> select();
 	std::shared_ptr<arrow::Table> ret;
 	ret = HashJoin(fact_table, fact_foreign_key, dim_table_selected, dim_primary_key);

@@ -45,13 +45,12 @@ public:
 
 class JoinExecutor{
 private:
-	std::string fact_foreign_key;
 	std::string dim_primary_key;
 	
 	SelectExecutor* select_exe;
 public:
-	JoinExecutor(std::string _fact_foreign_key, std::string _dim_primary_key, SelectExecutor* _s_exe);
-	std::shared_ptr<arrow::Table> join(std::shared_ptr<arrow::Table> fact_table);
+	JoinExecutor(SelectExecutor* _s_exe, std::string _dim_primary_key);
+	std::shared_ptr<arrow::Table> join(std::shared_ptr<arrow::Table> fact_table, std::string fact_foreign_key);
 };
 
 

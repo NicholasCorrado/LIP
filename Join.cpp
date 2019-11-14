@@ -69,12 +69,16 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
 
 
 std::shared_ptr<arrow::Table> EvaluateJoinTree(std::shared_ptr<arrow::Table> fact_table, 
+                                                std::vector<std::string> foreign_keys,
                                                 std::vector<JoinExecutor*> joinExecutors){
-
+    if (foreign_keys.size() != joinExecutors.size()){
+        std::cout << "Error: foreign key and join executor size do not match." << std::endl;
+        return NULL;
+    }
     std::shared_ptr<arrow::Table> ret_table = fact_table;
 
     for(int i = 0; i < joinExecutors.size(); i++){
-        ret_table = joinExecutors[i] -> join(ret_table);
+        ret_table = joinExecutors[i] -> join(ret_table, foreign_keys[i]);
     }
 
     return ret_table;

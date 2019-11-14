@@ -160,11 +160,18 @@ int main_xiating(){
     supplier    = build_table(file_path_supplier,  pool, supplier_schema);
 
   
+    // std::shared_ptr<arrow::Table> result_table = s_exe -> select();
     
-    
-    SelectExecutor* s_exe = new SelectExecutorCompare(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
+    // std::cout << result_table->num_rows() << std::endl;
 
-    std::shared_ptr<arrow::Table> result_table = s_exe -> select();
+    
+    SelectExecutor* date_s_exe = new SelectExecutorCompare(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
+    JoinExecutor* j_exe = new JoinExecutor(date_s_exe, "DATE KEY");
+
+
+    //std::vector<std::string> foreign_keys = {"ORDER DATE"};
+
+    std::shared_ptr<arrow::Table> result_table = j_exe -> join(lineorder, "ORDER DATE");
     
     std::cout << result_table->num_rows() << std::endl;
 
