@@ -15,7 +15,7 @@
 #include "util/util.h"
 #include "select.h"
 
-#include "JoinParam.h"
+#include "JoinExecutor.h"
 
 // If you successfully read the csv files but fail to write the arrow files, it might be because the arrow-output
 // directory does not exist.
@@ -125,11 +125,11 @@ int main_nick() {
 
 
 int main_xiating(){
-    std::string file_path_customer  = "../../benchmark/customer.tbl";
-    std::string file_path_date      = "../../benchmark/date.tbl";
-    std::string file_path_lineorder = "../../benchmark/lineorder.tbl";
-    std::string file_path_part      = "../../benchmark/part.tbl";
-    std::string file_path_supplier  = "../../benchmark/supplier.tbl";
+    std::string file_path_customer  = "./benchmark/customer.tbl";
+    std::string file_path_date      = "./benchmark/date.tbl";
+    std::string file_path_lineorder = "./benchmark/lineorder.tbl";
+    std::string file_path_part      = "./benchmark/part.tbl";
+    std::string file_path_supplier  = "./benchmark/supplier.tbl";
 
 
     std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
@@ -160,14 +160,13 @@ int main_xiating(){
     supplier    = build_table(file_path_supplier,  pool, supplier_schema);
 
   
-
     
-
     
-    SelectParam* sp = new SelectParamBetween(customer, "CUST KEY", 10, 20);
-    sp -> PrintParam();
+    SelectExecutor* s_exe = new SelectExecutorCompare(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
 
-
+    std::shared_ptr<arrow::Table> result_table = s_exe -> select();
+    
+    std::cout << result_table->num_rows() << std::endl;
 
 
     // ALWAYS LEFT JOIN FACT TABLE AND RIGHT JOIN CUSTOMER TABLE
@@ -222,9 +221,9 @@ int main_xiating(){
 
 
 int main(){
-    main_nick();
+    // main_nick();
 
-    //main_xiating();
+    main_xiating();
     return 0;
 }
 

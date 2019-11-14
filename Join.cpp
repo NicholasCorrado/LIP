@@ -2,7 +2,8 @@
 #include "util/util.h"
 
 
-std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table, std::string left_field, std::shared_ptr<arrow::Table> right_table, std::string right_field) {
+std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table, std::string left_field, 
+                                        std::shared_ptr<arrow::Table> right_table, std::string right_field) {
 
 
     std::map<long long, bool> hash;
@@ -45,7 +46,8 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
         for (int i=0; i<col->length(); i++) {
             long long key = col -> Value(i);
             if ( hash.count(key) > 0 ) {
-                AddRowToRecordBatch(i, in_batch, out_batch_builder);
+                // Need to do some stuff
+                //AddRowToRecordBatch(i, in_batch, out_batch_builder);
             }
         }
 
@@ -63,5 +65,21 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
 
     return result_table;
 }
+
+
+
+std::shared_ptr<arrow::Table> EvaluateJoinTree(std::shared_ptr<arrow::Table> fact_table, 
+                                                std::vector<JoinExecutor*> joinExecutors){
+
+    std::shared_ptr<arrow::Table> ret_table = fact_table;
+
+    for(int i = 0; i < joinExecutors.size(); i++){
+        ret_table = joinExecutors[i] -> join(ret_table);
+    }
+
+    return ret_table;
+}
+
+
 
 	
