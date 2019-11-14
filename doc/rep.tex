@@ -178,13 +178,12 @@ The dataset for testing is obtained from the Star Schema Benchmark \cite{o2009st
 
 We have finished milestone 1 and our system is implemented in C++, on top of apache arrow. Our implementation for selection currently only supports comparing integers and strings. For strings we only support $=$, and for integers we only support $=, <, >, \leq, \geq$ and \texttt{between}, where the semantics for \texttt{between}($\ell, h$) is selecting all integers $x$ with $\ell \leq x \leq h$. 
 
+More figures will be produced for sure!
 
 Our code is available at \url{https://github.com/NicholasCorrado/CS764}. 
 
 
 
-\section*{Acknowledgement}
-The authors wish to thank Prof.\ Jignesh Patel for constant feedback on this project and Kevin for helping us in coding with apache arrow.
 % \section{Skipping LIP Filters}
 
 % In this section, we present our modified \texttt{LIP-join-skip} algorithm and discuss some implementation details.
@@ -214,7 +213,17 @@ We first pick $n$ hash functions $h_i$ such that the range of each $h_i$ is $\{1
 
 \section{Future works}
 
-For 
+We have already implemented the Bloom Filter for milestone 2 and the LIP algorithm is.
+
+We will first try to run experiments to produce the concave curve of running time against the number of Bloom Filters used, and then empirically experiment the ``optimal" number of filters to be used in stage (2) of the LIP algorithm.
+
+A revised version of LIP that only remembers the past $t^*$ probing statistics will be implemented for experimental purpose. 
+
+
+
+\section*{Acknowledgement}
+The authors wish to thank Prof.\ Jignesh Patel for constant feedbacks on this project and Kevin Gaffney for helping us with apache arrow.
+
 
 \bibliography{rep}{}
 \bibliographystyle{plain}
