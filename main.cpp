@@ -135,10 +135,14 @@ int main_nick() {
     JoinExecutor* j_exe2 = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
 
     //std::vector<JoinExecutor*> tree = {j_exe1, j_exe2};
-    std::vector<JoinExecutor*> tree = {j_exe2, j_exe1};
+    std::vector<JoinExecutor*> tree = {j_exe1};
     std::cout<<"Join lineorder and customer and date "<<std::endl;
-    std::shared_ptr<arrow::Table> t = EvaluateJoinTreeLIP(lineorder, tree);
-    PrintTable(t);
+    std::shared_ptr<arrow::Table> t1 = EvaluateJoinTreeLIP(lineorder, tree);
+    //PrintTable(t1);
+    std::cout<< t1->num_rows()<<std::endl;
+    std::shared_ptr<arrow::Table> t2 = EvaluateJoinTree(lineorder, tree);
+    //PrintTable(t2);
+    std::cout<< t2->num_rows()<<std::endl;
 
     //SelectExecutor* customer_s_exe = new SelectExecutorCompare(customer, "CUST KEY", 1, arrow::compute::CompareOperator::EQUAL);
     //JoinExecutor* j_exe = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");

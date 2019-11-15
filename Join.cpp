@@ -89,24 +89,18 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
         BloomFilter* bf = joinExecutors[i] -> ConstructFilter();
         filters.push_back(bf);
     }
-
     
     // prepare to probe each fact
-
-
+    arrow::Status status;
+    std::shared_ptr<arrow::RecordBatch> in_batch;
     std::unique_ptr<arrow::RecordBatchBuilder> out_batch_builder;
     std::vector<std::shared_ptr<arrow::RecordBatch>> out_batches;
 
-
-    arrow::Status status;
-    std::shared_ptr<arrow::RecordBatch> in_batch;
+    status = arrow::RecordBatchBuilder::Make(fact_table->schema(), arrow::default_memory_pool(), &out_batch_builder);
 
     auto* reader = new arrow::TableBatchReader(*fact_table);
-
-
+    ///reader->set_chunksize(1024);
     int* indices;
-
-
     
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
 
@@ -175,8 +169,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     status = arrow::Table::FromRecordBatches(out_batches, &result_table);
     EvaluateStatus(status);
 
-
     return result_table;
+    //return EvaluateJoinTree(result_table, joinExecutors);
 }
 
 
