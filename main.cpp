@@ -115,18 +115,20 @@ int main_nick() {
 
     BloomFilter* bf_part = BuildFilter(part, "SIZE", size,arrow::compute::CompareOperator::GREATER_EQUAL,"PART KEY");
     BloomFilter* bf_date = BuildFilter(date, "YEAR", value, value2, "DATE KEY");
+    std::cout<<"Join lineorder and customer on CUST KEY"<<std::endl;
     std::shared_ptr<arrow::Table> ret = HashJoin(lineorder, "CUST KEY", customer, "CUST KEY");
+    //PrintTable(ret);
+    std::cout<<"ret->num_rows() = " << ret->num_rows()<<std::endl;
 
     //result_table = Select(date, "YEAR", value, arrow::compute::CompareOperator::EQUAL);
     arrow::NumericScalar<arrow::Int64Type> one(1);
     auto custkey = std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(one);
     result_table = Select(customer, "CUST KEY", custkey, arrow::compute::CompareOperator::EQUAL);
-    //PrintTable(result_table);
-    std::cout<<"result_table = " << result_table->num_rows()<<std::endl;
-
+    std::cout<<"ret->num_rows() = " << ret->num_rows()<<std::endl;
+    std::cout<<"Join lineorder and customer on CUST KEY where customer.CUST KEY = 1"<<std::endl;
     ret = HashJoin(lineorder, "CUST KEY", result_table, "CUST KEY");
-
-    std::cout <<"ret = " <<ret -> num_rows() << std::endl;
+    PrintTable(ret);
+    //std::cout<<"ret->num_rows() = " << ret->num_rows()<<std::endl;
     //PrintTable(ret);
 
     SelectExecutor* date_s_exe = new SelectExecutorCompare(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
@@ -136,6 +138,7 @@ int main_nick() {
 
     //std::vector<JoinExecutor*> tree = {j_exe1, j_exe2};
     std::vector<JoinExecutor*> tree = {j_exe2, j_exe1};
+    std::cout<<"Join lineorder and customer and date "<<std::endl;
     std::shared_ptr<arrow::Table> t = EvaluateJoinTree(lineorder, tree);
     PrintTable(t);
 
@@ -252,9 +255,9 @@ int main_xiating(){
 
 
 int main(){
-    // main_nick();
+    main_nick();
 
-    main_xiating();
+    //main_xiating();
     return 0;
 }
 

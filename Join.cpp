@@ -1,22 +1,18 @@
 #include "Join.h"
 #include "util/util.h"
 
+// As on 2019/11/15, we reutrn a table of tuples in left_table that would be joined with a tuple in right_table.
+// Hence, the join result will never be larger than the size of the left_table.
 std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table, std::string left_field, 
                                         std::shared_ptr<arrow::Table> right_table, std::string right_field) {
 
 
     std::map<long long, bool> hash;
 
-    std::cout << left_table -> num_rows() << std::endl;
-    std::cout << right_table -> num_rows() << std::endl;
+    std::cout << "rows in left table = " << left_table -> num_rows() << std::endl;
+    std::cout << "rows in right table = " << right_table -> num_rows() << std::endl;
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
-
-
-    // Instantiate things needed for a call to Compare()
-    arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
-    arrow::compute::CompareOptions compare_options(arrow::compute::CompareOperator::EQUAL);
-    auto* filter = new arrow::compute::Datum();
 
     auto* reader = new arrow::TableBatchReader(*right_table);
 
