@@ -7,7 +7,7 @@
 
 
 
-SelectExecutorCompare::SelectExecutorCompare(std::shared_ptr<arrow::Table> _dim_table, 
+SelectExecutorInt::SelectExecutorInt(std::shared_ptr<arrow::Table> _dim_table, 
 												std::string _select_field, 
 												long long _value, 
 												arrow::compute::CompareOperator _op){
@@ -19,14 +19,14 @@ SelectExecutorCompare::SelectExecutorCompare(std::shared_ptr<arrow::Table> _dim_
 	op = _op;
 }
 
-std::shared_ptr<arrow::Table> SelectExecutorCompare::select(){
+std::shared_ptr<arrow::Table> SelectExecutorInt::select(){
 	std::shared_ptr<arrow::Table> ret;
 	ret = Select(dim_table, select_field, value, op);
 	return ret;
 }
 
 
-BloomFilter* SelectExecutorCompare::ConstructFilterNoFK(std::string dim_primary_key){
+BloomFilter* SelectExecutorInt::ConstructFilterNoFK(std::string dim_primary_key){
 	BloomFilter* bf = BuildFilter(dim_table,
 									select_field,
 									value,
@@ -43,7 +43,32 @@ BloomFilter* SelectExecutorCompare::ConstructFilterNoFK(std::string dim_primary_
 // }
 
 
+SelectExecutorStr::SelectExecutorStr(std::shared_ptr<arrow::Table> _dim_table, 
+												std::string _select_field, 
+												std::string _value, 
+												arrow::compute::CompareOperator _op){
+	dim_table = _dim_table;
+	select_field = _select_field;
 
+	value = _value;
+	op = _op;
+}
+
+std::shared_ptr<arrow::Table> SelectExecutorStr::select(){
+	std::shared_ptr<arrow::Table> ret;
+	ret = SelectString(dim_table, select_field, value, op);
+	return ret;
+}
+
+
+BloomFilter* SelectExecutorStr::ConstructFilterNoFK(std::string dim_primary_key){
+	BloomFilter* bf = BuildFilter(dim_table,
+									select_field,
+									value,
+									op,
+									dim_primary_key);
+	return bf;
+}
 
 SelectExecutorBetween::SelectExecutorBetween(std::shared_ptr<arrow::Table> _dim_table, 
 												std::string _select_field, 

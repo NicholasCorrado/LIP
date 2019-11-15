@@ -23,14 +23,28 @@ public:
 
 
 
-class SelectExecutorCompare : public SelectExecutor{
+class SelectExecutorInt : public SelectExecutor{
 public:
 	std::shared_ptr<arrow::Scalar> value;
 	arrow::compute::CompareOperator op;
 
-	SelectExecutorCompare(std::shared_ptr<arrow::Table> _dim_table, 
+	SelectExecutorInt(std::shared_ptr<arrow::Table> _dim_table, 
 							std::string _select_field, 
 							long long _value, 
+							arrow::compute::CompareOperator _op);
+	std::shared_ptr<arrow::Table> select();
+	BloomFilter* ConstructFilterNoFK(std::string dim_primary_key);
+};
+
+
+class SelectExecutorStr : public SelectExecutor{
+public:
+	std::string value;
+	arrow::compute::CompareOperator op;
+
+	SelectExecutorStr(std::shared_ptr<arrow::Table> _dim_table, 
+							std::string _select_field, 
+							std::string _value, 
 							arrow::compute::CompareOperator _op);
 	std::shared_ptr<arrow::Table> select();
 	BloomFilter* ConstructFilterNoFK(std::string dim_primary_key);
