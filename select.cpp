@@ -39,15 +39,17 @@ std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table,
             status = arrow::compute::Filter(&function_context, in_batch->column(i), *filter, out);
             out_arrays.push_back(out->array());
         }
-
+        std::cout << "out_arrays = " << out_arrays[0]->length << std::endl;
         auto out_batch = arrow::RecordBatch::Make(in_batch->schema(),out_arrays[0]->length,out_arrays);
         out_batches.push_back(out_batch);
+
+        out_arrays.clear();
     }
 
     std::shared_ptr<arrow::Table> result_table;
     status = arrow::Table::FromRecordBatches(out_batches, &result_table);
     EvaluateStatus(status);
-
+    std::cout << "select table = " << result_table->num_rows() << std::endl;
     return result_table;
 }
 

@@ -8,6 +8,7 @@
 
 void EvaluateStatus(arrow::Status status);
 void PrintTable(std::shared_ptr<arrow::Table> table);
+void AddRowToRecordBatch(int row, std::shared_ptr<arrow::RecordBatch>& in_batch, std::unique_ptr<arrow::RecordBatchBuilder>& out_batch_builder);
 
 
 #endif //CSV_TO_ARROW_CPP_UTIL_H

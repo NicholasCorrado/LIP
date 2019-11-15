@@ -40,3 +40,26 @@ void PrintTable(std::shared_ptr<arrow::Table> table) {
         status = reader->ReadNext(&batch);
     }
 }
+
+void AddRowToRecordBatch(int row, std::shared_ptr<arrow::RecordBatch>& in_batch, std::unique_ptr<arrow::RecordBatchBuilder>& out_batch_builder) {
+
+    for (int i = 0; i<out_batch_builder->schema()->num_fields(); i++) {
+        arrow::ArrayBuilder* builder = out_batch_builder->GetField(i);
+        int type = out_batch_builder->schema()->field(i)->type()->id();
+
+        switch (type) {
+            case arrow::Type::type::STRING: {
+                auto* type_builder = dynamic_cast<arrow::StringBuilder *>(builder);
+                auto in_col = std::static_pointer_cast<arrow::StringArray>(in_batch->column(i));
+                type_builder->Append(in_col->GetString(row));
+                break;
+            }
+            case arrow::Type::type::INT64: {
+                auto* type_builder = dynamic_cast<arrow::Int64Builder *>(builder);
+                auto in_col = std::static_pointer_cast<arrow::Int64Array>(in_batch->column(i));
+                type_builder->Append(in_col->Value(row));
+                break;
+            }
+        }
+    }
+}

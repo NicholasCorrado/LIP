@@ -106,14 +106,39 @@ int main_nick() {
     arrow::NumericScalar<arrow::Int64Type> myscalar3(10);
     auto size = std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(myscalar);
 
-    result_table = Select(date, "YEAR", value, arrow::compute::CompareOperator::EQUAL);
-    PrintTable(result_table);
+    //result_table = Select(date, "YEAR", value, arrow::compute::CompareOperator::EQUAL);
+    //PrintTable(result_table);
 
     BloomFilter* bf_part = BuildFilter(part, "SIZE", size,arrow::compute::CompareOperator::GREATER_EQUAL,"PART KEY", "PART KEY");
     BloomFilter* bf_date = BuildFilter(date, "YEAR", value, value2, "DATE KEY", "ORDER DATE");
-    std::shared_ptr<arrow::Table> ret = HashJoin(lineorder, "CUST KEY", customer, "CUST KEY");
 
-    //std::cout << ret -> num_rows() << std::endl;
+    //result_table = Select(date, "YEAR", value, arrow::compute::CompareOperator::EQUAL);
+    arrow::NumericScalar<arrow::Int64Type> one(1);
+    auto custkey = std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(one);
+    result_table = Select(customer, "CUST KEY", custkey, arrow::compute::CompareOperator::EQUAL);
+    //PrintTable(result_table);
+    std::cout<<"result_table = " << result_table->num_rows()<<std::endl;
+
+    std::shared_ptr<arrow::Table> ret = HashJoin(lineorder, "CUST KEY", result_table, "CUST KEY");
+
+    std::cout <<"ret = " <<ret -> num_rows() << std::endl;
+    //PrintTable(ret);
+
+    SelectExecutor* date_s_exe = new SelectExecutorCompare(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor* customer_s_exe = new SelectExecutorCompare(customer, "CUST KEY", 1, arrow::compute::CompareOperator::EQUAL);
+    JoinExecutor* j_exe1 = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
+    JoinExecutor* j_exe2 = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
+
+    //std::vector<JoinExecutor*> tree = {j_exe1, j_exe2};
+    std::vector<JoinExecutor*> tree = {j_exe2, j_exe1};
+    std::shared_ptr<arrow::Table> t = EvaluateJoinTree(lineorder, tree);
+    PrintTable(t);
+
+    //SelectExecutor* customer_s_exe = new SelectExecutorCompare(customer, "CUST KEY", 1, arrow::compute::CompareOperator::EQUAL);
+    //JoinExecutor* j_exe = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
+
+    //std::vector<std::string> foreign_keys = {"ORDER DATE"}
+
 
     return 0;
 }

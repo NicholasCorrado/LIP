@@ -19,7 +19,7 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
     arrow::compute::CompareOptions compare_options(arrow::compute::CompareOperator::EQUAL);
     auto* filter = new arrow::compute::Datum();
 
-    auto* reader = new arrow::TableBatchReader(*left_table);
+    auto* reader = new arrow::TableBatchReader(*right_table);
 
 
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
@@ -46,8 +46,7 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
         for (int i=0; i<col->length(); i++) {
             long long key = col -> Value(i);
             if ( hash.count(key) > 0 ) {
-                // Need to do some stuff
-                //AddRowToRecordBatch(i, in_batch, out_batch_builder);
+                AddRowToRecordBatch(i, in_batch, out_batch_builder);
             }
         }
 
