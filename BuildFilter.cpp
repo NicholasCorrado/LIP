@@ -2,6 +2,7 @@
 #include <arrow/api.h>
 #include "BuildFilter.h"
 
+
 /* (String version)
 	Given a table, a attribute field name and the selective criterion, return a Bloom
 	Filter of all the attributes satisfyingg the criterion. 
@@ -15,16 +16,16 @@
 	Return
 		A Bloomfilter bf of all the attributes passing the selection
 */
-BloomFilter* 
-BuildFilter(std::shared_ptr<arrow::Table> table, 
-                std::string select_field, 
-                std::shared_ptr<arrow::Scalar> value, 
-                arrow::compute::CompareOperator op, 
+BloomFilter*
+BuildFilter(std::shared_ptr<arrow::Table> table,
+                std::string select_field,
+                std::shared_ptr<arrow::Scalar> value,
+                arrow::compute::CompareOperator op,
                 std::string key_field) {
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
-    
+
     auto* reader = new arrow::TableBatchReader(*table);
 
     // We were using the default constructor, which uses the default filter size of 500000!!!
@@ -56,6 +57,8 @@ BuildFilter(std::shared_ptr<arrow::Table> table,
 }
 
 
+
+
 /* (Int64 version), one sided compare
 
     Given a table, a attribute field name and the selective criterion, return a Bloom
@@ -70,17 +73,15 @@ BuildFilter(std::shared_ptr<arrow::Table> table,
     Return
         A Bloomfilter bf of all the attributes passing the selection
 */
-/*
-BloomFilter* 
-BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long long value, Operator op, std::string key_field, std::string foreign_key) {
+
+BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, arrow::compute::CompareOperator op, std::string key_field) {
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
     
     auto* reader = new arrow::TableBatchReader(*table);
 
-    BloomFilter* bf = new BloomFilter();
-    bf -> SetForeignKey(foreign_key);
+    BloomFilter* bf = new BloomFilter(table->num_rows());
     // The Status outcome object returned by ReadNext() does NOT return an error when you are already at the final
     // record batch; it sets the output batch to nullptr and returns Status::OK(). Hence, we must also check that the
     // output batch is not nullptr.
@@ -89,20 +90,20 @@ BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long 
         // Arrays must be downcasted to a concrete array type before we can access the array items. Note that the
         // method used to access item i of an array depend on the data type, e.g. GetString(i) for StringArray vs
         // Value(i) for Int64Array (and any other int array).
-        auto col = std::static_pointer_cast<arrow::Int64Array>(in_batch->GetColumnByName(select_field));
+        auto col = std::static_pointer_cast<arrow::StringArray>(in_batch->GetColumnByName(select_field));
         auto key_col = std::static_pointer_cast<arrow::Int64Array>(in_batch->GetColumnByName(key_field));
         
         for (int i=0; i<col->length(); i++) {
-            long long attr = col->Value(i);
+            std::string attr = col->GetString(i);
             if ( EvaluatePredicate(attr, value, op) ) {
-                bf -> Insert(key_col -> Value(i));
+                bf -> Insert(key_col ->Value(i) );
             }
         }
     }
     return bf;
 }
 
-*/
+
 
 /* (Int64 version), supporting between
 
