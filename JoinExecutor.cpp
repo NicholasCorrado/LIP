@@ -2,7 +2,7 @@
 #include "JoinExecutor.h"
 #include "select.h"
 #include "Join.h"
-
+#include "BuildFilter.h"
 
 
 
@@ -23,6 +23,16 @@ std::shared_ptr<arrow::Table> SelectExecutorCompare::select(){
 	std::shared_ptr<arrow::Table> ret;
 	ret = Select(dim_table, select_field, value, op);
 	return ret;
+}
+
+
+BloomFilter* SelectExecutorCompare::ConstructFilterNoFK(std::string dim_primary_key){
+	BloomFilter* bf = BuildFilter(dim_table,
+									select_field,
+									value,
+									op,
+									dim_primary_key);
+	return bf;
 }
 
 // void SelectParamCompare::PrintParam(){
@@ -62,7 +72,14 @@ std::shared_ptr<arrow::Table> SelectExecutorBetween::select(){
 // 	std::cout << "lo_value = " << GetLoValue() << std::endl;
 // 	std::cout << "hi_value = " << GetHiValue() << std::endl;
 // }
-
+BloomFilter* SelectExecutorBetween::ConstructFilterNoFK(std::string dim_primary_key){
+	BloomFilter* bf = BuildFilter(dim_table,
+									select_field,
+									lo_value,
+									hi_value,
+									dim_primary_key);
+	return bf;
+}
 
 JoinExecutor::JoinExecutor(SelectExecutor* _s_exe, 
 							std::string _dim_primary_key, 
@@ -78,5 +95,13 @@ std::shared_ptr<arrow::Table> JoinExecutor::join(std::shared_ptr<arrow::Table> f
 	std::shared_ptr<arrow::Table> ret;
 	ret = HashJoin(fact_table, fact_foreign_key, dim_table_selected, dim_primary_key);
 	return ret;
+}
+
+
+
+BloomFilter* JoinExecutor::ConstructFilter(){
+	BloomFilter* bf = select_exe -> ConstructFilterNoFK(dim_primary_key);
+	bf -> SetForeignKey(fact_foreign_key);
+	return bf;
 }
 

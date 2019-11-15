@@ -1,7 +1,6 @@
 #include "Join.h"
 #include "util/util.h"
 
-
 std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table, std::string left_field, 
                                         std::shared_ptr<arrow::Table> right_table, std::string right_field) {
 
@@ -78,6 +77,31 @@ std::shared_ptr<arrow::Table> EvaluateJoinTree(std::shared_ptr<arrow::Table> fac
 
     return ret_table;
 }
+
+
+
+std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> fact_table, 
+                                                std::vector<JoinExecutor*> joinExecutors){
+    
+    int n_dim = joinExecutors.size();
+
+
+    // Construct the array of bloom filters
+    std::vector<BloomFilter*> filters;
+
+    for(int i = 0; i < n_dim; i++){
+        BloomFilter* bf = joinExecutors[i] -> ConstructFilter();
+        filters.push_back(bf);
+    }
+
+    
+    // prepare to probe each fact
+
+    
+
+    return NULL;
+}
+
 
 
 

@@ -109,8 +109,13 @@ int main_nick() {
     //result_table = Select(date, "YEAR", value, arrow::compute::CompareOperator::EQUAL);
     //PrintTable(result_table);
 
-    BloomFilter* bf_part = BuildFilter(part, "SIZE", size,arrow::compute::CompareOperator::GREATER_EQUAL,"PART KEY", "PART KEY");
-    BloomFilter* bf_date = BuildFilter(date, "YEAR", value, value2, "DATE KEY", "ORDER DATE");
+
+    //BloomFilter* bf_part = BuildFilter(part, "SIZE", size,arrow::compute::CompareOperator::GREATER_EQUAL,"PART KEY", "PART KEY");
+    //BloomFilter* bf_date = BuildFilter(date, "YEAR", value, value2, "DATE KEY", "ORDER DATE");
+
+    BloomFilter* bf_part = BuildFilter(part, "SIZE", size,arrow::compute::CompareOperator::GREATER_EQUAL,"PART KEY");
+    BloomFilter* bf_date = BuildFilter(date, "YEAR", value, value2, "DATE KEY");
+    std::shared_ptr<arrow::Table> ret = HashJoin(lineorder, "CUST KEY", customer, "CUST KEY");
 
     //result_table = Select(date, "YEAR", value, arrow::compute::CompareOperator::EQUAL);
     arrow::NumericScalar<arrow::Int64Type> one(1);
@@ -119,7 +124,7 @@ int main_nick() {
     //PrintTable(result_table);
     std::cout<<"result_table = " << result_table->num_rows()<<std::endl;
 
-    std::shared_ptr<arrow::Table> ret = HashJoin(lineorder, "CUST KEY", result_table, "CUST KEY");
+    ret = HashJoin(lineorder, "CUST KEY", result_table, "CUST KEY");
 
     std::cout <<"ret = " <<ret -> num_rows() << std::endl;
     //PrintTable(ret);
@@ -188,13 +193,12 @@ int main_xiating(){
     SelectExecutor* date_s_exe = new SelectExecutorCompare(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
     JoinExecutor* j_exe = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
 
+    BloomFilter* bf = j_exe -> ConstructFilter();
 
-    //std::vector<std::string> foreign_keys = {"ORDER DATE"};
 
-    std::shared_ptr<arrow::Table> result_table = j_exe -> join(lineorder);
+    std::cout << bf -> Search(19920101) << std::endl;
+    std::cout << bf -> Search(19930101) << std::endl;
     
-    std::cout << result_table->num_rows() << std::endl;
-
 
     // ALWAYS LEFT JOIN FACT TABLE AND RIGHT JOIN CUSTOMER TABLE
     // std::shared_ptr<arrow::Table> result_table;
@@ -248,9 +252,9 @@ int main_xiating(){
 
 
 int main(){
-    main_nick();
+    // main_nick();
 
-    //main_xiating();
+    main_xiating();
     return 0;
 }
 
