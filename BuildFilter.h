@@ -10,10 +10,6 @@
 
 //BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, long long value, Operator op, std::string key_field, std::string foreign_key);
 
-BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, 
-							std::string select_field, 
-							std::string, 
-							std::string key_field);
 
 BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, 
 							std::string select_field, 
@@ -28,4 +24,10 @@ BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table,
 							std::string key_field);
 
 bool BloomFilterCompare( BloomFilter *lhs,  BloomFilter *rhs);
+
+BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table,
+                            std::string select_field,
+                            std::string value,
+                            arrow::compute::CompareOperator op,
+                            std::string key_field);
 

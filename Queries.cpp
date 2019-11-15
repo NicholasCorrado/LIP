@@ -98,9 +98,9 @@ int main_nick() {
     //std::cout<<"ret->num_rows() = " << ret->num_rows()<<std::endl;
     //PrintTable(ret);
 
-    SelectExecutor *date_s_exe = new SelectExecutorCompare(date, "YEAR", 1995, arrow::compute::CompareOperator::EQUAL);
-    SelectExecutor *customer_s_exe = new SelectExecutorCompare(customer, "CUST KEY", 5,
-                                                               arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor *date_s_exe = new SelectExecutorInt(date, "YEAR", 1995, arrow::compute::CompareOperator::EQUAL);
+    //SelectExecutor *customer_s_exe = new SelectExecutorInt(customer, "CUST KEY", 5,arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor *customer_s_exe = new SelectExecutorStr(customer, "REGION", "AMERICA",arrow::compute::CompareOperator::EQUAL);
     JoinExecutor *j_exe1 = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
     JoinExecutor *j_exe2 = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
 
@@ -164,7 +164,7 @@ int main_xiating(){
     // std::cout << result_table->num_rows() << std::endl;
 
 
-    SelectExecutor* date_s_exe = new SelectExecutorCompare(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor* date_s_exe = new SelectExecutorInt(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
     JoinExecutor* j_exe = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
 
     BloomFilter* bf = j_exe -> ConstructFilter();
