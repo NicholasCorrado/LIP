@@ -27,8 +27,9 @@ BuildFilter(std::shared_ptr<arrow::Table> table,
     
     auto* reader = new arrow::TableBatchReader(*table);
 
-    BloomFilter* bf = new BloomFilter();
-
+    // We were using the default constructor, which uses the default filter size of 500000!!!
+    //BloomFilter* bf = new BloomFilter();
+    BloomFilter* bf = new BloomFilter(table->num_rows());
 
     // Instantiate things needed for a call to Compare()
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
@@ -131,7 +132,7 @@ BuildFilter(std::shared_ptr<arrow::Table> table,
     
     auto* reader = new arrow::TableBatchReader(*table);
 
-    BloomFilter* bf = new BloomFilter();
+    BloomFilter* bf = new BloomFilter(table->num_rows());
 
     // Instantiate things needed for a call to Compare()
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());

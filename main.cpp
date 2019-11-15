@@ -77,7 +77,7 @@ int main_nick() {
     lineorder   = build_table(file_path_lineorder, pool, lineorder_schema);
     part        = build_table(file_path_part,      pool, part_schema);
     supplier    = build_table(file_path_supplier,  pool, supplier_schema);
-
+    /*
     std::cout<<"customer->num_rows() = " << customer->num_rows() << std::endl;
     std::cout<<"date->num_rows() = " << date->num_rows() << std::endl;
     std::cout<<"lineorder->num_rows() = " << lineorder->num_rows() << std::endl;
@@ -89,7 +89,7 @@ int main_nick() {
     write_to_file("arrow-output/lineorder.arrow", lineorder);
     write_to_file("arrow-output/supplier.arrow", supplier);
     write_to_file("arrow-output/part.arrow", part);
-
+    */
     std::shared_ptr<arrow::Table> result_table;
     //result_table = Select(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
     //PrintTable(result_table);
@@ -129,13 +129,13 @@ int main_nick() {
     //std::cout<<"ret->num_rows() = " << ret->num_rows()<<std::endl;
     //PrintTable(ret);
 
-    SelectExecutor* date_s_exe = new SelectExecutorCompare(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
-    SelectExecutor* customer_s_exe = new SelectExecutorCompare(customer, "CUST KEY", 1, arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor* date_s_exe = new SelectExecutorCompare(date, "YEAR", 1995, arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor* customer_s_exe = new SelectExecutorCompare(customer, "CUST KEY", 5, arrow::compute::CompareOperator::EQUAL);
     JoinExecutor* j_exe1 = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
     JoinExecutor* j_exe2 = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
 
     //std::vector<JoinExecutor*> tree = {j_exe1, j_exe2};
-    std::vector<JoinExecutor*> tree = {j_exe1};
+    std::vector<JoinExecutor*> tree = {j_exe1, j_exe2};
     std::cout<<"Join lineorder and customer and date "<<std::endl;
     std::shared_ptr<arrow::Table> t1 = EvaluateJoinTreeLIP(lineorder, tree);
     //PrintTable(t1);
@@ -146,8 +146,6 @@ int main_nick() {
 
     //SelectExecutor* customer_s_exe = new SelectExecutorCompare(customer, "CUST KEY", 1, arrow::compute::CompareOperator::EQUAL);
     //JoinExecutor* j_exe = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
-
-    //std::vector<std::string> foreign_keys = {"ORDER DATE"}
 
 
     return 0;

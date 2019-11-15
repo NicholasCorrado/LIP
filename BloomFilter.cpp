@@ -219,6 +219,7 @@ void BloomFilter::IncrementCount(){
 */
 void BloomFilter::IncrementPass(){
 	pass++;
+	//count++;
 }
 
 
@@ -256,7 +257,27 @@ BloomFilter::BloomFilter(){
 	}
 }
 
+/*
+	Constructor to initialize an empty Bloomfilter to be inserted.
 
+	The user can pass in a how many inserts will be performed.
+*/
+BloomFilter::BloomFilter(int num_insert){
+    Reset();
+    int n = num_insert;
+    numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
+    numberOfCells = int(n * numberOfHashes / log(2));
+
+    cells = (bool*)malloc(numberOfCells * sizeof(bool));
+    for(int i = 0; i < numberOfCells; ++i){
+        cells[i] = false;
+    }
+
+    seeds = (int*)malloc(numberOfHashes * sizeof(int));
+    for(int i = 0; i < numberOfHashes; ++i){
+        seeds[i] = rand() % MAX_SEED;
+    }
+}
 
 
 /*

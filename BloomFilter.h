@@ -10,7 +10,7 @@
 class BloomFilter{
 
 private:
-	int numberOfCells;
+    int numberOfCells;
 	int numberOfHashes;
 	bool* cells;
 	int* seeds;
@@ -20,7 +20,10 @@ private:
 	int pass;
 
 public:
+
+    ///int numberOfCells;
 	BloomFilter();
+    BloomFilter(int num_insert);
 	BloomFilter(std::vector<long long> elements);
 	BloomFilter(std::vector<std::string> elements);
 	
