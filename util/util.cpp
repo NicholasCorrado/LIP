@@ -4,7 +4,59 @@
 
 #include <iostream>
 #include <arrow/compute/api.h>
+#include <arrow/io/api.h>
+#include <arrow/ipc/api.h>
+#include <arrow/csv/api.h>
 #include "util.h"
+
+
+void write_to_file(const char* path, std::shared_ptr<arrow::Table> &table) {
+
+    std::shared_ptr<arrow::io::FileOutputStream> file;
+    std::shared_ptr<arrow::ipc::RecordBatchWriter> record_batch_writer;
+    arrow::Status status;
+
+    status = arrow::io::FileOutputStream::Open(path,&file);
+    EvaluateStatus(status);
+
+    status = arrow::ipc::RecordBatchFileWriter::Open(&*file, table->schema()).status();
+
+    if (status.ok()) {
+        record_batch_writer = arrow::ipc::RecordBatchFileWriter::Open(&*file, table->schema()).ValueOrDie();
+    }
+    status = record_batch_writer->WriteTable(*table);
+    EvaluateStatus(status);
+
+    status = record_batch_writer->Close();
+    EvaluateStatus(status);
+}
+
+std::shared_ptr<arrow::Table>
+        build_table(const std::string& file_path, arrow::MemoryPool *pool, std::vector<std::string> &schema) {
+
+    arrow::Status status;
+
+    std::shared_ptr<arrow::io::ReadableFile> infile;
+    status = arrow::io::ReadableFile::Open(file_path, pool, &infile);
+    EvaluateStatus(status);
+
+    auto read_options = arrow::csv::ReadOptions::Defaults();
+    read_options.column_names = schema;
+    auto parse_options = arrow::csv::ParseOptions::Defaults();
+    parse_options.delimiter = '|';
+    auto convert_options = arrow::csv::ConvertOptions::Defaults();
+
+    std::shared_ptr<arrow::csv::TableReader> reader;
+    status = arrow::csv::TableReader::Make(arrow::default_memory_pool(), infile, read_options, parse_options, convert_options, &reader);
+    EvaluateStatus(status);
+
+    std::shared_ptr<arrow::Table> table;
+    status = reader->Read(&table);
+    EvaluateStatus(status);
+
+    return table;
+}
+
 
 void EvaluateStatus(arrow::Status status) {
     if (!status.ok()) {

@@ -8,38 +8,10 @@
 #include <arrow/io/api.h>
 #include <arrow/csv/api.h>
 #include <arrow/stl.h>
-#include <arrow/ipc/api.h>
-#include "main.h"
 #include "BuildFilter.h"
 #include "Join.h"
 #include "util/util.h"
-#include "select.h"
-
 #include "JoinExecutor.h"
-
-
-// If you successfully read the csv files but fail to write the arrow files, it might be because the arrow-output
-// directory does not exist.
-void write_to_file(const char* path, std::shared_ptr<arrow::Table> &table) {
-
-    std::shared_ptr<arrow::io::FileOutputStream> file;
-    std::shared_ptr<arrow::ipc::RecordBatchWriter> record_batch_writer;
-    arrow::Status status;
-
-    status = arrow::io::FileOutputStream::Open(path,&file);
-    EvaluateStatus(status);
-
-    status = arrow::ipc::RecordBatchFileWriter::Open(&*file, table->schema()).status();
-
-    if (status.ok()) {
-        record_batch_writer = arrow::ipc::RecordBatchFileWriter::Open(&*file, table->schema()).ValueOrDie();
-    }
-    status = record_batch_writer->WriteTable(*table);
-    EvaluateStatus(status);
-
-    status = record_batch_writer->Close();
-    EvaluateStatus(status);
-}
 
 int main_nick() {
 
@@ -77,7 +49,7 @@ int main_nick() {
     lineorder   = build_table(file_path_lineorder, pool, lineorder_schema);
     part        = build_table(file_path_part,      pool, part_schema);
     supplier    = build_table(file_path_supplier,  pool, supplier_schema);
-    /*
+
     std::cout<<"customer->num_rows() = " << customer->num_rows() << std::endl;
     std::cout<<"date->num_rows() = " << date->num_rows() << std::endl;
     std::cout<<"lineorder->num_rows() = " << lineorder->num_rows() << std::endl;
@@ -89,7 +61,7 @@ int main_nick() {
     write_to_file("arrow-output/lineorder.arrow", lineorder);
     write_to_file("arrow-output/supplier.arrow", supplier);
     write_to_file("arrow-output/part.arrow", part);
-    */
+
     std::shared_ptr<arrow::Table> result_table;
     //result_table = Select(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
     //PrintTable(result_table);
@@ -261,28 +233,3 @@ int main(){
     return 0;
 }
 
-std::shared_ptr<arrow::Table>
-        build_table(const std::string& file_path, arrow::MemoryPool *pool, std::vector<std::string> &schema) {
-
-    arrow::Status status;
-
-    std::shared_ptr<arrow::io::ReadableFile> infile;
-    status = arrow::io::ReadableFile::Open(file_path, pool, &infile);
-    EvaluateStatus(status);
-    
-    auto read_options = arrow::csv::ReadOptions::Defaults();
-    read_options.column_names = schema;
-    auto parse_options = arrow::csv::ParseOptions::Defaults();
-    parse_options.delimiter = '|';
-    auto convert_options = arrow::csv::ConvertOptions::Defaults();
-
-    std::shared_ptr<arrow::csv::TableReader> reader;
-    status = arrow::csv::TableReader::Make(arrow::default_memory_pool(), infile, read_options, parse_options, convert_options, &reader);
-    EvaluateStatus(status);
-
-    std::shared_ptr<arrow::Table> table;
-    status = reader->Read(&table);
-    EvaluateStatus(status);
-
-    return table;
-}
