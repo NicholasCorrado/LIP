@@ -76,8 +76,9 @@ std::shared_ptr<arrow::Table> SelectBetween(std::shared_ptr<arrow::Table> table,
 
 // Arrow currently does not support vectorized string comparison. Nevertheless, we can still use this function to run
 // select queries on columns with string data if we really wanted to.
-/*
-std::shared_ptr<arrow::Table> SelectString(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, Operator op) {
+
+
+std::shared_ptr<arrow::Table> SelectString(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, arrow::compute::CompareOperator op) {
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
@@ -118,4 +119,19 @@ std::shared_ptr<arrow::Table> SelectString(std::shared_ptr<arrow::Table> table, 
 
     return result_table;
 }
-*/
+
+template <typename T>
+bool EvaluatePredicate(T data, T value, arrow::compute::CompareOperator op) {
+
+    bool result = false;
+
+    switch(op) {
+        case arrow::compute::CompareOperator::EQUAL:         result = (data == value); break;
+        case arrow::compute::CompareOperator::NOT_EQUAL:     result = (data >= value); break;
+        case arrow::compute::CompareOperator::LESS:          result = (data <  value); break;
+        case arrow::compute::CompareOperator::LESS_EQUAL:    result = (data <= value); break;
+        case arrow::compute::CompareOperator::GREATER:       result = (data >  value); break;
+        case arrow::compute::CompareOperator::GREATER_EQUAL: result = (data >= value); break;
+    }
+    return result;
+}

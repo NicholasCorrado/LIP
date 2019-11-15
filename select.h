@@ -20,7 +20,7 @@
 /// \param op comparison operator in the select predicate
 ///
 /// \return the result of the query wrapped in std::shared_ptr<arrow::Table>
-//std::shared_ptr<arrow::Table> SelectString(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, Operator op);
+
 std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, 
 										std::string select_field, 
 										std::shared_ptr<arrow::Scalar> value, 
@@ -31,5 +31,9 @@ std::shared_ptr<arrow::Table> SelectBetween(std::shared_ptr<arrow::Table> table,
 												std::shared_ptr<arrow::Scalar> lo,
 												std::shared_ptr<arrow::Scalar> hi);
 
+std::shared_ptr<arrow::Table> SelectString(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, arrow::compute::CompareOperator op);
+
+template <typename T>
+bool EvaluatePredicate(T data, T value, arrow::compute::CompareOperator op);
 
 #endif

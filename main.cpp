@@ -41,10 +41,6 @@ void write_to_file(const char* path, std::shared_ptr<arrow::Table> &table) {
     EvaluateStatus(status);
 }
 
-/*
- * main SHOULD accept files as arguments. First argument is the path to the fact table. All following arguments are
- * the paths to dimension tables.
- */
 int main_nick() {
 
     std::string file_path_customer  = "benchmark/customer.tbl";
@@ -120,8 +116,10 @@ int main_nick() {
     //PrintTable(ret);
     std::cout<<"ret->num_rows() = " << ret->num_rows()<<std::endl;
 
-    //result_table = Select(date, "YEAR", value, arrow::compute::CompareOperator::EQUAL);
+    //result_table = Select(date, "YEAR", value, arrow::; compute::CompareOperator::EQUAL);
     arrow::NumericScalar<arrow::Int64Type> one(1);
+    std::shared_ptr<arrow::Scalar> test;
+
     auto custkey = std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(one);
     result_table = Select(customer, "CUST KEY", custkey, arrow::compute::CompareOperator::EQUAL);
     std::cout<<"ret->num_rows() = " << ret->num_rows()<<std::endl;

@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <arrow/compute/api.h>
 #include "util.h"
 
 void EvaluateStatus(arrow::Status status) {
@@ -63,3 +64,5 @@ void AddRowToRecordBatch(int row, std::shared_ptr<arrow::RecordBatch>& in_batch,
         }
     }
 }
+
+
