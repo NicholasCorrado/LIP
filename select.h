@@ -21,6 +21,11 @@
 ///
 /// \return the result of the query wrapped in std::shared_ptr<arrow::Table>
 
+arrow::compute::Datum* Select2(std::shared_ptr<arrow::Table> table,
+                                     std::string select_field,
+                                     std::shared_ptr<arrow::Scalar> value,
+                                     arrow::compute::CompareOperator op);
+
 std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table, 
 										std::string select_field, 
 										std::shared_ptr<arrow::Scalar> value, 

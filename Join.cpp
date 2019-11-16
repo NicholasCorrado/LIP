@@ -73,7 +73,6 @@ std::shared_ptr<arrow::Table> EvaluateJoinTree(std::shared_ptr<arrow::Table> fac
 }
 
 
-
 std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> fact_table, 
                                                 std::vector<JoinExecutor*> joinExecutors){
     
@@ -93,8 +92,10 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     // prepare to probe each fact
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
-    std::unique_ptr<arrow::RecordBatchBuilder> out_batch_builder;
-    std::vector<std::shared_ptr<arrow::RecordBatch>> out_batches;
+
+    std::vector<std::shared_ptr<arrow::ArrayData>> out_arrays;      // vector of arrays corresponding to outputted columns in a given batch
+    std::unique_ptr<arrow::RecordBatchBuilder> out_batch_builder;   // to build a RecordBatch from a vector of arrays
+    std::vector<std::shared_ptr<arrow::RecordBatch>> out_batches;   // output table will be built from a vector of RecordBatches
 
     status = arrow::RecordBatchBuilder::Make(fact_table->schema(), arrow::default_memory_pool(), &out_batch_builder);
 
@@ -149,18 +150,30 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
 
         std::sort(filters.begin(), filters.end(), BloomFilterCompare);
 
-        for (int index_i = 0; index_i < index_size; index_i++) {
-            int actual_index = indices[index_i];
-            AddRowToRecordBatch(actual_index, in_batch, out_batch_builder);
-        }
-
-        std::shared_ptr<arrow::RecordBatch> out_batch;
-        status = out_batch_builder->Flush(true, &out_batch);
+        arrow::Int64Builder indices_builder;
+        std::shared_ptr<arrow::Array> indices_array;
+        status = indices_builder.AppendValues(indices,indices+index_size);
+        EvaluateStatus(status);
+        status = indices_builder.Finish(&indices_array);
         EvaluateStatus(status);
 
-        out_batches.push_back(out_batch);
-    }
+        // Instantiate things needed for a call to Compare()
+        arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
+        arrow::compute::TakeOptions take_options;
+        auto* filter = new arrow::compute::Datum();
+        auto* out = new arrow::compute::Datum();
 
+        for (int k=0; k<in_batch->schema()->num_fields(); k++) {
+            status = arrow::compute::Take(&function_context,in_batch->column(k),indices_array, take_options, out);
+            EvaluateStatus(status);
+            out_arrays.push_back(out->array());
+        }
+
+        auto out_batch = arrow::RecordBatch::Make(in_batch->schema(),out_arrays[0]->length,out_arrays);
+        out_batches.push_back(out_batch);
+
+        out_arrays.clear();
+    }
 
 
     std::shared_ptr<arrow::Table> result_table;

@@ -130,8 +130,8 @@ int main_nick() {
     //PrintTable(ret);
 
     SelectExecutor *date_s_exe = new SelectExecutorInt(date, "YEAR", 1995, arrow::compute::CompareOperator::EQUAL);
-    //SelectExecutor *customer_s_exe = new SelectExecutorInt(customer, "CUST KEY", 5,arrow::compute::CompareOperator::EQUAL);
-    SelectExecutor *customer_s_exe = new SelectExecutorStr(customer, "REGION", "AMERICA",arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor *customer_s_exe = new SelectExecutorInt(customer, "CUST KEY", 5,arrow::compute::CompareOperator::EQUAL);
+    //SelectExecutor *customer_s_exe = new SelectExecutorStr(customer, "REGION", "AMERICA",arrow::compute::CompareOperator::EQUAL);
     JoinExecutor *j_exe1 = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
     JoinExecutor *j_exe2 = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
 
@@ -203,6 +203,7 @@ void RunAllQueries(std::shared_ptr <arrow::Table> customer,
                 int alg_flag)
 {
     Query1_1(customer, date, lineorder, part, supplier, alg_flag);
+    /*
     Query1_2(customer, date, lineorder, part, supplier, alg_flag);
     Query1_3(customer, date, lineorder, part, supplier, alg_flag);
 
@@ -221,6 +222,7 @@ void RunAllQueries(std::shared_ptr <arrow::Table> customer,
     Query4_1(customer, date, lineorder, part, supplier, alg_flag);
     Query4_2(customer, date, lineorder, part, supplier, alg_flag);
     Query4_3(customer, date, lineorder, part, supplier, alg_flag);
+     */
 }
 
 
