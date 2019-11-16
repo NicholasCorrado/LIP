@@ -38,6 +38,11 @@ std::shared_ptr<arrow::Table> SelectBetween(std::shared_ptr<arrow::Table> table,
 
 std::shared_ptr<arrow::Table> SelectString(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, arrow::compute::CompareOperator op);
 
+std::shared_ptr<arrow::Table> SelectStringBetween(std::shared_ptr<arrow::Table> table,
+                                                    std::string select_field,
+                                                    std::string lo,
+                                                    std::string hi);
+
 template <typename T>
 bool EvaluatePredicate(T data, T value, arrow::compute::CompareOperator op);
 
