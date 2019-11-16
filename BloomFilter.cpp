@@ -219,7 +219,6 @@ void BloomFilter::IncrementCount(){
 */
 void BloomFilter::IncrementPass(){
 	pass++;
-	//count++;
 }
 
 

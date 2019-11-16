@@ -129,6 +129,7 @@ int main_nick() {
     //std::cout<<"ret->num_rows() = " << ret->num_rows()<<std::endl;
     //PrintTable(ret);
 
+    /*
     SelectExecutor *date_s_exe = new SelectExecutorInt(date, "YEAR", 1995, arrow::compute::CompareOperator::EQUAL);
     SelectExecutor *customer_s_exe = new SelectExecutorInt(customer, "CUST KEY", 5,arrow::compute::CompareOperator::EQUAL);
     //SelectExecutor *customer_s_exe = new SelectExecutorStr(customer, "REGION", "AMERICA",arrow::compute::CompareOperator::EQUAL);
@@ -144,10 +145,13 @@ int main_nick() {
     std::shared_ptr <arrow::Table> t2 = EvaluateJoinTree(lineorder, tree);
     //PrintTable(t2);
     std::cout << t2->num_rows() << std::endl;
-
+    */
     //SelectExecutor* customer_s_exe = new SelectExecutorCompare(customer, "CUST KEY", 1, arrow::compute::CompareOperator::EQUAL);
     //JoinExecutor* j_exe = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
-
+    auto* s_date = new SelectExecutorInt(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
+    auto* j1 = new JoinExecutor(s_date, "DATE KEY", "ORDER DATE");
+    auto result = j1->join(lineorder);
+    std::cout << result->num_rows() << std::endl;
 
     return 0;
 }

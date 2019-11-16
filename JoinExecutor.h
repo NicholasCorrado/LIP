@@ -24,7 +24,7 @@ public:
 	virtual arrow::compute::Datum* GetBitFilter() = 0;
 };
 
-class SelectExecutorComposite{
+class SelectExecutorComposite : public SelectExecutor{
 public:
 	std::vector<SelectExecutor*> children;
 	
@@ -76,6 +76,8 @@ public:
 
 class SelectExecutorStrBetween : public SelectExecutor{
 public:
+
+    std::string select_field;
     std::string lo_value;
     std::string hi_value;
 
@@ -83,8 +85,7 @@ public:
                           std::string _select_field,
                           std::string _lo_value,
                           std::string _hi_value);
-    std::shared_ptr<arrow::Table> select();
-    BloomFilter* ConstructFilterNoFK(std::string dim_primary_key);
+    arrow::compute::Datum* GetBitFilter();
 };
 
 
