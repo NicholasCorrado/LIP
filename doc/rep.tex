@@ -171,7 +171,7 @@ The dataset for testing is obtained from the Star Schema Benchmark \cite{o2009st
 
 \section{Current Progress}
 
-We have finished milestone 1 and 2. Our system is implemented on top of Apache Arrow in C++. Our implementation for selection currently only supports comparing 64-bit integers and strings. For strings we only support $=$, and for integers we only support $=, <, >, \leq, \geq$ and \texttt{between}, where the semantics for \texttt{between}($\ell, h$) is selecting all integers $x$ with $\ell \leq x \leq h$. 
+We have finished milestone 1 and 2. Our system is implemented on top of Apache Arrow in C++. Our implementation for selection currently only supports comparing 64-bit integers and strings and one single logical sentence for each dimension table. For strings we only support $=$, and for integers we only support $=, <, >, \leq, \geq$ and \texttt{between}, where the semantics for \texttt{between}($\ell, h$) is selecting all integers $x$ with $\ell \leq x \leq h$. 
 
 
 Our code is available at \url{https://github.com/NicholasCorrado/CS764} and more figures are coming for sure!
