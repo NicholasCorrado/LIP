@@ -10,19 +10,20 @@
 #include <arrow/stl.h>
 #include <chrono>
 #include "Queries.h"
-
+#include "select.h"
 
 /*
 
 All queries status:
 
-    1.1 - need select on fact table
-    1.2 - need select on fact table
-    1.3 - need select on fact table
+    1.1 - need select on fact table, now just select
+    1.2 - need select on fact table, now just select
+    1.3 - need select on fact table, 
+            need evaluating and on one dim table
 
-    2.1 - done
-    2.2 - need between on string
-    2.3 - done
+    2.1 - need retrieve all dim table
+    2.2 - need between on string, retrieve all dim table
+    2.3 - need retrieve all dim table
 
     3.1 - done
     3.2 - done
@@ -189,7 +190,7 @@ int main_xiating(){
     supplier    = build_table(file_path_supplier,  pool, supplier_schema);
 
 
-    RunAllQueries(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    RunAllQueries(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
 
     return 0;
 }
@@ -250,10 +251,23 @@ void Query1_1(std::shared_ptr <arrow::Table> customer,
     std::cout << "Running query 1.1 ..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
 
+    arrow::NumericScalar<arrow::Int64Type> one(1);
+    arrow::NumericScalar<arrow::Int64Type> three(3);
+    arrow::NumericScalar<arrow::Int64Type> twentyfive(25);
+    
+    lineorder = SelectBetween(lineorder, "DISCOUNT", 
+                                std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(one), 
+                                std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(three));
+    lineorder = Select(lineorder, "QUANTITY", 
+                                std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(twentyfive), arrow::compute::CompareOperator::LESS);
 
+    SelectExecutor *date_s_exe      = new SelectExecutorInt( // here should be a pure join
+                                            date, "YEAR", 1993, arrow::compute::CompareOperator::EQUAL);
+    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
+    
 
+    std::vector <JoinExecutor*> tree = {date_j_exe};
 
-    std::vector <JoinExecutor*> tree = {};
     AlgorithmSwitcher(lineorder, tree, alg_flag);
     
 
@@ -279,7 +293,26 @@ void Query1_2(std::shared_ptr <arrow::Table> customer,
 
     
     // produce the join tree by constructing the SelectExecutor and JoinExecutor:
-    std::vector <JoinExecutor*> tree = {};
+    
+    arrow::NumericScalar<arrow::Int64Type> four(4);
+    arrow::NumericScalar<arrow::Int64Type> six(6);
+    arrow::NumericScalar<arrow::Int64Type> twentysix(26);
+    arrow::NumericScalar<arrow::Int64Type> thirtyfive(35);
+    
+    lineorder = SelectBetween(lineorder, "DISCOUNT", 
+                                std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(four), 
+                                std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(six));
+    lineorder = SelectBetween(lineorder, "QUANTITY", 
+                                std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(twentysix), 
+                                std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(thirtyfive));
+
+    SelectExecutor *date_s_exe      = new SelectExecutorInt( // here should be a pure join
+                                            date, "YEAR MONTH NUM", 199401, arrow::compute::CompareOperator::EQUAL);
+    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
+    
+
+
+    std::vector <JoinExecutor*> tree = {date_j_exe};
 
     AlgorithmSwitcher(lineorder, tree, alg_flag);
 
@@ -302,8 +335,25 @@ void Query1_3(std::shared_ptr <arrow::Table> customer,
     auto start = std::chrono::high_resolution_clock::now();
 
 
-    // produce the join tree by constructing the SelectExecutor and JoinExecutor:
-    std::vector <JoinExecutor*> tree = {};
+    arrow::NumericScalar<arrow::Int64Type> five(5);
+    arrow::NumericScalar<arrow::Int64Type> seven(7);
+    arrow::NumericScalar<arrow::Int64Type> twentysix(26);
+    arrow::NumericScalar<arrow::Int64Type> thirtyfive(35);
+    
+    lineorder = SelectBetween(lineorder, "DISCOUNT", 
+                                std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(five), 
+                                std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(seven));
+    lineorder = SelectBetween(lineorder, "QUANTITY", 
+                                std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(twentysix), 
+                                std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(thirtyfive));
+
+    SelectExecutor *date_s_exe      = new SelectExecutorInt( // here should be a pure join
+                                            date, "YEAR MONTH NUM", 199401, arrow::compute::CompareOperator::EQUAL);
+    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
+    
+
+
+    std::vector <JoinExecutor*> tree = {date_j_exe};
 
     AlgorithmSwitcher(lineorder, tree, alg_flag);
 
