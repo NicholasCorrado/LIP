@@ -125,10 +125,10 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     auto* reader = new arrow::TableBatchReader(*fact_table);
     reader->set_chunksize(2 << 10);
     int* indices;
-    
-    while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
-        int n_rows = in_batch -> num_rows();
 
+    while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
+        // Note that we
+        int n_rows = in_batch -> num_rows();
         indices = (int*)malloc(n_rows * sizeof(int));
         int index_size = n_rows;
 

@@ -31,3 +31,9 @@ BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table,
                             arrow::compute::CompareOperator op,
                             std::string key_field);
 
+BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table,
+                         std::string select_field,
+                         std::string lo,
+                         std::string hi,
+                         std::string key_field);
+

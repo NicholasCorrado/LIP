@@ -64,6 +64,18 @@ public:
 	BloomFilter* ConstructFilterNoFK(std::string dim_primary_key);
 };
 
+class SelectExecutorStrBetween : public SelectExecutor{
+public:
+    std::string lo_value;
+    std::string hi_value;
+
+    SelectExecutorStrBetween(std::shared_ptr<arrow::Table> _dim_table,
+                          std::string _select_field,
+                          std::string _lo_value,
+                          std::string _hi_value);
+    std::shared_ptr<arrow::Table> select();
+    BloomFilter* ConstructFilterNoFK(std::string dim_primary_key);
+};
 
 
 

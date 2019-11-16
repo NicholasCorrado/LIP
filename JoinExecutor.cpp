@@ -84,12 +84,38 @@ SelectExecutorBetween::SelectExecutorBetween(std::shared_ptr<arrow::Table> _dim_
     hi_value = std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(hi_scalar);
 }
 
-std::shared_ptr<arrow::Table> SelectExecutorBetween::select(){
-	std::shared_ptr<arrow::Table> ret;
-	ret = SelectBetween(dim_table, select_field, lo_value, hi_value);
-	return ret;
+
+SelectExecutorStrBetween::SelectExecutorStrBetween(std::shared_ptr<arrow::Table> _dim_table,
+                                             std::string _select_field,
+                                             std::string _lo_value,
+                                             std::string _hi_value) {
+    dim_table = _dim_table;
+    select_field = _select_field;
+
+    lo_value = _lo_value;
+    hi_value = _hi_value;
 }
 
+std::shared_ptr<arrow::Table> SelectExecutorStrBetween::select() {
+    std::shared_ptr<arrow::Table> ret;
+    ret = SelectStringBetween(dim_table, select_field, lo_value, hi_value);
+    return ret;
+}
+
+std::shared_ptr<arrow::Table> SelectExecutorBetween::select() {
+    std::shared_ptr<arrow::Table> ret;
+    ret = SelectBetween(dim_table, select_field, lo_value, hi_value);
+    return ret;
+}
+
+BloomFilter* SelectExecutorStrBetween::ConstructFilterNoFK(std::string dim_primary_key){
+    BloomFilter* bf = BuildFilter(dim_table,
+                                  select_field,
+                                  lo_value,
+                                  hi_value,
+                                  dim_primary_key);
+    return bf;
+}
 
 // void SelectParamBetween::PrintParam(){
 // 	std::cout << "type = " << GetType() << std::endl;
