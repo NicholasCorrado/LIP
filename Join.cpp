@@ -35,7 +35,11 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
 
     arrow::Int64Builder array_builder;
 
+
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
+        // resize to maximum possible size to avoid resizing many times upon insertion.
+        status = array_builder.Resize(in_batch->num_rows());
+        EvaluateStatus(status);
         auto col = std::static_pointer_cast<arrow::Int64Array>(in_batch->GetColumnByName(left_field));
 
         for (int i=0; i<col->length(); i++) {
@@ -51,7 +55,7 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
         }
 
         std::shared_ptr<arrow::Int64Array> indices_array;
-        status = array_builder.Finish(&indices_array);
+        status = array_builder.Finish(&indices_array); // builders are automatically reset upon calling Finish()
         EvaluateStatus(status);
 
         // Instantiate things needed for a call to Take()

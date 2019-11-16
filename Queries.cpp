@@ -145,6 +145,19 @@ int main_nick() {
     //PrintTable(t2);
     std::cout << t2->num_rows() << std::endl;
 
+    arrow::Int64Builder array_builder;
+    array_builder.Resize(5000);
+
+    for(int i=0; i<1000; i++) {
+        array_builder.Append(i);
+    }
+
+    std::shared_ptr<arrow::Int64Array> indices_array;
+    array_builder.Finish(&indices_array);
+
+    std::cout<<"length =  " << indices_array->length() << std::endl;
+    std::cout<<"null count = " << indices_array->null_count() << std::endl;
+
     //SelectExecutor* customer_s_exe = new SelectExecutorCompare(customer, "CUST KEY", 1, arrow::compute::CompareOperator::EQUAL);
     //JoinExecutor* j_exe = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
 
