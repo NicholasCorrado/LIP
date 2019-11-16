@@ -9,8 +9,6 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
 
     std::map<long long, bool> hash;
 
-    std::cout << "rows in left table = " << left_table -> num_rows() << std::endl;
-    std::cout << "rows in right table = " << right_table -> num_rows() << std::endl;
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
 
@@ -81,7 +79,9 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     
     int n_dim = joinExecutors.size();
 
-
+    if (n_dim == 0){
+        return fact_table;
+    }
     // Construct the array of bloom filters
     std::vector<BloomFilter*> filters;
 
@@ -103,7 +103,6 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     int* indices;
     
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
-
         int n_rows = in_batch -> num_rows();
 
         indices = (int*)malloc(n_rows * sizeof(int));
@@ -156,7 +155,6 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
         }
 
         std::shared_ptr<arrow::RecordBatch> out_batch;
-
         status = out_batch_builder->Flush(true, &out_batch);
         EvaluateStatus(status);
 
