@@ -5,6 +5,68 @@
 #include "BuildFilter.h"
 
 
+std::shared_ptr<arrow::Table> 
+SelectExecutor::select(){
+
+	arrow::compute::Datum* filter = GetBitFilter();
+
+	std::shared_ptr<arrow::Table> ret;
+
+	/*
+
+		filter the result table here
+
+	*/
+
+	return ret;
+}
+
+
+
+BloomFilter* 
+SelectExecutor::ConstructFilterNoFK(std::string dim_primary_key){
+
+	arrow::compute::Datum* filter = GetBitFilter();
+
+	int n = 0; /* the number of 1 in filter */
+
+	BloomFilter* bf = new BloomFilter(n);
+
+	/*
+
+		add the bloom filter
+
+	*/
+
+	return bf;
+}
+	
+
+
+
+
+
+SelectExecutorComposite::SelectExecutorComposite(std::vector<SelectExecutor*> _children){
+	children = _children;
+}
+
+
+arrow::compute::Datum* 
+SelectExecutorComposite::GetBitFilter(){
+	int num_of_children = children.size();
+
+	arrow::compute::Datum* ret; /*initialize it to all 0*/
+
+	for(int child_i = 0; child_i < num_of_children; child_i++){
+		arrow::compute::Datum* child_filter = children[child_i] -> GetBitFilter();
+
+		/* ret = ret || child_filter */
+	}
+	return ret;
+}
+
+
+
 
 
 SelectExecutorInt::SelectExecutorInt(std::shared_ptr<arrow::Table> _dim_table, 
@@ -19,28 +81,15 @@ SelectExecutorInt::SelectExecutorInt(std::shared_ptr<arrow::Table> _dim_table,
 	op = _op;
 }
 
-std::shared_ptr<arrow::Table> SelectExecutorInt::select(){
-	std::shared_ptr<arrow::Table> ret;
-	ret = Select(dim_table, select_field, value, op);
+
+
+arrow::compute::Datum* 
+SelectExecutorInt::GetBitFilter(){
+	arrow::compute::Datum* ret;
+	/* Get bit filter satisfying (integers op value) */
 	return ret;
 }
 
-
-BloomFilter* SelectExecutorInt::ConstructFilterNoFK(std::string dim_primary_key){
-	BloomFilter* bf = BuildFilter(dim_table,
-									select_field,
-									value,
-									op,
-									dim_primary_key);
-	return bf;
-}
-
-// void SelectParamCompare::PrintParam(){
-// 	std::cout << "type = " << GetType() << std::endl;
-// 	std::cout << "select_field = " << GetSelectField() << std::endl;
-// 	std::cout << "value = " << GetValue() << std::endl;
-// 	std::cout << "operator = " << GetOperator() << std::endl;
-// }
 
 
 SelectExecutorStr::SelectExecutorStr(std::shared_ptr<arrow::Table> _dim_table, 
@@ -54,21 +103,16 @@ SelectExecutorStr::SelectExecutorStr(std::shared_ptr<arrow::Table> _dim_table,
 	op = _op;
 }
 
-std::shared_ptr<arrow::Table> SelectExecutorStr::select(){
-	std::shared_ptr<arrow::Table> ret;
-	ret = SelectString(dim_table, select_field, value, op);
+
+arrow::compute::Datum* 
+SelectExecutorStr::GetBitFilter(){
+	arrow::compute::Datum* ret;
+	/* Get bit filter satisfying (string op value) */
 	return ret;
+	
 }
 
 
-BloomFilter* SelectExecutorStr::ConstructFilterNoFK(std::string dim_primary_key){
-	BloomFilter* bf = BuildFilter(dim_table,
-									select_field,
-									value,
-									op,
-									dim_primary_key);
-	return bf;
-}
 
 SelectExecutorBetween::SelectExecutorBetween(std::shared_ptr<arrow::Table> _dim_table, 
 												std::string _select_field, 
@@ -85,15 +129,11 @@ SelectExecutorBetween::SelectExecutorBetween(std::shared_ptr<arrow::Table> _dim_
 }
 
 
-SelectExecutorStrBetween::SelectExecutorStrBetween(std::shared_ptr<arrow::Table> _dim_table,
-                                             std::string _select_field,
-                                             std::string _lo_value,
-                                             std::string _hi_value) {
-    dim_table = _dim_table;
-    select_field = _select_field;
-
-    lo_value = _lo_value;
-    hi_value = _hi_value;
+arrow::compute::Datum* 
+SelectExecutorBetween::GetBitFilter(){
+	arrow::compute::Datum* ret;
+	/* Get bit filter satisfying (lo <= integers <= hi) */
+	return ret;
 }
 
 std::shared_ptr<arrow::Table> SelectExecutorStrBetween::select() {
@@ -117,20 +157,9 @@ BloomFilter* SelectExecutorStrBetween::ConstructFilterNoFK(std::string dim_prima
     return bf;
 }
 
-// void SelectParamBetween::PrintParam(){
-// 	std::cout << "type = " << GetType() << std::endl;
-// 	std::cout << "select_field = " << GetSelectField() << std::endl;
-// 	std::cout << "lo_value = " << GetLoValue() << std::endl;
-// 	std::cout << "hi_value = " << GetHiValue() << std::endl;
-// }
-BloomFilter* SelectExecutorBetween::ConstructFilterNoFK(std::string dim_primary_key){
-	BloomFilter* bf = BuildFilter(dim_table,
-									select_field,
-									lo_value,
-									hi_value,
-									dim_primary_key);
-	return bf;
-}
+
+
+
 
 JoinExecutor::JoinExecutor(SelectExecutor* _s_exe, 
 							std::string _dim_primary_key, 
