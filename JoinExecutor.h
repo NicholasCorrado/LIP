@@ -16,7 +16,7 @@
 class SelectExecutor{
 public:
 	std::shared_ptr<arrow::Table> dim_table;
-
+    std::shared_ptr<arrow::TableBatchReader> reader;
 
 	std::shared_ptr<arrow::Table> select();
 	BloomFilter* ConstructFilterNoFK(std::string dim_primary_key);

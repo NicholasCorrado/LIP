@@ -60,14 +60,26 @@ SelectExecutor::ConstructFilterNoFK(std::string dim_primary_key){
 
     arrow::Status status;
 	arrow::compute::Datum* filter = GetBitFilter();
-
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
-    auto* out = new arrow::compute::Datum();
+    std::shared_ptr<arrow::Array> counts;
+    arrow::compute::Datum* out = new arrow::compute::Datum();
 
-    status = arrow::compute::Sum(&function_context, *filter, out);
+    // Sum() fails because filter is a boolean array and not a numeric array...
+    // Wait, we don't need to count how many times true appears in the filter to get the number of time we will insert
+    // into the bloom filter; we can just take the length of the resulting output...!!!!!!!
+    //status = arrow::compute::Sum(&function_context, *filter, out);
+    //status = arrow::compute::Count(&function_context, *filter);
+    /*
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
-
-	int n = 500000; //@TODO: Fix this!!!!!!!!!
+    arrow::compute::ValueCounts(&function_context, *filter, &counts);
+    arrow::compute::CastOptions cast_options;
+    //arrow::compute::Cast(&function_context,*filter,arrow::int8(),cast_options, out);
+    arrow::compute::Cast(&function_context,counts,counts->type(),cast_options, out);
+    std::cout << out->make_array()->ToString() << std::endl;
+    std::cout << counts->type() << std::endl;
+    std::cout<<filter->length()<< " " <<counts->length() << std::endl;
+     */
+	int n = 500000;//out->length(); //@TODO: Fix this!!!!!!!!!
 
 	BloomFilter* bf = new BloomFilter(n);
 
@@ -168,8 +180,11 @@ SelectExecutorInt::GetBitFilter(){
     arrow::compute::CompareOptions compare_options(op);
     auto* filter = new arrow::compute::Datum();
 
-
-    std::shared_ptr<arrow::Array> col = dim_table->GetColumnByName(select_field)->chunk(0);
+    //@TODO: THIS IS BAD.
+    std::shared_ptr<arrow::Table> tmp;
+    status = dim_table->CombineChunks(arrow::default_memory_pool(), &tmp);
+    std::shared_ptr<arrow::Array> col = tmp->GetColumnByName(select_field)->chunk(0); //we guarantee that there is only one chunk
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
     // NOTE: Compare() has issues if when you try to compare a chunked array. I'm not sure why, but this may indicate
     // that comparisons should (or maybe even MUST) be done in batches.
     status = arrow::compute::Compare(&function_context, col, value, compare_options, filter);
@@ -226,6 +241,29 @@ arrow::compute::Datum*
 SelectExecutorBetween::GetBitFilter(){
 	arrow::compute::Datum* ret;
 	/* Get bit filter satisfying (lo <= integers <= hi) */
+
+    arrow::Status status;
+    std::shared_ptr<arrow::RecordBatch> in_batch;
+
+    // Instantiate things needed for a call to Compare()
+    arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
+    arrow::compute::CompareOptions compare_options_leq(arrow::compute::CompareOperator::LESS_EQUAL);
+    arrow::compute::CompareOptions compare_options_geq(arrow::compute::CompareOperator::GREATER_EQUAL);
+    auto* filter_leq = new arrow::compute::Datum();
+    auto* filter_geq = new arrow::compute::Datum();
+    auto* filter = new arrow::compute::Datum();
+
+/*
+    std::shared_ptr<arrow::Array> col = dim_table->GetColumnByName(select_field)->chunk(0);
+    status = arrow::compute::Compare(&function_context, col, value, compare_options, filter);
+
+    //@TODO: do a loop instead. You can pass individual filter batches to the parent node if we make the reader a member variable.
+    // Wait, this is just a view over the table; this is fine, but the filter may be large!!!
+    status = arrow::compute::Compare(&function_context, col, value, compare_options, filter);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+*/
+    return filter;
+
 	return ret;
 }
 
@@ -243,7 +281,7 @@ SelectExecutorStrBetween::SelectExecutorStrBetween(std::shared_ptr<arrow::Table>
 arrow::compute::Datum*
 SelectExecutorStrBetween::GetBitFilter(){
     arrow::compute::Datum* ret;
-    /* Get bit filter satisfying (lo <= integers <= hi) */
+    /* Get bit filter satisfying (lo <= strings <= hi) */
     return ret;
 }
 

@@ -150,7 +150,12 @@ int main_nick() {
     //JoinExecutor* j_exe = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
     auto* s_date = new SelectExecutorInt(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
     auto* j1 = new JoinExecutor(s_date, "DATE KEY", "ORDER DATE");
-    auto result = j1->join(lineorder);
+
+    std::shared_ptr<arrow::Table> result;
+
+    std::vector<JoinExecutor*> tree = {j1};
+    //auto result = j1->join(lineorder);
+    result = EvaluateJoinTreeLIP(lineorder, tree);
     std::cout << result->num_rows() << std::endl;
 
     return 0;
