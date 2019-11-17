@@ -14,11 +14,8 @@
 
 class SelectExecutor{
 public:
-	std::shared_ptr<arrow::Table> dim_table; //@TODO remove later
-    //std::shared_ptr<arrow::RecordBatch> in_batch;
 
 	std::shared_ptr<arrow::RecordBatch> select(std::shared_ptr<arrow::RecordBatch> in_batch);
-	BloomFilter* ConstructFilterNoFK(std::string dim_primary_key, std::shared_ptr<arrow::RecordBatch> in_batch);
 
 	virtual arrow::compute::Datum* GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch) = 0;
 };
@@ -31,16 +28,7 @@ public:
 	arrow::compute::Datum* GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch);
 };
 
-class SelectExecutorTree {
-public:
-    std::shared_ptr<arrow::Table> dim_table;
-    arrow::TableBatchReader* reader;
 
-    SelectExecutor* root;
-
-    SelectExecutorTree(std::shared_ptr<arrow::Table> _dim_table, SelectExecutor* _root);
-    std::shared_ptr<arrow::Table> Select();
-};
 
 
 class SelectExecutorInt : public SelectExecutor{
@@ -55,8 +43,6 @@ public:
 							arrow::compute::CompareOperator _op);
 
 	arrow::compute::Datum* GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch);
-
-    arrow::compute::Datum *GetNextBitFilterBatch();
 };
 
 
@@ -70,7 +56,7 @@ public:
 							std::string _select_field, 
 							std::string _value, 
 							arrow::compute::CompareOperator _op);
-	arrow::compute::Datum* GetBitFilter();
+	arrow::compute::Datum* GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch);
 };
 
 
@@ -84,7 +70,7 @@ public:
 							std::string _select_field, 
 							long long _lo_value, 
 							long long _hi_value);
-	arrow::compute::Datum* GetBitFilter();
+	arrow::compute::Datum* GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch);
 };
 
 class SelectExecutorStrBetween : public SelectExecutor{
@@ -98,7 +84,18 @@ public:
                           std::string _select_field,
                           std::string _lo_value,
                           std::string _hi_value);
-    arrow::compute::Datum* GetBitFilter();
+    arrow::compute::Datum* GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch);
+};
+
+
+class SelectExecutorTree {
+public:
+    std::shared_ptr<arrow::Table> dim_table;
+    SelectExecutor* root;
+
+    SelectExecutorTree(std::shared_ptr<arrow::Table> _dim_table, SelectExecutor* _root);
+    std::shared_ptr<arrow::Table> Select();
+    BloomFilter* ConstructBloomFilterNoFK(std::string dim_primary_key);
 };
 
 
@@ -107,18 +104,15 @@ class JoinExecutor{
 private:
 	std::string dim_primary_key;
 	std::string fact_foreign_key;
-	SelectExecutor* select_exe;
 	SelectExecutorTree* select_tree_exe;
 public:
-	JoinExecutor(SelectExecutor* _s_exe, 
-					std::string _dim_primary_key, 
-					std::string fact_foreign_key);
+
     JoinExecutor(SelectExecutorTree* _s_tree_exe,
                  std::string _dim_primary_key,
                  std::string fact_foreign_key);
 
 	std::shared_ptr<arrow::Table> join(std::shared_ptr<arrow::Table> fact_table);
-	BloomFilter* ConstructFilter();
+	BloomFilter* ConstructBloomFilter();
 };
 
 

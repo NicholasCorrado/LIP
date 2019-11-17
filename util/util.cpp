@@ -90,7 +90,6 @@ void PrintTable(std::shared_ptr<arrow::Table> table) {
             }
             std::cout << std::endl;
         }
-        status = reader->ReadNext(&batch);
     }
 }
 

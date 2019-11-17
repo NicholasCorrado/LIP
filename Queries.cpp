@@ -11,7 +11,7 @@
 #include <chrono>
 #include "Queries.h"
 #include "select.h"
-
+#include "util/util.h"
 /*
 
 All queries status:
@@ -172,20 +172,62 @@ int main_nick() {
     std::cout << result->num_rows() << std::endl;
 */
 
+    arrow::Status status;
     auto* s_date_1 = new SelectExecutorInt("YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
-    auto* s_date_2 = new SelectExecutorInt("YEAR", 1995, arrow::compute::CompareOperator::EQUAL);
+    auto* s_date_2 = new SelectExecutorInt("YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
+    auto* s_customer = new SelectExecutorInt("CUST KEY", 2, arrow::compute::CompareOperator::EQUAL);
 
+    std::vector<SelectExecutor*> s_date_children = {s_date_1, s_date_2};
+    auto* s_date_comp = new SelectExecutorComposite(s_date_children);
+    auto* s_date_tree = new SelectExecutorTree(date, s_date_comp);
+    auto* s_customer_tree = new SelectExecutorTree(customer, s_customer);
 
-    std::vector<SelectExecutor*> children = {s_date_1, s_date_2};
-    auto* s_comp = new SelectExecutorComposite(children);
-    auto* s_tree = new SelectExecutorTree(date, s_comp);
+    auto* j_date = new JoinExecutor(s_date_tree, "DATE KEY", "ORDER DATE");
+    auto* j_customer = new JoinExecutor(s_customer_tree, "CUST KEY", "CUST KEY");
 
-    auto* j = new JoinExecutor(s_tree, "DATE KEY", "ORDER DATE");
-    result_table = j->join(lineorder);
+    /*
+    result_table = s_customer_tree->Select();
+    PrintTable(result_table);
+    std::cout<<result_table->num_rows()<<std::endl;
+
+    result_table = j_customer->join(lineorder);
+    PrintTable(result_table);
+    std::cout<<result_table->num_rows()<<std::endl;
+    */
+    std::vector<JoinExecutor*> j = {j_customer, j_date};
+    result_table = EvaluateJoinTree(lineorder,j);
+    PrintTable(result_table);
+    std::cout<<result_table->num_rows()<<std::endl;
+
+    result_table = EvaluateJoinTreeLIP(lineorder,j);
+    PrintTable(result_table);
+    std::cout<<result_table->num_rows()<<std::endl;
+
+    //result_table = j_date->join(lineorder);
     //PrintTable(result_table);
-    std::cout << result_table->num_rows() << std::endl;
+    //std::cout << result_table->num_rows() << std::endl;
 
-    return 0;
+
+    //@TODO: what??????? AHHH okay you can use a select executor for only one query, since the reader is at the end each time you try to reuse it.
+    //std::shared_ptr<arrow::Table> t1 = j_customer->join(lineorder);
+
+
+    //std::shared_ptr<arrow::RecordBatch> b;
+    //status = s_customer_tree->reader->Next(&b);
+    //std::cout<<"customer len = "  << (b == nullptr) << std::endl;
+    //std::shared_ptr<arrow::Table> t2 = j_date->join(lineorder);
+    //Instead of selecting all rows for join with no selects, just leave the option to not do a select.
+    //auto* j_final = new JoinExecutor(nullptr, j_customer);
+
+
+    //PrintTable(result_table);
+    //std::cout << result_table->num_rows() << std::endl;
+//    std::vector<JoinExecutor*> j = {j_customer, j_date};
+//    result_table = EvaluateJoinTree(lineorder,j);
+//    std::cout<<result_table->num_rows()<<std::endl;
+//    PrintTable(result_table);
+//
+//    return 0;
 }
 
 

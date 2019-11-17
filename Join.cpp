@@ -87,9 +87,11 @@ std::shared_ptr<arrow::Table> EvaluateJoinTree(std::shared_ptr<arrow::Table> fac
                                                 std::vector<JoinExecutor*> joinExecutors){
     
     std::shared_ptr<arrow::Table> ret_table = fact_table;
+    std::shared_ptr<arrow::Table> tmp;
 
     for(int i = 0; i < joinExecutors.size(); i++){
-        ret_table = joinExecutors[i] -> join(ret_table); // foreign key is a private var in joinExecutor
+        tmp = joinExecutors[i] -> join(ret_table); // foreign key is a private var in joinExecutor
+        ret_table = tmp;
     }
 
     return ret_table;
@@ -108,7 +110,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     std::vector<BloomFilter*> filters;
 
     for(int i = 0; i < n_dim; i++){
-        BloomFilter* bf = joinExecutors[i] -> ConstructFilter();
+        BloomFilter* bf = joinExecutors[i] -> ConstructBloomFilter();
         filters.push_back(bf);
     }
     

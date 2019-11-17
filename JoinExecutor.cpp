@@ -1,4 +1,3 @@
-
 #include "JoinExecutor.h"
 #include "select.h"
 #include "Join.h"
@@ -22,7 +21,7 @@ SelectExecutor::select(std::shared_ptr<arrow::RecordBatch> in_batch){
     std::vector<std::shared_ptr<arrow::ArrayData>> out_arrays;      // vector of arrays corresponding to outputted columns in a given batch
     std::unique_ptr<arrow::RecordBatchBuilder> out_batch_builder;   // to build a RecordBatch from a vector of arrays
 
-    status = arrow::RecordBatchBuilder::Make(dim_table->schema(), arrow::default_memory_pool(), &out_batch_builder);
+    status = arrow::RecordBatchBuilder::Make(in_batch->schema(), arrow::default_memory_pool(), &out_batch_builder);
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
     // Instantiate things needed for a call to Compare()
@@ -42,61 +41,49 @@ SelectExecutor::select(std::shared_ptr<arrow::RecordBatch> in_batch){
 
 
 BloomFilter* 
-SelectExecutor::ConstructFilterNoFK(std::string dim_primary_key, std::shared_ptr<arrow::RecordBatch> in_batch){
+SelectExecutorTree::ConstructBloomFilterNoFK(std::string dim_primary_key){
 
     arrow::Status status;
-	arrow::compute::Datum* filter = GetBitFilter(in_batch);
+	arrow::compute::Datum* filter;// = GetBitFilter();
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
-    std::shared_ptr<arrow::Array> counts;
-    arrow::compute::Datum* out = new arrow::compute::Datum();
 
-    // Sum() fails because filter is a boolean array and not a numeric array...
-    // Wait, we don't need to count how many times true appears in the filter to get the number of time we will insert
-    // into the bloom filter; we can just take the length of the resulting output...!!!!!!!
-    //status = arrow::compute::Sum(&function_context, *filter, out);
-    //status = arrow::compute::Count(&function_context, *filter);
-    /*
-    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
-    arrow::compute::ValueCounts(&function_context, *filter, &counts);
-    arrow::compute::CastOptions cast_options;
-    //arrow::compute::Cast(&function_context,*filter,arrow::int8(),cast_options, out);
-    arrow::compute::Cast(&function_context,counts,counts->type(),cast_options, out);
-    std::cout << out->make_array()->ToString() << std::endl;
-    std::cout << counts->type() << std::endl;
-    std::cout<<filter->length()<< " " <<counts->length() << std::endl;
-     */
-	int n = 500000;//out->length(); //@TODO: Fix this!!!!!!!!!
+    std::vector<std::shared_ptr<arrow::ArrayData>> out_arrays;      // vector of arrays corresponding to outputted columns in a given batch
+    std::unique_ptr<arrow::RecordBatchBuilder> out_batch_builder;   // to build a RecordBatch from a vector of arrays
+    std::vector<std::shared_ptr<arrow::RecordBatch>> out_batches;   // output table will be built from a vector of RecordBatches
 
-	BloomFilter* bf = new BloomFilter(n);
+    std::shared_ptr<arrow::RecordBatch> in_batch;
+    auto* reader = new arrow::TableBatchReader(*dim_table);
 
-	/*
+    BloomFilter* bf = new BloomFilter(500000);
 
-		add the bloom filter
+    while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
+        filter = root->GetBitFilter(in_batch);
 
-	*/
+        auto* out = new arrow::compute::Datum();
+        status = arrow::compute::Filter(&function_context, in_batch->GetColumnByName(dim_primary_key), *filter, out);
 
-    status = arrow::compute::Filter(&function_context, in_batch->GetColumnByName(dim_primary_key), *filter, out);
-    auto key_col = std::static_pointer_cast<arrow::Int64Array>(out->make_array());
+        std::shared_ptr<arrow::Int64Array> keys = std::static_pointer_cast<arrow::Int64Array>(out->make_array());
 
-    for (int i=0; i<key_col->length(); i++) {
-        long long key = key_col->Value(i);
-        bf -> Insert(key);
+        for (int i=0;i<keys->length(); i++) {
+            bf->Insert(keys->Value(i));
+        }
     }
 
-	return bf;
+    return bf;
+
 }
 	
 
 
 SelectExecutorTree::SelectExecutorTree(std::shared_ptr<arrow::Table> _dim_table, SelectExecutor* _root) {
     dim_table = _dim_table;
-    reader = new arrow::TableBatchReader(*_dim_table);
     root = _root;
 
 }
 
 std::shared_ptr<arrow::Table> SelectExecutorTree::Select() {
 
+    //if (root == nullptr) return dim_table;
     arrow::Status status;
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
 
@@ -106,6 +93,8 @@ std::shared_ptr<arrow::Table> SelectExecutorTree::Select() {
 
     std::shared_ptr<arrow::RecordBatch> in_batch;
     auto* out = new arrow::compute::Datum();
+
+    auto* reader = new arrow::TableBatchReader(*dim_table);
 
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
         arrow::compute::Datum* filter = root->GetBitFilter(in_batch);
@@ -131,7 +120,7 @@ std::shared_ptr<arrow::Table> SelectExecutorTree::Select() {
 
 SelectExecutorComposite::SelectExecutorComposite(std::vector<SelectExecutor*> _children){
 
-    dim_table = _children[0]->dim_table; // assuming that all child select exe have the same dim_table
+    //dim_table = _children[0]->dim_table; // assuming that all child select exe have the same dim_table
 	children = _children;
 }
 
@@ -202,35 +191,12 @@ SelectExecutorInt::GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch){
 }
 
 
-arrow::compute::Datum*
-SelectExecutorInt::GetNextBitFilterBatch(){
-
-    /* Get bit filter satisfying (integers op value) */
-
-    arrow::Status status;
-    std::shared_ptr<arrow::RecordBatch> in_batch;
-
-    // Instantiate things needed for a call to Compare()
-    arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
-    arrow::compute::CompareOptions compare_options(op);
-    auto* filter = new arrow::compute::Datum();
-
-    //status = reader->ReadNext(&in_batch);
-    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
-
-    status = arrow::compute::Compare(&function_context, in_batch->GetColumnByName(select_field), value, compare_options, filter);
-    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
-
-    return filter;
-
-}
-
 
 SelectExecutorStr::SelectExecutorStr(std::shared_ptr<arrow::Table> _dim_table, 
 												std::string _select_field, 
 												std::string _value, 
 												arrow::compute::CompareOperator _op){
-	dim_table = _dim_table;
+	//dim_table = _dim_table;
 	select_field = _select_field;
 
 	value = _value;
@@ -239,9 +205,10 @@ SelectExecutorStr::SelectExecutorStr(std::shared_ptr<arrow::Table> _dim_table,
 
 
 arrow::compute::Datum* 
-SelectExecutorStr::GetBitFilter(){
+SelectExecutorStr::GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch){
 
 	/* Get bit filter satisfying (string op value) */
+	/*
     arrow::Status status;
 
     arrow::BooleanBuilder boolean_builder;
@@ -268,7 +235,8 @@ SelectExecutorStr::GetBitFilter(){
     auto* filter = new arrow::compute::Datum(boolean_array);
 
 	return filter;
-	
+	*/
+	return nullptr;
 }
 
 
@@ -277,7 +245,7 @@ SelectExecutorBetween::SelectExecutorBetween(std::shared_ptr<arrow::Table> _dim_
 												std::string _select_field, 
 												long long _lo_value, 
 												long long _hi_value){
-	dim_table = _dim_table;
+	//dim_table = _dim_table;
 	select_field = _select_field;
 
 	arrow::NumericScalar<arrow::Int64Type> lo_scalar(_lo_value);
@@ -289,12 +257,12 @@ SelectExecutorBetween::SelectExecutorBetween(std::shared_ptr<arrow::Table> _dim_
 
 
 arrow::compute::Datum* 
-SelectExecutorBetween::GetBitFilter(){
+SelectExecutorBetween::GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch){
 	arrow::compute::Datum* ret;
 	/* Get bit filter satisfying (lo <= integers <= hi) */
 
     arrow::Status status;
-    std::shared_ptr<arrow::RecordBatch> in_batch;
+
 
     // Instantiate things needed for a call to Compare()
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
@@ -322,7 +290,7 @@ SelectExecutorStrBetween::SelectExecutorStrBetween(std::shared_ptr<arrow::Table>
                                                    std::string _select_field,
                                                    std::string _lo_value,
                                                    std::string _hi_value) {
-    dim_table = _dim_table;
+    //dim_table = _dim_table;
     select_field = _select_field;
 
     lo_value = _lo_value;
@@ -330,21 +298,12 @@ SelectExecutorStrBetween::SelectExecutorStrBetween(std::shared_ptr<arrow::Table>
 }
 
 arrow::compute::Datum*
-SelectExecutorStrBetween::GetBitFilter(){
+SelectExecutorStrBetween::GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch){
     arrow::compute::Datum* ret;
     /* Get bit filter satisfying (lo <= strings <= hi) */
     return ret;
 }
 
-
-
-JoinExecutor::JoinExecutor(SelectExecutor* _s_exe, 
-							std::string _dim_primary_key, 
-							std::string _fact_foreign_key){
-	fact_foreign_key = _fact_foreign_key;
-	dim_primary_key = _dim_primary_key;
-	select_exe = _s_exe;
-}
 
 JoinExecutor::JoinExecutor(SelectExecutorTree* _s_tree_exe,
                            std::string _dim_primary_key,
@@ -356,7 +315,16 @@ JoinExecutor::JoinExecutor(SelectExecutorTree* _s_tree_exe,
 
 std::shared_ptr<arrow::Table> JoinExecutor::join(std::shared_ptr<arrow::Table> fact_table){
 
-	std::shared_ptr<arrow::Table> dim_table_selected = select_tree_exe ->Select();
+    arrow::Status status;
+    std::shared_ptr<arrow::Table> dim_table_selected;
+
+	if (select_tree_exe->root == nullptr) {
+	    dim_table_selected = select_tree_exe->dim_table;
+	}
+	else {
+        dim_table_selected = select_tree_exe ->Select();
+	}
+
 	std::shared_ptr<arrow::Table> ret;
 	ret = HashJoin(fact_table, fact_foreign_key, dim_table_selected, dim_primary_key);
 	return ret;
@@ -364,8 +332,8 @@ std::shared_ptr<arrow::Table> JoinExecutor::join(std::shared_ptr<arrow::Table> f
 
 
 
-BloomFilter* JoinExecutor::ConstructFilter(){
-	BloomFilter* bf;// = select_exe -> ConstructFilterNoFK(dim_primary_key, in_batch); //@TODO FIX THIS
+BloomFilter* JoinExecutor::ConstructBloomFilter(){
+	BloomFilter* bf = select_tree_exe -> ConstructBloomFilterNoFK(dim_primary_key);
 	bf -> SetForeignKey(fact_foreign_key);
 	return bf;
 }
