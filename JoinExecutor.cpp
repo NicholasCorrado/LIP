@@ -25,7 +25,7 @@ SelectExecutor::select(){
     std::vector<std::shared_ptr<arrow::RecordBatch>> out_batches;   // output table will be built from a vector of RecordBatches
 
     status = arrow::RecordBatchBuilder::Make(dim_table->schema(), arrow::default_memory_pool(), &out_batch_builder);
-    EvaluateStatus(status);
+    EvaluateStatus(status, __FUNCTION__, __LINE__);
 
     // Instantiate things needed for a call to Compare()
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
@@ -48,7 +48,7 @@ SelectExecutor::select(){
     }
 
     status = arrow::Table::FromRecordBatches(out_batches, &ret);
-    EvaluateStatus(status);
+    EvaluateStatus(status, __FUNCTION__, __LINE__);
 
 	return ret;
 }
@@ -65,7 +65,7 @@ SelectExecutor::ConstructFilterNoFK(std::string dim_primary_key){
     auto* out = new arrow::compute::Datum();
 
     status = arrow::compute::Sum(&function_context, *filter, out);
-    EvaluateStatus(status);
+    EvaluateStatus(status, __FUNCTION__, __LINE__);
 
 	int n = 500000; //@TODO: Fix this!!!!!!!!!
 
@@ -115,9 +115,9 @@ SelectExecutorComposite::GetBitFilter(){
 	std::shared_ptr<arrow::BooleanArray> boolean_array;
 
 	status = boolean_builder.AppendValues(dim_table->num_rows(), false);
-	EvaluateStatus(status);
+	EvaluateStatus(status, __FUNCTION__, __LINE__);
 	status = boolean_builder.Finish(&boolean_array);
-	EvaluateStatus(status);
+	EvaluateStatus(status, __FUNCTION__, __LINE__);
 
     auto* filter = new arrow::compute::Datum(boolean_array);
 
@@ -128,7 +128,7 @@ SelectExecutorComposite::GetBitFilter(){
 		arrow::compute::Datum* child_filter = children[child_i] -> GetBitFilter();
 
 		status = arrow::compute::Or(&function_context, *filter, *child_filter, tmp);
-		EvaluateStatus(status);
+		EvaluateStatus(status, __FUNCTION__, __LINE__);
 
 		filter = tmp;
 
@@ -177,7 +177,7 @@ SelectExecutorInt::GetBitFilter(){
     //@TODO: do a loop instead
     // Wait, this is just a view over the table; this is fine, but the filter may be large!!!
     status = arrow::compute::Compare(&function_context, dim_table->GetColumnByName(select_field), value, compare_options, filter);
-    EvaluateStatus(status);
+    EvaluateStatus(status, __FUNCTION__, __LINE__);
 
     return filter;
 

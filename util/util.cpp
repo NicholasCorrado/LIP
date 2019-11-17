@@ -17,7 +17,7 @@ void write_to_file(const char* path, std::shared_ptr<arrow::Table> &table) {
     arrow::Status status;
 
     status = arrow::io::FileOutputStream::Open(path,&file);
-    EvaluateStatus(status);
+    EvaluateStatus(status, __FUNCTION__, __LINE__);
 
     status = arrow::ipc::RecordBatchFileWriter::Open(&*file, table->schema()).status();
 
@@ -25,10 +25,10 @@ void write_to_file(const char* path, std::shared_ptr<arrow::Table> &table) {
         record_batch_writer = arrow::ipc::RecordBatchFileWriter::Open(&*file, table->schema()).ValueOrDie();
     }
     status = record_batch_writer->WriteTable(*table);
-    EvaluateStatus(status);
+    EvaluateStatus(status, __FUNCTION__, __LINE__);
 
     status = record_batch_writer->Close();
-    EvaluateStatus(status);
+    EvaluateStatus(status, __FUNCTION__, __LINE__);
 }
 
 std::shared_ptr<arrow::Table>
@@ -38,7 +38,7 @@ std::shared_ptr<arrow::Table>
 
     std::shared_ptr<arrow::io::ReadableFile> infile;
     status = arrow::io::ReadableFile::Open(file_path, pool, &infile);
-    EvaluateStatus(status);
+    EvaluateStatus(status, __FUNCTION__, __LINE__);
 
     auto read_options = arrow::csv::ReadOptions::Defaults();
     read_options.column_names = schema;
@@ -48,19 +48,19 @@ std::shared_ptr<arrow::Table>
 
     std::shared_ptr<arrow::csv::TableReader> reader;
     status = arrow::csv::TableReader::Make(arrow::default_memory_pool(), infile, read_options, parse_options, convert_options, &reader);
-    EvaluateStatus(status);
+    EvaluateStatus(status, __FUNCTION__, __LINE__);
 
     std::shared_ptr<arrow::Table> table;
     status = reader->Read(&table);
-    EvaluateStatus(status);
+    EvaluateStatus(status, __FUNCTION__, __LINE__);
 
     return table;
 }
 
 
-void EvaluateStatus(arrow::Status status) {
+void EvaluateStatus(const arrow::Status& status, const char* function_name, int line_no) {
     if (!status.ok()) {
-        std::cout << status.message() << std::endl;
+        std::cout << "Invalid status in " << function_name << " at line " << __LINE__ << ": " << status.message() << std::endl;
     }
 }
 void PrintTable(std::shared_ptr<arrow::Table> table) {

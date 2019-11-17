@@ -6,7 +6,7 @@
 #define CSV_TO_ARROW_CPP_UTIL_H
 #include <arrow/api.h>
 
-void EvaluateStatus(arrow::Status status);
+void EvaluateStatus(const arrow::Status& status, const char* function_name, int line_no);
 void PrintTable(std::shared_ptr<arrow::Table> table);
 void AddRowToRecordBatch(int row, std::shared_ptr<arrow::RecordBatch>& in_batch, std::unique_ptr<arrow::RecordBatchBuilder>& out_batch_builder);
 void write_to_file(const char* path, std::shared_ptr<arrow::Table> &table);
