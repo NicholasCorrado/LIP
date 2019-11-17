@@ -173,17 +173,26 @@ int main_nick() {
 */
 
     arrow::Status status;
-    auto* s_date_1 = new SelectExecutorInt("YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
+    auto* s_date_1 = new SelectExecutorBetween("YEAR", 1992, 1994);
     auto* s_date_2 = new SelectExecutorInt("YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
     auto* s_customer = new SelectExecutorInt("CUST KEY", 2, arrow::compute::CompareOperator::EQUAL);
+    auto* s_customer_str = new SelectExecutorStrBetween("REGION", "ASIA", "AMERICA");
 
-    std::vector<SelectExecutor*> s_date_children = {s_date_1, s_date_2};
-    auto* s_date_comp = new SelectExecutorComposite(s_date_children);
-    auto* s_date_tree = new SelectExecutorTree(date, s_date_comp);
-    auto* s_customer_tree = new SelectExecutorTree(customer, s_customer);
+    //std::vector<SelectExecutor*> s_date_children = {s_date_1, s_date_2};
+    std::vector<SelectExecutor*> s_children = {s_date_1, s_customer_str};
+    //auto* s_date_comp = new SelectExecutorComposite(s_date_children);
+    auto* s_date_tree = new SelectExecutorTree(date, s_date_1);
+    auto* s_customer_str_tree = new SelectExecutorTree(customer, s_customer_str);
 
     auto* j_date = new JoinExecutor(s_date_tree, "DATE KEY", "ORDER DATE");
-    auto* j_customer = new JoinExecutor(s_customer_tree, "CUST KEY", "CUST KEY");
+    auto* j_customer = new JoinExecutor(s_customer_str_tree, "CUST KEY", "CUST KEY");
+
+
+    // To select all tuples, pass a null SelectExecutor to the tree.
+
+
+    //auto* j_date = new JoinExecutor(s_date_tree, "DATE KEY", "ORDER DATE");
+    //auto* j_customer = new JoinExecutor(s_customer_tree, "CUST KEY", "CUST KEY");
 
     /*
     result_table = s_customer_tree->Select();

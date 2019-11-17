@@ -192,10 +192,9 @@ SelectExecutorInt::GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch){
 
 
 
-SelectExecutorStr::SelectExecutorStr(std::shared_ptr<arrow::Table> _dim_table, 
-												std::string _select_field, 
-												std::string _value, 
-												arrow::compute::CompareOperator _op){
+SelectExecutorStr::SelectExecutorStr( std::string _select_field,
+                                        std::string _value,
+                                        arrow::compute::CompareOperator _op){
 	//dim_table = _dim_table;
 	select_field = _select_field;
 
@@ -207,22 +206,16 @@ SelectExecutorStr::SelectExecutorStr(std::shared_ptr<arrow::Table> _dim_table,
 arrow::compute::Datum* 
 SelectExecutorStr::GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch){
 
-	/* Get bit filter satisfying (string op value) */
-	/*
+
     arrow::Status status;
 
     arrow::BooleanBuilder boolean_builder;
     std::shared_ptr<arrow::BooleanArray> boolean_array;
 
-    status = boolean_builder.Resize(dim_table->num_rows());
+    status = boolean_builder.Resize(in_batch->num_rows());
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
-    //@TODO: THIS IS BAD.
-    std::shared_ptr<arrow::Table> tmp;
-    status = dim_table->CombineChunks(arrow::default_memory_pool(), &tmp);
-    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
-    auto col = std::static_pointer_cast<arrow::StringArray>(tmp->GetColumnByName(select_field)->chunk(0));//we guarantee that there is only one chunk
-
+    auto col = std::static_pointer_cast<arrow::StringArray>(in_batch->GetColumnByName(select_field));//we guarantee that there is only one chunk
 
     for (int i=0; i<col->length(); i++) {
         status = boolean_builder.Append(EvaluatePredicate(col->GetString(i), value, op));
@@ -235,13 +228,12 @@ SelectExecutorStr::GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch){
     auto* filter = new arrow::compute::Datum(boolean_array);
 
 	return filter;
-	*/
-	return nullptr;
+
 }
 
 
 
-SelectExecutorBetween::SelectExecutorBetween(std::shared_ptr<arrow::Table> _dim_table, 
+SelectExecutorBetween::SelectExecutorBetween(
 												std::string _select_field, 
 												long long _lo_value, 
 												long long _hi_value){
@@ -263,7 +255,6 @@ SelectExecutorBetween::GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch
 
     arrow::Status status;
 
-
     // Instantiate things needed for a call to Compare()
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
     arrow::compute::CompareOptions compare_options_leq(arrow::compute::CompareOperator::LESS_EQUAL);
@@ -272,21 +263,14 @@ SelectExecutorBetween::GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch
     auto* filter_geq = new arrow::compute::Datum();
     auto* filter = new arrow::compute::Datum();
 
-/*
-    std::shared_ptr<arrow::Array> col = dim_table->GetColumnByName(select_field)->chunk(0);
-    status = arrow::compute::Compare(&function_context, col, value, compare_options, filter);
+    status = arrow::compute::Compare(&function_context, in_batch->GetColumnByName(select_field), lo_value, compare_options_geq, filter_geq); // bool array
+    status = arrow::compute::Compare(&function_context, in_batch->GetColumnByName(select_field), hi_value, compare_options_leq, filter_leq); // bool array
+    status = arrow::compute::And(&function_context,*filter_leq, *filter_geq, filter);
 
-    //@TODO: do a loop instead. You can pass individual filter batches to the parent node if we make the reader a member variable.
-    // Wait, this is just a view over the table; this is fine, but the filter may be large!!!
-    status = arrow::compute::Compare(&function_context, col, value, compare_options, filter);
-    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
-*/
     return filter;
-
-	return ret;
 }
 
-SelectExecutorStrBetween::SelectExecutorStrBetween(std::shared_ptr<arrow::Table> _dim_table,
+SelectExecutorStrBetween::SelectExecutorStrBetween(
                                                    std::string _select_field,
                                                    std::string _lo_value,
                                                    std::string _hi_value) {
@@ -301,7 +285,28 @@ arrow::compute::Datum*
 SelectExecutorStrBetween::GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch){
     arrow::compute::Datum* ret;
     /* Get bit filter satisfying (lo <= strings <= hi) */
-    return ret;
+    arrow::Status status;
+
+    arrow::BooleanBuilder boolean_builder;
+    std::shared_ptr<arrow::BooleanArray> boolean_array;
+
+    status = boolean_builder.Resize(in_batch->num_rows());
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+
+    auto col = std::static_pointer_cast<arrow::StringArray>(in_batch->GetColumnByName(select_field));//we guarantee that there is only one chunk
+
+    for (int i=0; i<col->length(); i++) {
+        status = boolean_builder.Append(
+                EvaluatePredicate(col->GetString(i), lo_value, arrow::compute::CompareOperator::GREATER_EQUAL) &&
+                EvaluatePredicate(col->GetString(i), hi_value, arrow::compute::CompareOperator::LESS_EQUAL));
+        EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+    }
+
+    status = boolean_builder.Finish(&boolean_array);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+
+    auto* filter = new arrow::compute::Datum(boolean_array);
+    return filter;
 }
 
 

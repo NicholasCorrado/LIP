@@ -1,11 +1,10 @@
 #include "Join.h"
 #include "util/util.h"
 
-// As on 2019/11/15, we reutrn a table of tuples in left_table that would be joined with a tuple in right_table.
-// Hence, the join result will never be larger than the size of the left_table.
 std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table, std::string left_field, 
                                         std::shared_ptr<arrow::Table> right_table, std::string right_field) {
 
+    if (left_table == nullptr || right_table == nullptr) return nullptr;
 
     std::map<long long, bool> hash;
 
@@ -77,6 +76,7 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
     std::shared_ptr<arrow::Table> result_table;
     status = arrow::Table::FromRecordBatches(out_batches, &result_table);
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+    if (!status.ok()) return nullptr;
 
     return result_table;
 }

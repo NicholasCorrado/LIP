@@ -60,17 +60,17 @@ std::shared_ptr<arrow::Table>
 
 void EvaluateStatus(const arrow::Status& status, const char* function_name, int line_no) {
     if (!status.ok()) {
-        std::cout << "Invalid status: " << function_name << ", line " << __LINE__ << ": " << status.message() << std::endl;
+        std::cout << "Invalid status: " << function_name << ", line " << line_no << ": " << status.message() << std::endl;
     }
 }
-void PrintTable(std::shared_ptr<arrow::Table> table) {
+void PrintTable(std::shared_ptr<arrow::Table> table, int flag) {
 
     auto* reader = new arrow::TableBatchReader(*table);
     std::shared_ptr<arrow::RecordBatch> batch;
     arrow::Status status;
 
     while (reader->ReadNext(&batch).ok() && batch != nullptr) {
-        for (int row=0; row < batch->num_rows(); row++) {
+        for (int row = 0; row < batch->num_rows(); row++) {
             for (int i = 0; i < batch->schema()->num_fields(); i++) {
 
                 int type = batch->schema()->field(i)->type()->id();

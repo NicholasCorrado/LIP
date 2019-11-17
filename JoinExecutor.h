@@ -52,8 +52,7 @@ public:
 	std::string value;
 	arrow::compute::CompareOperator op;
 
-	SelectExecutorStr(std::shared_ptr<arrow::Table> _dim_table, 
-							std::string _select_field, 
+	SelectExecutorStr(std::string _select_field,
 							std::string _value, 
 							arrow::compute::CompareOperator _op);
 	arrow::compute::Datum* GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch);
@@ -66,7 +65,7 @@ public:
 	std::shared_ptr<arrow::Scalar> lo_value;
 	std::shared_ptr<arrow::Scalar> hi_value;
 
-	SelectExecutorBetween(std::shared_ptr<arrow::Table> _dim_table, 
+	SelectExecutorBetween(
 							std::string _select_field, 
 							long long _lo_value, 
 							long long _hi_value);
@@ -80,7 +79,7 @@ public:
     std::string lo_value;
     std::string hi_value;
 
-    SelectExecutorStrBetween(std::shared_ptr<arrow::Table> _dim_table,
+    SelectExecutorStrBetween(
                           std::string _select_field,
                           std::string _lo_value,
                           std::string _hi_value);
