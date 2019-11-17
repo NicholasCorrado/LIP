@@ -22,7 +22,7 @@ enum ALG{
 int main_nick();
 int main_xiating();
 
-
+/*
 void RunAllQueries(std::shared_ptr <arrow::Table> customer, 
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
@@ -130,7 +130,7 @@ void Query4_3(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> supplier,
 				int alg_flag);
 
-
+*/
 #endif //CSV_TO_ARROW_CPP_QUERIES_H
 
 

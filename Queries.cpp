@@ -148,6 +148,10 @@ int main_nick() {
     */
     //SelectExecutor* customer_s_exe = new SelectExecutorCompare(customer, "CUST KEY", 1, arrow::compute::CompareOperator::EQUAL);
     //JoinExecutor* j_exe = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
+
+
+
+    /*
     auto* s_date_1 = new SelectExecutorInt(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
     auto* s_date_2 = new SelectExecutorInt(date, "YEAR", 1995, arrow::compute::CompareOperator::EQUAL);
     std::vector<SelectExecutor*> children = {s_date_1, s_date_2};
@@ -166,6 +170,20 @@ int main_nick() {
     result = EvaluateJoinTreeLIP(lineorder, tree);
     PrintTable(result);
     std::cout << result->num_rows() << std::endl;
+*/
+
+    auto* s_date_1 = new SelectExecutorInt("YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
+    auto* s_date_2 = new SelectExecutorInt("YEAR", 1995, arrow::compute::CompareOperator::EQUAL);
+
+
+    std::vector<SelectExecutor*> children = {s_date_1, s_date_2};
+    auto* s_comp = new SelectExecutorComposite(children);
+    auto* s_tree = new SelectExecutorTree(date, s_comp);
+
+    auto* j = new JoinExecutor(s_tree, "DATE KEY", "ORDER DATE");
+    result_table = j->join(lineorder);
+    //PrintTable(result_table);
+    std::cout << result_table->num_rows() << std::endl;
 
     return 0;
 }
@@ -208,7 +226,7 @@ int main_xiating(){
     supplier    = build_table(file_path_supplier,  pool, supplier_schema);
 
 
-    RunAllQueries(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    //RunAllQueries(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
 
     return 0;
 }
@@ -220,7 +238,7 @@ void RunAllQueries(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> supplier,
                 int alg_flag)
 {
-    Query1_1(customer, date, lineorder, part, supplier, alg_flag);
+    //Query1_1(customer, date, lineorder, part, supplier, alg_flag);
     /*
     Query1_2(customer, date, lineorder, part, supplier, alg_flag);
     Query1_3(customer, date, lineorder, part, supplier, alg_flag);
@@ -259,7 +277,7 @@ void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<Joi
 }
 
 
-
+/*
 // WE NEED SELECT ON FACT TABLE HERE
 void Query1_1(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
@@ -289,7 +307,7 @@ void Query1_1(std::shared_ptr <arrow::Table> customer,
     std::vector <JoinExecutor*> tree = {date_j_exe};
 
     AlgorithmSwitcher(lineorder, tree, alg_flag);
-    
+
 
 
 
@@ -712,3 +730,4 @@ void Query4_3(std::shared_ptr <arrow::Table> customer,
 
 
 
+*/
