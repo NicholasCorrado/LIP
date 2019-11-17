@@ -167,16 +167,16 @@ SelectExecutorInt::GetBitFilter(){
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
     arrow::compute::CompareOptions compare_options(op);
     auto* filter = new arrow::compute::Datum();
-/*
-    arrow::BooleanBuilder boolean_builder;
-    std::shared_ptr<arrow::BooleanArray> boolean_array;
-    boolean_builder.Resize(dim_table->num_rows());
 
-    auto* reader = new arrow::TableBatchReader(*dim_table);
-*/
-    //@TODO: do a loop instead
+
+    std::shared_ptr<arrow::Array> col = dim_table->GetColumnByName(select_field)->chunk(0);
+    // NOTE: Compare() has issues if when you try to compare a chunked array. I'm not sure why, but this may indicate
+    // that comparisons should (or maybe even MUST) be done in batches.
+    status = arrow::compute::Compare(&function_context, col, value, compare_options, filter);
+
+    //@TODO: do a loop instead. You can pass individual filter batches to the parent node if we make the reader a member variable.
     // Wait, this is just a view over the table; this is fine, but the filter may be large!!!
-    status = arrow::compute::Compare(&function_context, dim_table->GetColumnByName(select_field), value, compare_options, filter);
+    status = arrow::compute::Compare(&function_context, col, value, compare_options, filter);
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
     return filter;
