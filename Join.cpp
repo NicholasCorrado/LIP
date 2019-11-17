@@ -29,7 +29,7 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
     std::vector<std::shared_ptr<arrow::RecordBatch>> out_batches;   // output table will be built from a vector of RecordBatches
 
     status = arrow::RecordBatchBuilder::Make(left_table->schema(), arrow::default_memory_pool(), &out_batch_builder);
-    EvaluateStatus(status, __FUNCTION__, __LINE__);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
     reader = new arrow::TableBatchReader(*left_table);
 
@@ -39,7 +39,7 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
         // resize to maximum possible size to avoid resizing many times upon insertion.
         status = array_builder.Resize(in_batch->num_rows());
-        EvaluateStatus(status, __FUNCTION__, __LINE__);
+        EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
         auto col = std::static_pointer_cast<arrow::Int64Array>(in_batch->GetColumnByName(left_field));
 
         for (int i=0; i<col->length(); i++) {
@@ -49,14 +49,14 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
                 // In LIP join, we use an int array to hold the indices. So, hash join and LIP are implemented differently.
                 // This causes issues when trying to compare performance between LIP and has join.
                 status = array_builder.Append(i);
-                EvaluateStatus(status, __FUNCTION__, __LINE__);
+                EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
                 //AddRowToRecordBatch(i, in_batch, out_batch_builder);
             }
         }
 
         std::shared_ptr<arrow::Int64Array> indices_array;
         status = array_builder.Finish(&indices_array); // builders are automatically reset upon calling Finish()
-        EvaluateStatus(status, __FUNCTION__, __LINE__);
+        EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
         // Instantiate things needed for a call to Take()
         arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
@@ -65,7 +65,7 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
 
         for (int k=0; k<in_batch->schema()->num_fields(); k++) {
             status = arrow::compute::Take(&function_context,in_batch->column(k),indices_array, take_options, out);
-            EvaluateStatus(status, __FUNCTION__, __LINE__);
+            EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
             out_arrays.push_back(out->array());
         }
 
@@ -76,7 +76,7 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
     }
     std::shared_ptr<arrow::Table> result_table;
     status = arrow::Table::FromRecordBatches(out_batches, &result_table);
-    EvaluateStatus(status, __FUNCTION__, __LINE__);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
     return result_table;
 }
@@ -176,9 +176,9 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
         arrow::Int64Builder indices_builder;
         std::shared_ptr<arrow::Array> indices_array;
         status = indices_builder.AppendValues(indices,indices+index_size);
-        EvaluateStatus(status, __FUNCTION__, __LINE__);
+        EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
         status = indices_builder.Finish(&indices_array);
-        EvaluateStatus(status, __FUNCTION__, __LINE__);
+        EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
         // Instantiate things needed for a call to Take()
         arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
@@ -187,7 +187,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
 
         for (int k=0; k<in_batch->schema()->num_fields(); k++) {
             status = arrow::compute::Take(&function_context,in_batch->column(k),indices_array, take_options, out);
-            EvaluateStatus(status, __FUNCTION__, __LINE__);
+            EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
             out_arrays.push_back(out->array());
         }
 
@@ -200,7 +200,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
 
     std::shared_ptr<arrow::Table> result_table;
     status = arrow::Table::FromRecordBatches(out_batches, &result_table);
-    EvaluateStatus(status, __FUNCTION__, __LINE__);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
     return result_table;
     //return EvaluateJoinTree(result_table, joinExecutors);

@@ -20,7 +20,7 @@ arrow::compute::Datum* GetSelectFilter(std::shared_ptr<arrow::RecordBatch> in_ba
     auto* filter = new arrow::compute::Datum();
 
     status = arrow::compute::Compare(&function_context, in_batch->GetColumnByName(select_field), value, compare_options, filter);
-    EvaluateStatus(status, __FUNCTION__, __LINE__);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
     return filter;
 }
@@ -51,7 +51,7 @@ arrow::compute::Datum* CombineSelectFilters(arrow::compute::Datum  &filter1,
             status = arrow::compute::Xor(&function_context, filter1, filter2, filter);
             break;
     }
-    EvaluateStatus(status, __FUNCTION__, __LINE__);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
     return filter;
 }
 
@@ -66,19 +66,19 @@ arrow::compute::Datum* CombineSelectFilters(std::vector<arrow::compute::Datum*> 
         case FilterCompareOperator::AND:
             for (int i=1; i<filters.size(); i++) {
                 status = arrow::compute::And(&function_context, *filter, *filters[i], filter);
-                EvaluateStatus(status, __FUNCTION__, __LINE__);
+                EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
             }
             break;
         case FilterCompareOperator::OR:
             for (int i=1; i<filters.size(); i++) {
                 status = arrow::compute::Or(&function_context, *filter, *filters[i], filter);
-                EvaluateStatus(status, __FUNCTION__, __LINE__);
+                EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
             }
             break;
         case FilterCompareOperator::XOR:
             for (int i=1; i<filters.size(); i++) {
                 status = arrow::compute::Xor(&function_context, *filter, *filters[i], filter);
-                EvaluateStatus(status, __FUNCTION__, __LINE__);
+                EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
             }
             break;
     }
@@ -101,7 +101,7 @@ std::shared_ptr<arrow::Table> SelectMany(std::shared_ptr<arrow::Table> table,
     std::vector<std::shared_ptr<arrow::RecordBatch>> out_batches;   // output table will be built from a vector of RecordBatches
 
     status = arrow::RecordBatchBuilder::Make(table->schema(), arrow::default_memory_pool(), &out_batch_builder);
-    EvaluateStatus(status, __FUNCTION__, __LINE__);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
     // Instantiate things needed for a call to Compare()
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
@@ -141,7 +141,7 @@ std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table,
     std::vector<std::shared_ptr<arrow::RecordBatch>> out_batches;   // output table will be built from a vector of RecordBatches
 
     status = arrow::RecordBatchBuilder::Make(table->schema(), arrow::default_memory_pool(), &out_batch_builder);
-    EvaluateStatus(status, __FUNCTION__, __LINE__);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
     // Instantiate things needed for a call to Compare()
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
@@ -170,7 +170,7 @@ std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table,
 
     std::shared_ptr<arrow::Table> result_table;
     status = arrow::Table::FromRecordBatches(out_batches, &result_table);
-    EvaluateStatus(status, __FUNCTION__, __LINE__);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
     return result_table;
 }
@@ -206,7 +206,7 @@ std::shared_ptr<arrow::Table> SelectString(std::shared_ptr<arrow::Table> table, 
     std::vector<std::shared_ptr<arrow::RecordBatch>> out_batches;
 
     status = arrow::RecordBatchBuilder::Make(table->schema(), arrow::default_memory_pool(), &out_batch_builder);
-    EvaluateStatus(status, __FUNCTION__, __LINE__);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
     auto* reader = new arrow::TableBatchReader(*table);
 
     // The Status outcome object returned by ReadNext() does NOT return an error when you are already at the final
@@ -228,14 +228,14 @@ std::shared_ptr<arrow::Table> SelectString(std::shared_ptr<arrow::Table> table, 
         std::shared_ptr<arrow::RecordBatch> out_batch;
 
         status = out_batch_builder->Flush(true, &out_batch);
-        EvaluateStatus(status, __FUNCTION__, __LINE__);
+        EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
         out_batches.push_back(out_batch);
     }
 
     std::shared_ptr<arrow::Table> result_table;
     status = arrow::Table::FromRecordBatches(out_batches, &result_table);
-    EvaluateStatus(status, __FUNCTION__, __LINE__);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
     return result_table;
 }
@@ -248,7 +248,7 @@ std::shared_ptr<arrow::Table> SelectStringBetween(std::shared_ptr<arrow::Table> 
     std::vector<std::shared_ptr<arrow::RecordBatch>> out_batches;
 
     status = arrow::RecordBatchBuilder::Make(table->schema(), arrow::default_memory_pool(), &out_batch_builder);
-    EvaluateStatus(status, __FUNCTION__, __LINE__);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
     auto* reader = new arrow::TableBatchReader(*table);
 
     // The Status outcome object returned by ReadNext() does NOT return an error when you are already at the final
@@ -271,14 +271,14 @@ std::shared_ptr<arrow::Table> SelectStringBetween(std::shared_ptr<arrow::Table> 
         std::shared_ptr<arrow::RecordBatch> out_batch;
 
         status = out_batch_builder->Flush(true, &out_batch);
-        EvaluateStatus(status, __FUNCTION__, __LINE__);
+        EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
         out_batches.push_back(out_batch);
     }
 
     std::shared_ptr<arrow::Table> result_table;
     status = arrow::Table::FromRecordBatches(out_batches, &result_table);
-    EvaluateStatus(status, __FUNCTION__, __LINE__);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
 
     return result_table;
 }

@@ -12,4 +12,7 @@ void AddRowToRecordBatch(int row, std::shared_ptr<arrow::RecordBatch>& in_batch,
 void write_to_file(const char* path, std::shared_ptr<arrow::Table> &table);
 std::shared_ptr<arrow::Table> build_table(const std::string& file_path, arrow::MemoryPool *pool, std::vector<std::string> &schema);
 
+//@TODO: EvaluateStatus should really be a macro
+//#define EVALUATE_STATUS()
+
 #endif //CSV_TO_ARROW_CPP_UTIL_H

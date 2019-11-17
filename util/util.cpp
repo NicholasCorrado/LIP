@@ -60,7 +60,7 @@ std::shared_ptr<arrow::Table>
 
 void EvaluateStatus(const arrow::Status& status, const char* function_name, int line_no) {
     if (!status.ok()) {
-        std::cout << "Invalid status in " << function_name << " at line " << __LINE__ << ": " << status.message() << std::endl;
+        std::cout << "Invalid status: " << function_name << ", line " << __LINE__ << ": " << status.message() << std::endl;
     }
 }
 void PrintTable(std::shared_ptr<arrow::Table> table) {
