@@ -12,11 +12,10 @@
 
 
 
-
 class SelectExecutor{
 public:
 	std::shared_ptr<arrow::Table> dim_table;
-    std::shared_ptr<arrow::TableBatchReader> reader;
+    arrow::TableBatchReader* reader;
 
 	std::shared_ptr<arrow::Table> select();
 	BloomFilter* ConstructFilterNoFK(std::string dim_primary_key);
@@ -32,6 +31,14 @@ public:
 	arrow::compute::Datum* GetBitFilter();
 };
 
+class SelectExceutorTree {
+    std::shared_ptr<arrow::Table> dim_table;
+    arrow::TableBatchReader* reader;
+
+    SelectExecutor* root;
+};
+
+
 class SelectExecutorInt : public SelectExecutor{
 public:
 	std::string select_field;
@@ -44,6 +51,8 @@ public:
 							long long _value, 
 							arrow::compute::CompareOperator _op);
 	arrow::compute::Datum* GetBitFilter();
+
+    arrow::compute::Datum *GetNextBitFilterBatch();
 };
 
 

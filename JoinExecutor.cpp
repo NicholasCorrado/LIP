@@ -114,6 +114,8 @@ SelectExecutor::ConstructFilterNoFK(std::string dim_primary_key){
 
 
 SelectExecutorComposite::SelectExecutorComposite(std::vector<SelectExecutor*> _children){
+
+    dim_table = _children[0]->dim_table; // assuming that all child select exe have the same dim_table
 	children = _children;
 }
 
@@ -158,6 +160,7 @@ SelectExecutorInt::SelectExecutorInt(std::shared_ptr<arrow::Table> _dim_table,
 												long long _value, 
 												arrow::compute::CompareOperator _op){
 	dim_table = _dim_table;
+	reader = new arrow::TableBatchReader(*_dim_table);
 	select_field = _select_field;
 
 	arrow::NumericScalar<arrow::Int64Type> myscalar(_value);
@@ -199,6 +202,29 @@ SelectExecutorInt::GetBitFilter(){
 }
 
 
+arrow::compute::Datum*
+SelectExecutorInt::GetNextBitFilterBatch(){
+
+    /* Get bit filter satisfying (integers op value) */
+
+    arrow::Status status;
+    std::shared_ptr<arrow::RecordBatch> in_batch;
+
+    // Instantiate things needed for a call to Compare()
+    arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
+    arrow::compute::CompareOptions compare_options(op);
+    auto* filter = new arrow::compute::Datum();
+
+    status = reader->ReadNext(&in_batch);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+
+    status = arrow::compute::Compare(&function_context, in_batch->GetColumnByName(select_field), value, compare_options, filter);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+
+    return filter;
+
+}
+
 
 SelectExecutorStr::SelectExecutorStr(std::shared_ptr<arrow::Table> _dim_table, 
 												std::string _select_field, 
@@ -214,9 +240,34 @@ SelectExecutorStr::SelectExecutorStr(std::shared_ptr<arrow::Table> _dim_table,
 
 arrow::compute::Datum* 
 SelectExecutorStr::GetBitFilter(){
-	arrow::compute::Datum* ret;
+
 	/* Get bit filter satisfying (string op value) */
-	return ret;
+    arrow::Status status;
+
+    arrow::BooleanBuilder boolean_builder;
+    std::shared_ptr<arrow::BooleanArray> boolean_array;
+
+    status = boolean_builder.Resize(dim_table->num_rows());
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+
+    //@TODO: THIS IS BAD.
+    std::shared_ptr<arrow::Table> tmp;
+    status = dim_table->CombineChunks(arrow::default_memory_pool(), &tmp);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+    auto col = std::static_pointer_cast<arrow::StringArray>(tmp->GetColumnByName(select_field)->chunk(0));//we guarantee that there is only one chunk
+
+
+    for (int i=0; i<col->length(); i++) {
+        status = boolean_builder.Append(EvaluatePredicate(col->GetString(i), value, op));
+        EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+    }
+
+    status = boolean_builder.Finish(&boolean_array);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+
+    auto* filter = new arrow::compute::Datum(boolean_array);
+
+	return filter;
 	
 }
 

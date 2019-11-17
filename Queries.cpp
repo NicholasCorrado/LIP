@@ -148,14 +148,23 @@ int main_nick() {
     */
     //SelectExecutor* customer_s_exe = new SelectExecutorCompare(customer, "CUST KEY", 1, arrow::compute::CompareOperator::EQUAL);
     //JoinExecutor* j_exe = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
-    auto* s_date = new SelectExecutorInt(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
-    auto* j1 = new JoinExecutor(s_date, "DATE KEY", "ORDER DATE");
+    auto* s_date_1 = new SelectExecutorInt(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
+    auto* s_date_2 = new SelectExecutorInt(date, "YEAR", 1995, arrow::compute::CompareOperator::EQUAL);
+    std::vector<SelectExecutor*> children = {s_date_1, s_date_2};
+    auto* s_comp = new SelectExecutorComposite(children);
 
+    auto* s_customer = new SelectExecutorInt(customer, "CUST KEY", 1, arrow::compute::CompareOperator::EQUAL);
+    //auto* j1 = new JoinExecutor(s_date, "DATE KEY", "ORDER DATE");
+    //auto* j2 = new JoinExecutor(s_customer, "CUST KEY", "CUST KEY");
+    auto* j = new JoinExecutor(s_comp, "DATE KEY", "ORDER DATE");
     std::shared_ptr<arrow::Table> result;
 
-    std::vector<JoinExecutor*> tree = {j1};
+    result = j->join(lineorder);
+    PrintTable(result);
+    std::vector<JoinExecutor*> tree = {j};
     //auto result = j1->join(lineorder);
     result = EvaluateJoinTreeLIP(lineorder, tree);
+    PrintTable(result);
     std::cout << result->num_rows() << std::endl;
 
     return 0;
