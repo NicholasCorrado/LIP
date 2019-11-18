@@ -21,6 +21,8 @@ enum ALG{
 
 int ui();
 
+int run(std::string q, std::string alg);
+
 int main_nick();
 int main_xiating();
 

@@ -50,16 +50,14 @@ int ui(){
         return 0;
     }
 
-
-    
-
-
     std::string alg;
     std::cout << "Choose an algorithm [lip] or [hash]\n>>> ";
     std::cin >> alg;
+    run(q, alg);
+    return 0;
+}
 
-
-
+int run(std::string q, std::string alg){
     std::string file_path_customer  = "./benchmark/customer.tbl";
     std::string file_path_date      = "./benchmark/date.tbl";
     std::string file_path_lineorder = "./benchmark/lineorder.tbl";
@@ -155,10 +153,7 @@ int ui(){
             
     }
 
-    return 0;
 }
-
-
 
 int main_nick() {
 

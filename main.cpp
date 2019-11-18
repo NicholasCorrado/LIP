@@ -3,9 +3,16 @@
 //
 #include "Queries.h"
 
-int main(){
+int main(int argc, char *argv[]){
 
-    ui();
-
+	if (argc <= 1){
+		ui();
+	}
+	else if (argc >= 3){
+		run(argv[1], argv[2]);
+	}
+	else{
+		std::cout << "Invalid arguments." << std::endl;
+	}
     return 0;
 }
