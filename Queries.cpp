@@ -39,25 +39,32 @@ All queries status:
 
 
 int ui(){
-    std::cout << "To run a specific query [2.3] or [all]" << std::endl;
-    std::cout << "To run main_nick, enter nick" << std::endl;
-    std::string q;
-    std::cout << ">>> ";
-    std::cin >> q;
+    while(true){
+        std::cout << "To run a specific query [2.3] or [all]" << std::endl;
+        std::cout << "To run main_nick, enter nick" << std::endl;
+        std::string q;
+        std::cout << ">>> ";
+        std::cin >> q;
 
-    if (q == "nick"){
-        main_nick();
-        return 0;
+        if (q == "nick"){
+            main_nick();
+            continue;
+        }
+        if (q == "quit"){
+            break;
+        }
+
+        std::string alg;
+        std::cout << "Choose an algorithm [lip] or [hash]\n>>> ";
+        std::cin >> alg;
+        run(q, alg);
+        
     }
-
-    std::string alg;
-    std::cout << "Choose an algorithm [lip] or [hash]\n>>> ";
-    std::cin >> alg;
-    run(q, alg);
     return 0;
 }
 
 int run(std::string q, std::string alg){
+
     std::string file_path_customer  = "./benchmark/customer.tbl";
     std::string file_path_date      = "./benchmark/date.tbl";
     std::string file_path_lineorder = "./benchmark/lineorder.tbl";
@@ -93,66 +100,56 @@ int run(std::string q, std::string alg){
     supplier    = build_table(file_path_supplier,  pool, supplier_schema);
 
 
+    if (q == "nick") {
+        main_nick();
+        return 0;
+    }
+    if (q == "exit") {
+        return 0;
+    }
 
     int alg_flag;
 
-    if (alg == "lip"){
+    if (alg == "lip") {
         alg_flag = ALG::LIP_STANDARD;
-    }  
-    else if (alg == "hash"){
+    } else if (alg == "hash") {
         alg_flag = ALG::HASH_JOIN;
-    }       
-    else{
+    } else {
         alg_flag = ALG::UNKNOWN;
     }
 
-    if (q == "1.1"){
+    if (q == "1.1") {
         Query1_1(customer, date, lineorder, part, supplier, alg_flag);
-    }
-    else if (q == "1.2"){
+    } else if (q == "1.2") {
         Query1_2(customer, date, lineorder, part, supplier, alg_flag);
-    }
-    else if (q == "1.3"){
+    } else if (q == "1.3") {
         Query1_3(customer, date, lineorder, part, supplier, alg_flag);
-    }
-    else if (q == "2.1"){
+    } else if (q == "2.1") {
         Query2_1(customer, date, lineorder, part, supplier, alg_flag);
-    }
-    else if (q == "2.2"){
+    } else if (q == "2.2") {
         Query2_2(customer, date, lineorder, part, supplier, alg_flag);
-    }
-    else if (q == "2.3"){
+    } else if (q == "2.3") {
         Query2_3(customer, date, lineorder, part, supplier, alg_flag);
-    }
-    else if (q == "3.1"){
+    } else if (q == "3.1") {
         Query3_1(customer, date, lineorder, part, supplier, alg_flag);
-    }
-    else if (q == "3.2"){
+    } else if (q == "3.2") {
         Query3_2(customer, date, lineorder, part, supplier, alg_flag);
-    }
-    else if (q == "3.3"){
+    } else if (q == "3.3") {
         Query3_3(customer, date, lineorder, part, supplier, alg_flag);
-    }
-    else if (q == "3.4"){
+    } else if (q == "3.4") {
         Query3_4(customer, date, lineorder, part, supplier, alg_flag);
-    }
-    else if (q == "4.1"){
+    } else if (q == "4.1") {
         Query4_1(customer, date, lineorder, part, supplier, alg_flag);
-    }
-    else if (q == "4.2"){
+    } else if (q == "4.2") {
         Query4_2(customer, date, lineorder, part, supplier, alg_flag);
-    }
-    else if (q == "4.3"){
+    } else if (q == "4.3") {
         Query4_3(customer, date, lineorder, part, supplier, alg_flag);
-    }
-    else if (q == "all"){
+    } else if (q == "all") {
         RunAllQueries(customer, date, lineorder, part, supplier, alg_flag);
-    }
-    else{
+    } else {
         std::cout << "Unknown query entered." << std::endl;
-            
     }
-
+    return 0;
 }
 
 int main_nick() {
