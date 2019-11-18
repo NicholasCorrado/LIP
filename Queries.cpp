@@ -42,11 +42,11 @@ All queries status:
 
 int main_nick() {
 
-    std::string file_path_customer = "benchmark/customer.tbl";
-    std::string file_path_date = "benchmark/date.tbl";
+    std::string file_path_customer  = "benchmark/customer.tbl";
+    std::string file_path_date      = "benchmark/date.tbl";
     std::string file_path_lineorder = "benchmark/lineorder.tbl";
-    std::string file_path_part = "benchmark/part.tbl";
-    std::string file_path_supplier = "benchmark/supplier.tbl";
+    std::string file_path_part      = "benchmark/part.tbl";
+    std::string file_path_supplier  = "benchmark/supplier.tbl";
 
 
     std::vector <std::string> customer_schema = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
