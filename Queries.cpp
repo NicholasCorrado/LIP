@@ -38,6 +38,126 @@ All queries status:
 */
 
 
+int ui(){
+    std::cout << "To run a specific query [2.3] or [all]" << std::endl;
+    std::cout << "To run main_nick, enter nick" << std::endl;
+    std::string q;
+    std::cout << ">>> ";
+    std::cin >> q;
+
+    if (q == "nick"){
+        main_nick();
+        return 0;
+    }
+
+
+    
+
+
+    std::string alg;
+    std::cout << "Choose an algorithm [lip] or [hash]\n>>> ";
+    std::cin >> alg;
+
+
+
+    std::string file_path_customer  = "./benchmark/customer.tbl";
+    std::string file_path_date      = "./benchmark/date.tbl";
+    std::string file_path_lineorder = "./benchmark/lineorder.tbl";
+    std::string file_path_part      = "./benchmark/part.tbl";
+    std::string file_path_supplier  = "./benchmark/supplier.tbl";
+
+
+    std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
+                                                   "MKT SEGMENT"};
+    std::vector<std::string> date_schema        = {"DATE KEY", "DATE", "DAY OF WEEK", "MONTH", "YEAR", "YEAR MONTH NUM",
+                                                   "YEAR MONTH", "DAY NUM IN WEEK", "DAY NUM IN MONTH", "MONTH NUM IN YEAR",
+                                                   "WEEK NUM IN YEAR", "SELLING SEASON", "LAST DAY IN WEEK FL",
+                                                   "LAST DAT IN MONTH FL", "HOLIDAY FL", "WEEKDAY FL", "DAY NUM YEAR"};
+    std::vector<std::string> lineorder_schema   = {"ORDER KEY", "LINE NUMBER", "CUST KEY", "PART KEY", "SUPP KEY",
+                                                   "ORDER DATE", "ORD PRIORITY", "SHIP PRIORITY", "QUANTITY",
+                                                   "EXTENDED PRICE", "ORD TOTAL PRICE", "DISCOUNT", "REVENUE",
+                                                   "SUPPLY COST", "TAX", "COMMIT DATE", "SHIP MODE"};
+    std::vector<std::string> part_schema        = {"PART KEY", "NAME", "MFGR", "CATEGORY", "BRAND", "COLOR", "TYPE", "SIZE", "CONTAINER"};
+    std::vector<std::string> supplier_schema    = {"SUPP KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE"};
+
+    std::shared_ptr<arrow::Table> customer;
+    std::shared_ptr<arrow::Table> date;
+    std::shared_ptr<arrow::Table> lineorder;
+    std::shared_ptr<arrow::Table> part;
+    std::shared_ptr<arrow::Table> supplier;
+
+    arrow::MemoryPool *pool = arrow::default_memory_pool();
+
+    customer    = build_table(file_path_customer,  pool, customer_schema);
+    date        = build_table(file_path_date,      pool, date_schema);
+    lineorder   = build_table(file_path_lineorder, pool, lineorder_schema);
+    part        = build_table(file_path_part,      pool, part_schema);
+    supplier    = build_table(file_path_supplier,  pool, supplier_schema);
+
+
+
+    int alg_flag;
+
+    if (alg == "lip"){
+        alg_flag = ALG::LIP_STANDARD;
+    }  
+    else if (alg == "hash"){
+        alg_flag = ALG::HASH_JOIN;
+    }       
+    else{
+        alg_flag = ALG::UNKNOWN;
+    }
+
+    if (q == "1.1"){
+        Query1_1(customer, date, lineorder, part, supplier, alg_flag);
+    }
+    else if (q == "1.2"){
+        Query1_2(customer, date, lineorder, part, supplier, alg_flag);
+    }
+    else if (q == "1.3"){
+        Query1_3(customer, date, lineorder, part, supplier, alg_flag);
+    }
+    else if (q == "2.1"){
+        Query2_1(customer, date, lineorder, part, supplier, alg_flag);
+    }
+    else if (q == "2.2"){
+        Query2_2(customer, date, lineorder, part, supplier, alg_flag);
+    }
+    else if (q == "2.3"){
+        Query2_3(customer, date, lineorder, part, supplier, alg_flag);
+    }
+    else if (q == "3.1"){
+        Query3_1(customer, date, lineorder, part, supplier, alg_flag);
+    }
+    else if (q == "3.2"){
+        Query3_2(customer, date, lineorder, part, supplier, alg_flag);
+    }
+    else if (q == "3.3"){
+        Query3_3(customer, date, lineorder, part, supplier, alg_flag);
+    }
+    else if (q == "3.4"){
+        Query3_4(customer, date, lineorder, part, supplier, alg_flag);
+    }
+    else if (q == "4.1"){
+        Query4_1(customer, date, lineorder, part, supplier, alg_flag);
+    }
+    else if (q == "4.2"){
+        Query4_2(customer, date, lineorder, part, supplier, alg_flag);
+    }
+    else if (q == "4.3"){
+        Query4_3(customer, date, lineorder, part, supplier, alg_flag);
+    }
+    else if (q == "all"){
+        RunAllQueries(customer, date, lineorder, part, supplier, alg_flag);
+    }
+    else{
+        std::cout << "Unknown query entered." << std::endl;
+            
+    }
+
+    return 0;
+}
+
 
 
 int main_nick() {

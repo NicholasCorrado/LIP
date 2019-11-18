@@ -6,7 +6,7 @@
 int main(){
     //main_nick();
 
-    main_xiating();
+    ui();
 
     return 0;
 }

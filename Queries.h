@@ -15,9 +15,11 @@
 
 enum ALG{
 	HASH_JOIN,
-	LIP_STANDARD
+	LIP_STANDARD,
+	UNKNOWN
 };
 
+int ui();
 
 int main_nick();
 int main_xiating();
