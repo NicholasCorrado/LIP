@@ -50,7 +50,7 @@ int ui(){
             main_nick();
             continue;
         }
-        if (q == "quit"){
+        if (q == "quit" || q == "exit"){
             break;
         }
 
@@ -104,7 +104,7 @@ int run(std::string q, std::string alg){
         main_nick();
         return 0;
     }
-    if (q == "exit") {
+    if (q == "exit" || q == "quit") {
         return 0;
     }
 
@@ -481,7 +481,6 @@ void RunAllQueries(std::shared_ptr <arrow::Table> customer,
 
 
 void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<JoinExecutor*> tree, int alg_flag){
-    
     std::shared_ptr <arrow::Table> result_table = nullptr;
     switch (alg_flag){
         case ALG::HASH_JOIN:
