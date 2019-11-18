@@ -130,7 +130,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     status = arrow::RecordBatchBuilder::Make(fact_table->schema(), arrow::default_memory_pool(), &out_batch_builder);
 
     auto* reader = new arrow::TableBatchReader(*fact_table);
-    reader->set_chunksize(2 << 10);
+    //reader->set_chunksize(2 << 10);
     int* indices;
 
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {

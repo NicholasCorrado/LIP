@@ -4,7 +4,6 @@
 #include "Queries.h"
 
 int main(){
-    //main_nick();
 
     ui();
 
