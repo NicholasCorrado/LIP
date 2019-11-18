@@ -290,47 +290,52 @@ void RunAllQueries_nick(std::shared_ptr <arrow::Table> customer,
                    std::shared_ptr <arrow::Table> part,
                    std::shared_ptr <arrow::Table> supplier)
 {
-    Query1_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    Query1_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<<std::endl;
-    Query1_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    Query1_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<<std::endl;
-    Query1_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    Query1_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<<std::endl;
 
-    Query2_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    Query2_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<<std::endl;
-    Query2_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    Query2_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<<std::endl;
-    Query2_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    Query2_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<<std::endl;
+    int hashjoin_time = 0;
+    int LIPjoin_time = 0;
 
-    Query3_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    Query3_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<<std::endl;
-    Query3_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    Query3_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<<std::endl;
-    Query3_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    Query3_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<<std::endl;
-    Query3_4(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    Query3_4(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<<std::endl;
+    hashjoin_time = Query1_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    LIPjoin_time  = Query1_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+    hashjoin_time = Query1_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    LIPjoin_time  = Query1_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+    hashjoin_time = Query1_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    LIPjoin_time  = Query1_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
 
-    Query4_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    Query4_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<<std::endl;
-    Query4_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    Query4_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<<std::endl;
-    Query4_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    Query4_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    hashjoin_time = Query2_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    LIPjoin_time  = Query2_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+    hashjoin_time = Query2_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    LIPjoin_time  = Query2_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+    hashjoin_time = Query2_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    LIPjoin_time  = Query2_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+
+    hashjoin_time = Query3_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    LIPjoin_time  = Query3_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+    hashjoin_time = Query3_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    LIPjoin_time  = Query3_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+    hashjoin_time = Query3_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    LIPjoin_time  = Query3_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+    hashjoin_time = Query3_4(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    LIPjoin_time  = Query3_4(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+
+    hashjoin_time = Query4_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    LIPjoin_time  = Query4_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+    hashjoin_time = Query4_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    LIPjoin_time  = Query4_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+    hashjoin_time = Query4_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    LIPjoin_time  = Query4_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
 }
 
 void RunAllQueries(std::shared_ptr <arrow::Table> customer, 
