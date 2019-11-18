@@ -1,5 +1,15 @@
-./csv_to_arrow all hash > scripts/data/hash
-./csv_to_arrow all lip > scripts/data/lip
-./csv_to_arrow all xiating > scripts/data/xiating
+make
+
+query=$1
+
+if [ "$#" -ne 1 ]; then
+    query=all
+fi
+
+echo $query
+
+./csv_to_arrow $query hash > scripts/data/hash
+./csv_to_arrow $query lip > scripts/data/lip
+./csv_to_arrow $query xiating > scripts/data/xiating
 
 python3 ./scripts/plot.py
