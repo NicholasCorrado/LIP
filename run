@@ -1,0 +1,5 @@
+./csv_to_arrow all hash > scripts/data/hash
+./csv_to_arrow all lip > scripts/data/lip
+./csv_to_arrow all xiating > scripts/data/xiating
+
+python3 ./scripts/plot.py

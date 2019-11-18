@@ -9,3 +9,7 @@
 !/doc/*.sty
 !.gitignore
 !CMakeLists.txt
+!/scripts/
+/scripts/*
+!/scripts/*.py
+!run

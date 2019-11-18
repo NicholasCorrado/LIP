@@ -114,6 +114,8 @@ int run(std::string q, std::string alg){
         alg_flag = ALG::LIP_STANDARD;
     } else if (alg == "hash") {
         alg_flag = ALG::HASH_JOIN;
+    } else if (alg == "xiating") {
+        alg_flag = ALG::LIP_XIATING;
     } else {
         alg_flag = ALG::UNKNOWN;
     }
@@ -488,6 +490,9 @@ void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<Joi
             break;
         case ALG::LIP_STANDARD:
             result_table = EvaluateJoinTreeLIP(lineorder, tree);
+            break;
+        case ALG::LIP_XIATING:
+            result_table = EvaluateJoinTreeLIPXiating(lineorder, tree);
             break;
         default:
             std::cout << "Unknown algorithm" << std::endl;
