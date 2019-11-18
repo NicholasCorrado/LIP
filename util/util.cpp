@@ -64,7 +64,10 @@ void EvaluateStatus(const arrow::Status& status, const char* function_name, int 
     }
 }
 void PrintTable(std::shared_ptr<arrow::Table> table, int flag) {
-
+    if (table == nullptr) {
+        std::cout << "Table with 0 rows." << std::endl;
+        return;
+    }
     auto* reader = new arrow::TableBatchReader(*table);
     std::shared_ptr<arrow::RecordBatch> batch;
     arrow::Status status;

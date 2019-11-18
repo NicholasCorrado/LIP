@@ -56,19 +56,56 @@ SelectExecutorTree::ConstructBloomFilterNoFK(std::string dim_primary_key){
 
     BloomFilter* bf = new BloomFilter(500000);
 
-    while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
-        filter = root->GetBitFilter(in_batch);
+    
 
-        auto* out = new arrow::compute::Datum();
-        status = arrow::compute::Filter(&function_context, in_batch->GetColumnByName(dim_primary_key), *filter, out);
+    if (root == nullptr){
+        while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
+            // NICK HELP:
+            // NEED A NCIER WAY THAT WHEN ROOT IS NULL, JUST INSERT THE KEYS.
+            arrow::Status status;
 
-        std::shared_ptr<arrow::Int64Array> keys = std::static_pointer_cast<arrow::Int64Array>(out->make_array());
+            arrow::BooleanBuilder boolean_builder;
+            std::shared_ptr<arrow::BooleanArray> boolean_array;
 
-        for (int i=0;i<keys->length(); i++) {
-            bf->Insert(keys->Value(i));
+            status = boolean_builder.AppendValues(in_batch->num_rows(), true);
+            EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+            status = boolean_builder.Finish(&boolean_array);
+            EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+
+            filter = /* just need this to be all true*/ new arrow::compute::Datum(boolean_array);
+
+        
+            auto* out = new arrow::compute::Datum();
+            status = arrow::compute::Filter(&function_context, in_batch->GetColumnByName(dim_primary_key), *filter, out);
+
+            std::shared_ptr<arrow::Int64Array> keys = std::static_pointer_cast<arrow::Int64Array>(out->make_array());
+
+            for (int i=0;i<keys->length(); i++) {
+                bf->Insert(keys->Value(i));
+            }
         }
     }
+    else{
 
+        while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
+            
+            filter = root->GetBitFilter(in_batch);
+            
+            auto* out = new arrow::compute::Datum();
+            
+            status = arrow::compute::Filter(&function_context, in_batch->GetColumnByName(dim_primary_key), *filter, out);
+            EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+            
+            
+            std::shared_ptr<arrow::Int64Array> keys = std::static_pointer_cast<arrow::Int64Array>(out->make_array());
+
+            for (int i=0;i<keys->length(); i++) {
+                bf->Insert(keys->Value(i));
+            }
+        }
+    
+    }
+    
     return bf;
 
 }
@@ -78,12 +115,12 @@ SelectExecutorTree::ConstructBloomFilterNoFK(std::string dim_primary_key){
 SelectExecutorTree::SelectExecutorTree(std::shared_ptr<arrow::Table> _dim_table, SelectExecutor* _root) {
     dim_table = _dim_table;
     root = _root;
-
 }
 
 std::shared_ptr<arrow::Table> SelectExecutorTree::Select() {
-
-    //if (root == nullptr) return dim_table;
+    
+    if (root == nullptr) 
+        return dim_table;
     arrow::Status status;
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
 
@@ -98,7 +135,6 @@ std::shared_ptr<arrow::Table> SelectExecutorTree::Select() {
 
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
         arrow::compute::Datum* filter = root->GetBitFilter(in_batch);
-
         // For each column, store all values that pass the filter
         for (int i=0; i<in_batch->schema()->num_fields(); i++) {
             status = arrow::compute::Filter(&function_context, in_batch->column(i), *filter, out);
@@ -107,13 +143,14 @@ std::shared_ptr<arrow::Table> SelectExecutorTree::Select() {
         auto out_batch = arrow::RecordBatch::Make(in_batch->schema(),out_arrays[0]->length,out_arrays);
         out_batches.push_back(out_batch);
 
+        
         out_arrays.clear();
     }
 
     std::shared_ptr<arrow::Table> result_table;
     status = arrow::Table::FromRecordBatches(out_batches, &result_table);
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
-
+    
     return result_table;
 }
 
@@ -128,7 +165,6 @@ SelectExecutorComposite::SelectExecutorComposite(std::vector<SelectExecutor*> _c
 arrow::compute::Datum* 
 SelectExecutorComposite::GetBitFilter(std::shared_ptr<arrow::RecordBatch> in_batch){
 	int num_of_children = children.size();
-
 	arrow::Status status;
 	arrow::BooleanBuilder boolean_builder;
 	std::shared_ptr<arrow::BooleanArray> boolean_array;
@@ -319,7 +355,7 @@ JoinExecutor::JoinExecutor(SelectExecutorTree* _s_tree_exe,
 }
 
 std::shared_ptr<arrow::Table> JoinExecutor::join(std::shared_ptr<arrow::Table> fact_table){
-
+    
     arrow::Status status;
     std::shared_ptr<arrow::Table> dim_table_selected;
 
@@ -331,15 +367,17 @@ std::shared_ptr<arrow::Table> JoinExecutor::join(std::shared_ptr<arrow::Table> f
 	}
 
 	std::shared_ptr<arrow::Table> ret;
-	ret = HashJoin(fact_table, fact_foreign_key, dim_table_selected, dim_primary_key);
+    ret = HashJoin(fact_table, fact_foreign_key, dim_table_selected, dim_primary_key);
+    
 	return ret;
 }
 
 
 
 BloomFilter* JoinExecutor::ConstructBloomFilter(){
-	BloomFilter* bf = select_tree_exe -> ConstructBloomFilterNoFK(dim_primary_key);
-	bf -> SetForeignKey(fact_foreign_key);
+    BloomFilter* bf = select_tree_exe -> ConstructBloomFilterNoFK(dim_primary_key);
+	
+    bf -> SetForeignKey(fact_foreign_key);
 	return bf;
 }
 

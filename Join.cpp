@@ -22,7 +22,7 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
             hash[key] = true;
         }
     }
-
+    
     std::vector<std::shared_ptr<arrow::ArrayData>> out_arrays;      // vector of arrays corresponding to outputted columns in a given batch
     std::unique_ptr<arrow::RecordBatchBuilder> out_batch_builder;   // to build a RecordBatch from a vector of arrays
     std::vector<std::shared_ptr<arrow::RecordBatch>> out_batches;   // output table will be built from a vector of RecordBatches
@@ -90,7 +90,9 @@ std::shared_ptr<arrow::Table> EvaluateJoinTree(std::shared_ptr<arrow::Table> fac
     std::shared_ptr<arrow::Table> tmp;
 
     for(int i = 0; i < joinExecutors.size(); i++){
+        
         tmp = joinExecutors[i] -> join(ret_table); // foreign key is a private var in joinExecutor
+        
         ret_table = tmp;
     }
 
@@ -110,7 +112,9 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     std::vector<BloomFilter*> filters;
 
     for(int i = 0; i < n_dim; i++){
+        
         BloomFilter* bf = joinExecutors[i] -> ConstructBloomFilter();
+        
         filters.push_back(bf);
     }
     
@@ -118,6 +122,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
 
+    
     std::vector<std::shared_ptr<arrow::ArrayData>> out_arrays;      // vector of arrays corresponding to outputted columns in a given batch
     std::unique_ptr<arrow::RecordBatchBuilder> out_batch_builder;   // to build a RecordBatch from a vector of arrays
     std::vector<std::shared_ptr<arrow::RecordBatch>> out_batches;   // output table will be built from a vector of RecordBatches
@@ -203,9 +208,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     std::shared_ptr<arrow::Table> result_table;
     status = arrow::Table::FromRecordBatches(out_batches, &result_table);
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
-
-    return result_table;
-    //return EvaluateJoinTree(result_table, joinExecutors);
+    //return result_table;
+    return EvaluateJoinTree(result_table, joinExecutors);
 }
 
 

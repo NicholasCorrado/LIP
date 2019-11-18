@@ -90,7 +90,6 @@ int main_nick() {
     write_to_file("arrow-output/supplier.arrow", supplier);
     write_to_file("arrow-output/part.arrow", part);
 
-    std::shared_ptr <arrow::Table> result_table;
     //result_table = Select(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
     //PrintTable(result_table);
 
@@ -171,23 +170,23 @@ int main_nick() {
     PrintTable(result);
     std::cout << result->num_rows() << std::endl;
 */
-
-    arrow::Status status;
+    std::shared_ptr <arrow::Table> result_table;
     auto* s_date_1 = new SelectExecutorBetween("YEAR", 1992, 1994);
     auto* s_date_2 = new SelectExecutorInt("YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
     auto* s_customer = new SelectExecutorInt("CUST KEY", 2, arrow::compute::CompareOperator::EQUAL);
     auto* s_customer_str = new SelectExecutorStrBetween("REGION", "ASIA", "AMERICA");
 
-    //std::vector<SelectExecutor*> s_date_children = {s_date_1, s_date_2};
     std::vector<SelectExecutor*> s_children = {s_date_1, s_customer_str};
-    //auto* s_date_comp = new SelectExecutorComposite(s_date_children);
     auto* s_date_tree = new SelectExecutorTree(date, s_date_1);
     auto* s_customer_str_tree = new SelectExecutorTree(customer, s_customer_str);
 
     auto* j_date = new JoinExecutor(s_date_tree, "DATE KEY", "ORDER DATE");
     auto* j_customer = new JoinExecutor(s_customer_str_tree, "CUST KEY", "CUST KEY");
 
-
+    std::vector<JoinExecutor*> j = {j_customer, j_date};
+    result_table = EvaluateJoinTreeLIP(lineorder, j);
+    PrintTable(result_table, 1);
+    
     // To select all tuples, pass a null SelectExecutor to the tree.
 
 
@@ -203,15 +202,10 @@ int main_nick() {
     PrintTable(result_table);
     std::cout<<result_table->num_rows()<<std::endl;
     */
-    std::vector<JoinExecutor*> j = {j_customer, j_date};
-    result_table = EvaluateJoinTree(lineorder,j);
-    PrintTable(result_table);
-    std::cout<<result_table->num_rows()<<std::endl;
-
-    result_table = EvaluateJoinTreeLIP(lineorder,j);
-    PrintTable(result_table);
-    std::cout<<result_table->num_rows()<<std::endl;
-
+    // result_table = EvaluateJoinTree(lineorder,j);
+    // PrintTable(result_table, 1);
+    
+    
     //result_table = j_date->join(lineorder);
     //PrintTable(result_table);
     //std::cout << result_table->num_rows() << std::endl;
@@ -277,7 +271,9 @@ int main_xiating(){
     supplier    = build_table(file_path_supplier,  pool, supplier_schema);
 
 
-    //RunAllQueries(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    RunAllQueries(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    RunAllQueries(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    
 
     return 0;
 }
@@ -289,47 +285,49 @@ void RunAllQueries(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> supplier,
                 int alg_flag)
 {
-    //Query1_1(customer, date, lineorder, part, supplier, alg_flag);
-    /*
+    Query1_1(customer, date, lineorder, part, supplier, alg_flag);
     Query1_2(customer, date, lineorder, part, supplier, alg_flag);
     Query1_3(customer, date, lineorder, part, supplier, alg_flag);
-
+    
 
     Query2_1(customer, date, lineorder, part, supplier, alg_flag);
-    Query2_2(customer, date, lineorder, part, supplier, alg_flag);
+    Query2_2(customer, date, lineorder, part, supplier, alg_flag); 
     Query2_3(customer, date, lineorder, part, supplier, alg_flag);
-
+    
 
     Query3_1(customer, date, lineorder, part, supplier, alg_flag);
     Query3_2(customer, date, lineorder, part, supplier, alg_flag);
     Query3_3(customer, date, lineorder, part, supplier, alg_flag);
     Query3_4(customer, date, lineorder, part, supplier, alg_flag);
 
-
+    
     Query4_1(customer, date, lineorder, part, supplier, alg_flag);
     Query4_2(customer, date, lineorder, part, supplier, alg_flag);
     Query4_3(customer, date, lineorder, part, supplier, alg_flag);
-     */
+     
 }
 
 
 void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<JoinExecutor*> tree, int alg_flag){
+    
+    std::shared_ptr <arrow::Table> result_table = nullptr;
     switch (alg_flag){
         case ALG::HASH_JOIN:
-            EvaluateJoinTree(lineorder, tree);
+            result_table = EvaluateJoinTree(lineorder, tree);
             break;
         case ALG::LIP_STANDARD:
-            EvaluateJoinTreeLIP(lineorder, tree);
+            result_table = EvaluateJoinTreeLIP(lineorder, tree);
             break;
         default:
             std::cout << "Unknown algorithm" << std::endl;
             break;
     }
+    if (result_table != nullptr)
+        std::cout << "Rows " << result_table -> num_rows() << std::endl; 
 }
 
 
-/*
-// WE NEED SELECT ON FACT TABLE HERE
+
 void Query1_1(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
                 std::shared_ptr <arrow::Table> lineorder,
@@ -350,21 +348,23 @@ void Query1_1(std::shared_ptr <arrow::Table> customer,
     lineorder = Select(lineorder, "QUANTITY", 
                                 std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(twentyfive), arrow::compute::CompareOperator::LESS);
 
-    SelectExecutor *date_s_exe      = new SelectExecutorInt( // here should be a pure join
-                                            date, "YEAR", 1993, arrow::compute::CompareOperator::EQUAL);
-    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
+    // WHERE lo_dicount between 1 and 3 and lo_quantity < 25;
+
+    SelectExecutor *date_s_exe = new SelectExecutorInt("YEAR", 1993, arrow::compute::CompareOperator::EQUAL);
+    
+    // WHERE date = 1993 
+    SelectExecutorTree *s_tree = new SelectExecutorTree(date, date_s_exe);
+
+    JoinExecutor *date_j_exe = new JoinExecutor(s_tree, "DATE KEY", "ORDER DATE");
     
 
     std::vector <JoinExecutor*> tree = {date_j_exe};
 
     AlgorithmSwitcher(lineorder, tree, alg_flag);
 
-
-
-
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << duration.count() << std::endl;
+    std::cout << "RunningTime " << duration.count() << std::endl;
 }
 
 
@@ -395,9 +395,13 @@ void Query1_2(std::shared_ptr <arrow::Table> customer,
                                 std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(twentysix), 
                                 std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(thirtyfive));
 
-    SelectExecutor *date_s_exe      = new SelectExecutorInt( // here should be a pure join
-                                            date, "YEAR MONTH NUM", 199401, arrow::compute::CompareOperator::EQUAL);
-    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
+    // WHERE lo_discount between 4 and 6 AND quantity between 26 and 35
+
+    SelectExecutor *date_s_exe      = new SelectExecutorInt("YEAR MONTH NUM", 199401, arrow::compute::CompareOperator::EQUAL);
+    
+    SelectExecutorTree *s_exe_tree = new SelectExecutorTree(date, date_s_exe);
+
+    JoinExecutor *date_j_exe = new JoinExecutor(s_exe_tree, "DATE KEY", "ORDER DATE");
     
 
 
@@ -407,7 +411,7 @@ void Query1_2(std::shared_ptr <arrow::Table> customer,
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << duration.count() << std::endl;
+    std::cout << "RunningTime " << duration.count() << std::endl;
 }
 
 
@@ -436,9 +440,13 @@ void Query1_3(std::shared_ptr <arrow::Table> customer,
                                 std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(twentysix), 
                                 std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(thirtyfive));
 
-    SelectExecutor *date_s_exe      = new SelectExecutorInt( // here should be a pure join
-                                            date, "YEAR MONTH NUM", 199401, arrow::compute::CompareOperator::EQUAL);
-    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
+    // WHERE discount between 5 and 7 and quantity between 26 and 35
+
+    SelectExecutor *date_s_exe      = new SelectExecutorInt("YEAR MONTH NUM", 199401, arrow::compute::CompareOperator::EQUAL);
+    
+    SelectExecutorTree *s_exe_tree = new SelectExecutorTree(date, date_s_exe);
+
+    JoinExecutor *date_j_exe = new JoinExecutor(s_exe_tree, "DATE KEY", "ORDER DATE");
     
 
 
@@ -448,7 +456,7 @@ void Query1_3(std::shared_ptr <arrow::Table> customer,
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << duration.count() << std::endl;
+    std::cout << "RunningTime " << duration.count() << std::endl;
 }
 
 
@@ -467,27 +475,33 @@ void Query2_1(std::shared_ptr <arrow::Table> customer,
 
 
 
-    // produce the join tree by constructing the SelectExecutor and JoinExecutor:
-
-    SelectExecutor *date_s_exe      = new SelectExecutorInt( // here should be a pure join
-                                            date, "YEAR", 1995, arrow::compute::CompareOperator::EQUAL);
-    SelectExecutor *part_s_exe      = new SelectExecutorStr(
-                                            part, "CATEGORY", "MFGR#12",arrow::compute::CompareOperator::EQUAL);
-    SelectExecutor *supplier_s_exe  = new SelectExecutorStr(
-                                            supplier, "REGION", "ASIA",arrow::compute::CompareOperator::EQUAL);
     
-    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
-    JoinExecutor *part_j_exe = new JoinExecutor(part_s_exe, "PART KEY", "PART KEY");
-    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe, "SUPP KEY", "SUPP KEY");
+    SelectExecutorTree *date_s_exe_tree = new SelectExecutorTree(date, nullptr);
+    // WHERE DATE CAN BE ANYTHING
+
+    SelectExecutor *part_s_exe      = new SelectExecutorStr(
+                                            "CATEGORY", "MFGR#12",arrow::compute::CompareOperator::EQUAL);
+    SelectExecutorTree *part_s_exe_tree = new SelectExecutorTree(part, part_s_exe);
+    // WHERE PART.CATEGORY = MFGR#12
+
+    SelectExecutor *supplier_s_exe  = new SelectExecutorStr(
+                                            "REGION", "AMERICA",arrow::compute::CompareOperator::EQUAL);
+
+    SelectExecutorTree *supplier_s_exe_tree = new SelectExecutorTree(supplier, supplier_s_exe);
+    // WHERE SUPPLIER.REGION = AMERICA
+
+
+    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "DATE KEY", "ORDER DATE");
+    JoinExecutor *part_j_exe = new JoinExecutor(part_s_exe_tree, "PART KEY", "PART KEY");
+    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
     std::vector <JoinExecutor*> tree = {date_j_exe, part_j_exe, supplier_j_exe};
 
     AlgorithmSwitcher(lineorder, tree, alg_flag);
-
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << duration.count() << std::endl;
+    std::cout << "RunningTime " << duration.count() << std::endl;
 }
 
 
@@ -503,17 +517,37 @@ void Query2_2(std::shared_ptr <arrow::Table> customer,
     std::cout << "Running query 2.2 ..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
 
+    SelectExecutorTree *date_s_exe_tree = new SelectExecutorTree(date, nullptr);
+    // WHERE DATE CAN BE ANYTHING
+
+    SelectExecutor *part_s_exe      = new SelectExecutorStrBetween(
+                                            "BRAND", "MFGR#2221", "MFGR#2228");
+    SelectExecutorTree *part_s_exe_tree = new SelectExecutorTree(part, part_s_exe);
+    // WHERE PART.BRAND BETWEEN  MFGR#2221 AND MFGR#2228
+
+    SelectExecutor *supplier_s_exe  = new SelectExecutorStr(
+                                            "REGION", "ASIA", arrow::compute::CompareOperator::EQUAL);
+
+    SelectExecutorTree *supplier_s_exe_tree = new SelectExecutorTree(supplier, supplier_s_exe);
+    // WHERE SUPPLIER.REGION = ASIA
 
 
-    // produce the join tree by constructing the SelectExecutor and JoinExecutor:
-    std::vector <JoinExecutor*> tree = {};
+    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "DATE KEY", "ORDER DATE");
+    JoinExecutor *part_j_exe = new JoinExecutor(part_s_exe_tree, "PART KEY", "PART KEY");
+    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
+
+
+    std::vector <JoinExecutor*> tree = {date_j_exe, part_j_exe, supplier_j_exe};
 
     AlgorithmSwitcher(lineorder, tree, alg_flag);
 
+
+
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << duration.count() << std::endl;
+    std::cout << "RunningTime " << duration.count() << std::endl;
 }
+
 
 void Query2_3(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
@@ -527,27 +561,34 @@ void Query2_3(std::shared_ptr <arrow::Table> customer,
 
 
 
+    SelectExecutorTree *date_s_exe_tree = new SelectExecutorTree(date, nullptr);
+    // WHERE DATE CAN BE ANYTHING
 
-    SelectExecutor *date_s_exe      = new SelectExecutorInt( // here should be a pure join
-                                            date, "YEAR", 1995, arrow::compute::CompareOperator::EQUAL);
     SelectExecutor *part_s_exe      = new SelectExecutorStr(
-                                            part, "BRAND", "MFGR#2239",arrow::compute::CompareOperator::EQUAL);
+                                            "BRAND", "MFGR#2239", arrow::compute::CompareOperator::EQUAL);
+    SelectExecutorTree *part_s_exe_tree = new SelectExecutorTree(part, part_s_exe);
+    // WHERE PART.BRAND = MFGR#2239
+
     SelectExecutor *supplier_s_exe  = new SelectExecutorStr(
-                                            supplier, "REGION", "EUROPE",arrow::compute::CompareOperator::EQUAL);
-    
-    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
-    JoinExecutor *part_j_exe = new JoinExecutor(part_s_exe, "PART KEY", "PART KEY");
-    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe, "SUPP KEY", "SUPP KEY");
+                                            "REGION", "EUROPE",arrow::compute::CompareOperator::EQUAL);
+
+    SelectExecutorTree *supplier_s_exe_tree = new SelectExecutorTree(supplier, supplier_s_exe);
+    // WHERE SUPPLIER.REGION = EUROPE
+
+
+    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "DATE KEY", "ORDER DATE");
+    JoinExecutor *part_j_exe = new JoinExecutor(part_s_exe_tree, "PART KEY", "PART KEY");
+    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
     std::vector <JoinExecutor*> tree = {date_j_exe, part_j_exe, supplier_j_exe};
 
-
     AlgorithmSwitcher(lineorder, tree, alg_flag);
+
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << duration.count() << std::endl;
+    std::cout << "RunningTime " << duration.count() << std::endl;
 }
 
 
@@ -562,29 +603,36 @@ void Query3_1(std::shared_ptr <arrow::Table> customer,
     auto start = std::chrono::high_resolution_clock::now();
 
 
+    SelectExecutor *customer_s_exe = new SelectExecutorStr("REGION", "ASIA", arrow::compute::CompareOperator::EQUAL);
+    SelectExecutorTree *customer_s_exe_tree = new SelectExecutorTree(customer, customer_s_exe);
+    // WHERE CUSTOMER.REGION = ASIA
 
+    SelectExecutor *supplier_s_exe      = new SelectExecutorStr(
+                                            "REGION", "ASIA", arrow::compute::CompareOperator::EQUAL);
+    SelectExecutorTree *supplier_s_exe_tree = new SelectExecutorTree(supplier, supplier_s_exe);
+    // WHERE SUPPLIER.REGION = ASIA
 
-
-
-    SelectExecutor *customer_s_exe      = new SelectExecutorStr( 
-                                            customer, "REGION", "ASIA", arrow::compute::CompareOperator::EQUAL);
-    SelectExecutor *date_s_exe      = new SelectExecutorBetween( 
-                                            date, "YEAR", 1992, 1997);
-    SelectExecutor *supplier_s_exe  = new SelectExecutorStr(
-                                            supplier, "REGION", "ASIA",arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor *date_s_exe  = new SelectExecutorBetween(
+                                            "YEAR", 1992, 1997);
     
-    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
-    JoinExecutor *customer_j_exe = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
-    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe, "SUPP KEY", "SUPP KEY");
+    SelectExecutorTree *date_s_exe_tree = new SelectExecutorTree(date, date_s_exe);
+    // WHERE DATE.YEAR >= 1992 AND DATE.YEAR <= 1997
 
-    std::vector <JoinExecutor*> tree = {date_j_exe, customer_j_exe, supplier_j_exe};
+    JoinExecutor *customer_j_exe = new JoinExecutor(customer_s_exe_tree, "CUST KEY", "CUST KEY");
+    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "DATE KEY", "ORDER DATE");
+    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
+
+    std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
 
     AlgorithmSwitcher(lineorder, tree, alg_flag);
 
+
+
+
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << duration.count() << std::endl;
+    std::cout << "RunningTime " << duration.count() << std::endl;
 }
 
 
@@ -600,30 +648,35 @@ void Query3_2(std::shared_ptr <arrow::Table> customer,
 
 
 
+    SelectExecutor *customer_s_exe = new SelectExecutorStr("NATION", "UNITED STATES", arrow::compute::CompareOperator::EQUAL);
+    SelectExecutorTree *customer_s_exe_tree = new SelectExecutorTree(customer, customer_s_exe);
+    // WHERE CUSTOMER.NATION = UNITED STATES
 
+    SelectExecutor *supplier_s_exe      = new SelectExecutorStr(
+                                            "REGION", "ASIA", arrow::compute::CompareOperator::EQUAL);
+    SelectExecutorTree *supplier_s_exe_tree = new SelectExecutorTree(supplier, supplier_s_exe);
+    // WHERE SUPPLIER REGION = ASIA
 
-
-    SelectExecutor *customer_s_exe  = new SelectExecutorStr( 
-                                            customer, "NATION", "UNITED STATES", arrow::compute::CompareOperator::EQUAL);
-    SelectExecutor *date_s_exe      = new SelectExecutorBetween( 
-                                            date, "YEAR", 1992, 1997);
-    SelectExecutor *supplier_s_exe  = new SelectExecutorStr(
-                                            supplier, "NATION", "UNITED STATES",arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor *date_s_exe  = new SelectExecutorBetween(
+                                            "YEAR", 1992, 1997);
     
-    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
-    JoinExecutor *customer_j_exe = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
-    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe, "SUPP KEY", "SUPP KEY");
+    SelectExecutorTree *date_s_exe_tree = new SelectExecutorTree(date, date_s_exe);
+    // WHERE DATE.YEAR >= 1992 AND DATE.YEAR <= 1997
 
-    std::vector <JoinExecutor*> tree = {date_j_exe, customer_j_exe, supplier_j_exe};
+    JoinExecutor *customer_j_exe = new JoinExecutor(customer_s_exe_tree, "CUST KEY", "CUST KEY");
+    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "DATE KEY", "ORDER DATE");
+    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
+    std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
 
     AlgorithmSwitcher(lineorder, tree, alg_flag);
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << duration.count() << std::endl;
+    std::cout << "RunningTime " << duration.count() << std::endl;
 }
+
 
 // NEED TO EVALUATE 'OR' FOR ONE DIM TABLE
 void Query3_3(std::shared_ptr <arrow::Table> customer, 
@@ -639,30 +692,47 @@ void Query3_3(std::shared_ptr <arrow::Table> customer,
 
 
 
-
-
-    // need or
-    SelectExecutor *customer_s_exe  = new SelectExecutorStr( 
-                                            customer, "NATION", "UNITED STATES", arrow::compute::CompareOperator::EQUAL);
-    SelectExecutor *date_s_exe      = new SelectExecutorBetween( 
-                                            date, "YEAR", 1992, 1997);
-    // need or
-    SelectExecutor *supplier_s_exe  = new SelectExecutorStr(
-                                            supplier, "NATION", "UNITED STATES",arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor *customer_s_exe_ki1 = new SelectExecutorStr("CITY", "UNITED KI1", arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor *customer_s_exe_ki5 = new SelectExecutorStr("CITY", "UNITED KI5", arrow::compute::CompareOperator::EQUAL);
     
-    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
-    JoinExecutor *customer_j_exe = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
-    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe, "SUPP KEY", "SUPP KEY");
+    std::vector<SelectExecutor*> children_customer{customer_s_exe_ki1, customer_s_exe_ki5};
+    SelectExecutor* customer_s_exe_comp = new SelectExecutorComposite(children_customer);
+    
+    SelectExecutorTree *customer_s_exe_tree = new SelectExecutorTree(customer, customer_s_exe_comp);
+    // WHERE CUSTOMER.CITY = UNITED KI1 OR UNITED KI5
 
-    std::vector <JoinExecutor*> tree = {date_j_exe, customer_j_exe, supplier_j_exe};
+    SelectExecutor *supplier_s_exe_ki1 = new SelectExecutorStr("CITY", "UNITED KI1", arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor *supplier_s_exe_ki5 = new SelectExecutorStr("CITY", "UNITED KI5", arrow::compute::CompareOperator::EQUAL);
+    
+    std::vector<SelectExecutor*> children_supplier{supplier_s_exe_ki1, supplier_s_exe_ki5};
+    SelectExecutor* supplier_s_exe_comp = new SelectExecutorComposite(children_supplier);
 
+    SelectExecutorTree *supplier_s_exe_tree = new SelectExecutorTree(supplier, supplier_s_exe_comp);
+    // WHERE SUPPLIER CITY = UNITED KI1 OR UNITED KI5
+
+    SelectExecutor *date_s_exe  = new SelectExecutorBetween(
+                                            "YEAR", 1992, 1997);
+    
+    SelectExecutorTree *date_s_exe_tree = new SelectExecutorTree(date, date_s_exe);
+    // WHERE DATE.YEAR >= 1992 AND DATE.YEAR <= 1997
+
+    JoinExecutor *customer_j_exe = new JoinExecutor(customer_s_exe_tree, "CUST KEY", "CUST KEY");
+    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "DATE KEY", "ORDER DATE");
+    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
+
+
+    std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
 
     AlgorithmSwitcher(lineorder, tree, alg_flag);
 
+
+
+
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << duration.count() << std::endl;
+    std::cout << "RunningTime " << duration.count() << std::endl;
 }
+
 
 
 // NEED TO EVALUATE 'OR' FOR ONE DIM TABLE
@@ -677,32 +747,46 @@ void Query3_4(std::shared_ptr <arrow::Table> customer,
     auto start = std::chrono::high_resolution_clock::now();
 
 
-
-
-
-
-    // need or
-    SelectExecutor *customer_s_exe  = new SelectExecutorStr( 
-                                            customer, "NATION", "UNITED STATES", arrow::compute::CompareOperator::EQUAL);
-    SelectExecutor *date_s_exe      = new SelectExecutorStr( 
-                                            date, "YEAR MONTH", "Dec1997", arrow::compute::CompareOperator::EQUAL);
-    // need or
-    SelectExecutor *supplier_s_exe  = new SelectExecutorStr(
-                                            supplier, "NATION", "UNITED STATES",arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor *customer_s_exe_ki1 = new SelectExecutorStr("CITY", "UNITED KI1", arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor *customer_s_exe_ki5 = new SelectExecutorStr("CITY", "UNITED KI5", arrow::compute::CompareOperator::EQUAL);
     
-    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
-    JoinExecutor *customer_j_exe = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
-    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe, "SUPP KEY", "SUPP KEY");
+    std::vector<SelectExecutor*> children_customer{customer_s_exe_ki1, customer_s_exe_ki5};
+    SelectExecutor* customer_s_exe_comp = new SelectExecutorComposite(children_customer);
+    
+    SelectExecutorTree *customer_s_exe_tree = new SelectExecutorTree(customer, customer_s_exe_comp);
+    // WHERE CUSTOMER.CITY = UNITED KI1 OR UNITED KI5
 
-    std::vector <JoinExecutor*> tree = {date_j_exe, customer_j_exe, supplier_j_exe};
+    SelectExecutor *supplier_s_exe_ki1 = new SelectExecutorStr("CITY", "UNITED KI1", arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor *supplier_s_exe_ki5 = new SelectExecutorStr("CITY", "UNITED KI5", arrow::compute::CompareOperator::EQUAL);
+    
+    std::vector<SelectExecutor*> children_supplier{supplier_s_exe_ki1, supplier_s_exe_ki5};
+    SelectExecutor* supplier_s_exe_comp = new SelectExecutorComposite(children_supplier);
 
+    SelectExecutorTree *supplier_s_exe_tree = new SelectExecutorTree(supplier, supplier_s_exe_comp);
+    // WHERE SUPPLIER CITY = UNITED KI1 OR UNITED KI5
+
+    SelectExecutor *date_s_exe  = new SelectExecutorStr(
+                                            "YEAR MONTH", "Dec1997", arrow::compute::CompareOperator::EQUAL);
+    
+    SelectExecutorTree *date_s_exe_tree = new SelectExecutorTree(date, date_s_exe);
+    // WHERE DATE.YEAR MON = Dec1997
+
+    JoinExecutor *customer_j_exe = new JoinExecutor(customer_s_exe_tree, "CUST KEY", "CUST KEY");
+    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "DATE KEY", "ORDER DATE");
+    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
+
+
+    std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
 
     AlgorithmSwitcher(lineorder, tree, alg_flag);
 
+
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << duration.count() << std::endl;
+    std::cout << "RunningTime " << duration.count() << std::endl;
 }
+
+
 
 // NEED TO EVALUATE 'OR'
 void Query4_1(std::shared_ptr <arrow::Table> customer, 
@@ -717,17 +801,45 @@ void Query4_1(std::shared_ptr <arrow::Table> customer,
 
 
 
+    SelectExecutor *customer_s_exe = new SelectExecutorStr("REGION", "AMERICA", arrow::compute::CompareOperator::EQUAL);
+    
+    SelectExecutorTree *customer_s_exe_tree = new SelectExecutorTree(customer, customer_s_exe);
+    // WHERE CUSTOMER.REGION = AMERICA
+
+    SelectExecutor *supplier_s_exe = new SelectExecutorStr("REGION", "AMERICA", arrow::compute::CompareOperator::EQUAL);
+    
+    SelectExecutorTree *supplier_s_exe_tree = new SelectExecutorTree(supplier, supplier_s_exe);
+    // WHERE SUPPLIER.REGION = AMERICA
+
+    SelectExecutor *part_s_exe_mfgr1  = new SelectExecutorStr(
+                                            "MFGR", "MFGR#1", arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor *part_s_exe_mfgr2  = new SelectExecutorStr(
+                                            "MFGR", "MFGR#2", arrow::compute::CompareOperator::EQUAL);
+    std::vector<SelectExecutor*> part_children{part_s_exe_mfgr1, part_s_exe_mfgr2};
+    SelectExecutor *part_s_exe = new SelectExecutorComposite(part_children);
+
+    SelectExecutorTree *part_s_exe_tree = new SelectExecutorTree(part, part_s_exe);
+    // WHERE PART.MFGR = MFGR#1 OR MFGR#2
+
+    JoinExecutor *customer_j_exe = new JoinExecutor(customer_s_exe_tree, "CUST KEY", "CUST KEY");
+    JoinExecutor *part_j_exe = new JoinExecutor(part_s_exe_tree, "PART KEY", "PART KEY");
+    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    // produce the join tree by constructing the SelectExecutor and JoinExecutor:
-    std::vector <JoinExecutor*> tree = {};
+    std::vector <JoinExecutor*> tree = {customer_j_exe, part_j_exe, supplier_j_exe};
 
     AlgorithmSwitcher(lineorder, tree, alg_flag);
 
+
+
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << duration.count() << std::endl;
+    std::cout << "RunningTime " << duration.count() << std::endl;
 }
+
+
+
+
 
 // NEED TO EVALUATE 'OR'
 void Query4_2(std::shared_ptr <arrow::Table> customer, 
@@ -741,18 +853,54 @@ void Query4_2(std::shared_ptr <arrow::Table> customer,
     auto start = std::chrono::high_resolution_clock::now();
 
 
+    SelectExecutor *customer_s_exe = new SelectExecutorStr("REGION", "AMERICA", arrow::compute::CompareOperator::EQUAL);
+    
+    SelectExecutorTree *customer_s_exe_tree = new SelectExecutorTree(customer, customer_s_exe);
+    // WHERE CUSTOMER.REGION = AMERICA
+
+    SelectExecutor *supplier_s_exe = new SelectExecutorStr("REGION", "AMERICA", arrow::compute::CompareOperator::EQUAL);
+    
+    SelectExecutorTree *supplier_s_exe_tree = new SelectExecutorTree(supplier, supplier_s_exe);
+    // WHERE SUPPLIER.REGION = AMERICA
+
+    SelectExecutor *date_s_exe_97  = new SelectExecutorInt(
+                                            "YEAR", 1997, arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor *date_s_exe_98  = new SelectExecutorInt(
+                                            "YEAR", 1998, arrow::compute::CompareOperator::EQUAL);
+
+    std::vector<SelectExecutor*> date_children{date_s_exe_97, date_s_exe_98};
+    SelectExecutor *date_s_exe_comp = new SelectExecutorComposite(date_children);
+
+    SelectExecutorTree *date_s_exe_tree = new SelectExecutorTree(date, date_s_exe_comp);
+    // WHERE DATE.YEAR = 1997 or 1998
 
 
+    SelectExecutor *part_s_exe_mfgr1  = new SelectExecutorStr(
+                                            "MFGR", "MFGR#1", arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor *part_s_exe_mfgr2  = new SelectExecutorStr(
+                                            "MFGR", "MFGR#2", arrow::compute::CompareOperator::EQUAL);
+    std::vector<SelectExecutor*> part_children{part_s_exe_mfgr1, part_s_exe_mfgr2};
+    SelectExecutor *part_s_exe = new SelectExecutorComposite(part_children);
 
-    // produce the join tree by constructing the SelectExecutor and JoinExecutor:
-    std::vector <JoinExecutor*> tree = {};
+    SelectExecutorTree *part_s_exe_tree = new SelectExecutorTree(part, part_s_exe);
+    // WHERE PART.MFGR = MFGR#1 OR MFGR#2
+
+    JoinExecutor *customer_j_exe = new JoinExecutor(customer_s_exe_tree, "CUST KEY", "CUST KEY");
+    JoinExecutor *part_j_exe = new JoinExecutor(part_s_exe_tree, "PART KEY", "PART KEY");
+    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
+    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "SUPP KEY", "SUPP KEY");
+    
+
+    std::vector <JoinExecutor*> tree = {customer_j_exe, part_j_exe, supplier_j_exe};
 
     AlgorithmSwitcher(lineorder, tree, alg_flag);
 
+
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << duration.count() << std::endl;
+    std::cout << "RunningTime " << duration.count() << std::endl;
 }
+
 
 // NEED TO EVALUATE 'OR'
 void Query4_3(std::shared_ptr <arrow::Table> customer, 
@@ -766,19 +914,50 @@ void Query4_3(std::shared_ptr <arrow::Table> customer,
     auto start = std::chrono::high_resolution_clock::now();
 
 
+    SelectExecutor *customer_s_exe = new SelectExecutorStr("REGION", "AMERICA", arrow::compute::CompareOperator::EQUAL);
+    
+    SelectExecutorTree *customer_s_exe_tree = new SelectExecutorTree(customer, customer_s_exe);
+    // WHERE CUSTOMER.REGION = AMERICA
+
+    SelectExecutor *supplier_s_exe = new SelectExecutorStr("NATION", "UNITED STATES", arrow::compute::CompareOperator::EQUAL);
+    
+    SelectExecutorTree *supplier_s_exe_tree = new SelectExecutorTree(supplier, supplier_s_exe);
+    // WHERE SUPPLIER.NATION = UNITED STATES
+
+    SelectExecutor *date_s_exe_97  = new SelectExecutorInt(
+                                            "YEAR", 1997, arrow::compute::CompareOperator::EQUAL);
+    SelectExecutor *date_s_exe_98  = new SelectExecutorInt(
+                                            "YEAR", 1998, arrow::compute::CompareOperator::EQUAL);
+
+    std::vector<SelectExecutor*> date_children{date_s_exe_97, date_s_exe_98};
+    SelectExecutor *date_s_exe_comp = new SelectExecutorComposite(date_children);
+
+    SelectExecutorTree *date_s_exe_tree = new SelectExecutorTree(date, date_s_exe_comp);
+    // WHERE DATE.YEAR = 1997 or 1998
 
 
+    SelectExecutor *part_s_exe_mfgr14  = new SelectExecutorStr(
+                                            "CATEGORY", "MFGR#14", arrow::compute::CompareOperator::EQUAL);
+    
+    SelectExecutorTree *part_s_exe_tree = new SelectExecutorTree(part, part_s_exe_mfgr14);
+    // WHERE PART.MFGR = MFGR#14
 
-    // produce the join tree by constructing the SelectExecutor and JoinExecutor:
-    std::vector <JoinExecutor*> tree = {};
+    JoinExecutor *customer_j_exe = new JoinExecutor(customer_s_exe_tree, "CUST KEY", "CUST KEY");
+    JoinExecutor *part_j_exe = new JoinExecutor(part_s_exe_tree, "PART KEY", "PART KEY");
+    JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
+    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "SUPP KEY", "SUPP KEY");
+    
+
+    std::vector <JoinExecutor*> tree = {customer_j_exe, part_j_exe, supplier_j_exe};
 
     AlgorithmSwitcher(lineorder, tree, alg_flag);
 
+
+
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << duration.count() << std::endl;
+    std::cout << "RunningTime " << duration.count() << std::endl;
 }
 
 
 
-*/
