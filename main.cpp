@@ -4,9 +4,9 @@
 #include "Queries.h"
 
 int main(){
-    //main_nick();
+    main_nick();
 
-    main_xiating();
+    //main_xiating();
 
     return 0;
 }

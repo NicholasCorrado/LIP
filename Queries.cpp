@@ -170,6 +170,8 @@ int main_nick() {
     PrintTable(result);
     std::cout << result->num_rows() << std::endl;
 */
+
+    /*
     std::shared_ptr <arrow::Table> result_table;
     auto* s_date_1 = new SelectExecutorBetween("YEAR", 1992, 1994);
     auto* s_date_2 = new SelectExecutorInt("YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
@@ -186,7 +188,7 @@ int main_nick() {
     std::vector<JoinExecutor*> j = {j_customer, j_date};
     result_table = EvaluateJoinTreeLIP(lineorder, j);
     PrintTable(result_table, 1);
-    
+    */
     // To select all tuples, pass a null SelectExecutor to the tree.
 
 
@@ -231,6 +233,9 @@ int main_nick() {
 //    PrintTable(result_table);
 //
 //    return 0;
+
+    RunAllQueries_nick(customer, date, lineorder, part, supplier);
+    return 0;
 }
 
 
@@ -276,6 +281,56 @@ int main_xiating(){
     
 
     return 0;
+}
+
+
+void RunAllQueries_nick(std::shared_ptr <arrow::Table> customer,
+                   std::shared_ptr <arrow::Table> date,
+                   std::shared_ptr <arrow::Table> lineorder,
+                   std::shared_ptr <arrow::Table> part,
+                   std::shared_ptr <arrow::Table> supplier)
+{
+    Query1_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    Query1_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<<std::endl;
+    Query1_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    Query1_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<<std::endl;
+    Query1_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    Query1_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<<std::endl;
+
+    Query2_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    Query2_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<<std::endl;
+    Query2_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    Query2_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<<std::endl;
+    Query2_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    Query2_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<<std::endl;
+
+    Query3_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    Query3_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<<std::endl;
+    Query3_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    Query3_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<<std::endl;
+    Query3_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    Query3_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<<std::endl;
+    Query3_4(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    Query3_4(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<<std::endl;
+
+    Query4_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    Query4_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<<std::endl;
+    Query4_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    Query4_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    std::cout<<std::endl;
+    Query4_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
+    Query4_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
 }
 
 void RunAllQueries(std::shared_ptr <arrow::Table> customer, 
@@ -328,7 +383,7 @@ void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<Joi
 
 
 
-void Query1_1(std::shared_ptr <arrow::Table> customer, 
+int Query1_1(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
@@ -365,12 +420,14 @@ void Query1_1(std::shared_ptr <arrow::Table> customer,
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "RunningTime " << duration.count() << std::endl;
+
+    return duration.count();
 }
 
 
 
 // WE NEED SELECT ON FACT TABLE HERE
-void Query1_2(std::shared_ptr <arrow::Table> customer, 
+int Query1_2(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
@@ -412,12 +469,14 @@ void Query1_2(std::shared_ptr <arrow::Table> customer,
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "RunningTime " << duration.count() << std::endl;
+
+    return duration.count();
 }
 
 
 
 // WE NEED SELECT ON FACT TABLE HERE
-void Query1_3(std::shared_ptr <arrow::Table> customer, 
+int Query1_3(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
@@ -457,13 +516,15 @@ void Query1_3(std::shared_ptr <arrow::Table> customer,
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "RunningTime " << duration.count() << std::endl;
+
+    return duration.count();
 }
 
 
 
 
 // WE NEED SELECT EVERYTHING HERE, PURE JOIN
-void Query2_1(std::shared_ptr <arrow::Table> customer, 
+int Query2_1(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
@@ -502,12 +563,14 @@ void Query2_1(std::shared_ptr <arrow::Table> customer,
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "RunningTime " << duration.count() << std::endl;
+
+    return duration.count();
 }
 
 
 
 // HERE WE NEED STRING BETWEEN
-void Query2_2(std::shared_ptr <arrow::Table> customer, 
+int Query2_2(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
@@ -546,10 +609,12 @@ void Query2_2(std::shared_ptr <arrow::Table> customer,
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "RunningTime " << duration.count() << std::endl;
+
+    return duration.count();
 }
 
 
-void Query2_3(std::shared_ptr <arrow::Table> customer, 
+int Query2_3(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
@@ -589,10 +654,12 @@ void Query2_3(std::shared_ptr <arrow::Table> customer,
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "RunningTime " << duration.count() << std::endl;
+
+    return duration.count();
 }
 
 
-void Query3_1(std::shared_ptr <arrow::Table> customer, 
+int Query3_1(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
@@ -633,10 +700,12 @@ void Query3_1(std::shared_ptr <arrow::Table> customer,
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "RunningTime " << duration.count() << std::endl;
+
+    return duration.count();
 }
 
 
-void Query3_2(std::shared_ptr <arrow::Table> customer, 
+int Query3_2(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
@@ -675,11 +744,13 @@ void Query3_2(std::shared_ptr <arrow::Table> customer,
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "RunningTime " << duration.count() << std::endl;
+
+    return duration.count();
 }
 
 
 // NEED TO EVALUATE 'OR' FOR ONE DIM TABLE
-void Query3_3(std::shared_ptr <arrow::Table> customer, 
+int Query3_3(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
@@ -731,12 +802,14 @@ void Query3_3(std::shared_ptr <arrow::Table> customer,
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "RunningTime " << duration.count() << std::endl;
+
+    return duration.count();
 }
 
 
 
 // NEED TO EVALUATE 'OR' FOR ONE DIM TABLE
-void Query3_4(std::shared_ptr <arrow::Table> customer, 
+int Query3_4(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
@@ -784,12 +857,14 @@ void Query3_4(std::shared_ptr <arrow::Table> customer,
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "RunningTime " << duration.count() << std::endl;
+
+    return duration.count();
 }
 
 
 
 // NEED TO EVALUATE 'OR'
-void Query4_1(std::shared_ptr <arrow::Table> customer, 
+int Query4_1(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
@@ -835,6 +910,8 @@ void Query4_1(std::shared_ptr <arrow::Table> customer,
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "RunningTime " << duration.count() << std::endl;
+
+    return duration.count();
 }
 
 
@@ -842,7 +919,7 @@ void Query4_1(std::shared_ptr <arrow::Table> customer,
 
 
 // NEED TO EVALUATE 'OR'
-void Query4_2(std::shared_ptr <arrow::Table> customer, 
+int Query4_2(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
@@ -899,11 +976,13 @@ void Query4_2(std::shared_ptr <arrow::Table> customer,
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "RunningTime " << duration.count() << std::endl;
+
+    return duration.count();
 }
 
 
 // NEED TO EVALUATE 'OR'
-void Query4_3(std::shared_ptr <arrow::Table> customer, 
+int Query4_3(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
@@ -957,6 +1036,8 @@ void Query4_3(std::shared_ptr <arrow::Table> customer,
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "RunningTime " << duration.count() << std::endl;
+
+    return duration.count();
 }
 
 

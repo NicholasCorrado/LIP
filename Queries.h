@@ -22,6 +22,11 @@ enum ALG{
 int main_nick();
 int main_xiating();
 
+void RunAllQueries_nick(std::shared_ptr <arrow::Table> customer,
+                   std::shared_ptr <arrow::Table> date,
+                   std::shared_ptr <arrow::Table> lineorder,
+                   std::shared_ptr <arrow::Table> part,
+                   std::shared_ptr <arrow::Table> supplier);
 
 void RunAllQueries(std::shared_ptr <arrow::Table> customer, 
 				std::shared_ptr <arrow::Table> date,
@@ -30,7 +35,7 @@ void RunAllQueries(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> supplier,
 				int alg_flag);
 
-void Query1_1(std::shared_ptr <arrow::Table> customer, 
+int Query1_1(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
@@ -38,43 +43,35 @@ void Query1_1(std::shared_ptr <arrow::Table> customer,
 				int alg_flag);
 
 
-void Query1_2(std::shared_ptr <arrow::Table> customer, 
+int Query1_2(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
 				int alg_flag);
 
-void Query1_3(std::shared_ptr <arrow::Table> customer, 
+int Query1_3(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
 				int alg_flag);
 
-void Query2_1(std::shared_ptr <arrow::Table> customer, 
+int Query2_1(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
 				int alg_flag);
 
-void Query2_2(std::shared_ptr <arrow::Table> customer, 
+int Query2_2(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
 				int alg_flag);
 
-void Query2_3(std::shared_ptr <arrow::Table> customer, 
-				std::shared_ptr <arrow::Table> date,
-				std::shared_ptr <arrow::Table> lineorder,
-				std::shared_ptr <arrow::Table> part,
-				std::shared_ptr <arrow::Table> supplier,
-				int alg_flag);
-
-
-void Query3_1(std::shared_ptr <arrow::Table> customer, 
+int Query2_3(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
@@ -82,7 +79,7 @@ void Query3_1(std::shared_ptr <arrow::Table> customer,
 				int alg_flag);
 
 
-void Query3_2(std::shared_ptr <arrow::Table> customer, 
+int Query3_1(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
@@ -90,7 +87,15 @@ void Query3_2(std::shared_ptr <arrow::Table> customer,
 				int alg_flag);
 
 
-void Query3_3(std::shared_ptr <arrow::Table> customer, 
+int Query3_2(std::shared_ptr <arrow::Table> customer,
+				std::shared_ptr <arrow::Table> date,
+				std::shared_ptr <arrow::Table> lineorder,
+				std::shared_ptr <arrow::Table> part,
+				std::shared_ptr <arrow::Table> supplier,
+				int alg_flag);
+
+
+int Query3_3(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
@@ -99,7 +104,7 @@ void Query3_3(std::shared_ptr <arrow::Table> customer,
 
 
 
-void Query3_4(std::shared_ptr <arrow::Table> customer, 
+int Query3_4(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
@@ -107,7 +112,7 @@ void Query3_4(std::shared_ptr <arrow::Table> customer,
 				int alg_flag);
 
 
-void Query4_1(std::shared_ptr <arrow::Table> customer, 
+int Query4_1(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
@@ -115,7 +120,7 @@ void Query4_1(std::shared_ptr <arrow::Table> customer,
 				int alg_flag);
 
 
-void Query4_2(std::shared_ptr <arrow::Table> customer, 
+int Query4_2(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
@@ -123,7 +128,7 @@ void Query4_2(std::shared_ptr <arrow::Table> customer,
 				int alg_flag);
 
 
-void Query4_3(std::shared_ptr <arrow::Table> customer, 
+int Query4_3(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
