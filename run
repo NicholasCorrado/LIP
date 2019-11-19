@@ -8,8 +8,8 @@ fi
 
 echo $query
 
-./csv_to_arrow $query hash > scripts/data/hash
-./csv_to_arrow $query lip > scripts/data/lip
-./csv_to_arrow $query xiating > scripts/data/xiating
+./csv_to_arrow $query hash y > scripts/data/hash_enum
+./csv_to_arrow $query lip y > scripts/data/lip_enum
+./csv_to_arrow $query xiating y > scripts/data/xiating_enum
 
 python3 ./scripts/plot.py

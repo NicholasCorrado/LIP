@@ -22,10 +22,19 @@ enum ALG{
 
 int ui();
 
-int run(std::string q, std::string alg);
+int run(std::string q, std::string alg, bool enum_flag);
 
 int main_nick();
 int main_xiating();
+
+void RunAllPlans(std::shared_ptr <arrow::Table> lineorder, std::vector<JoinExecutor*> tree, int alg_flag);
+
+
+void RunAllPlans_util(std::shared_ptr <arrow::Table> lineorder, 
+                        std::vector<JoinExecutor*> tree, 
+                        int alg_flag, 
+                        std::vector<JoinExecutor*> curTree, 
+                        std::map<JoinExecutor*, bool> map);
 
 void RunAllQueries_nick(std::shared_ptr <arrow::Table> customer,
                    std::shared_ptr <arrow::Table> date,
@@ -33,19 +42,24 @@ void RunAllQueries_nick(std::shared_ptr <arrow::Table> customer,
                    std::shared_ptr <arrow::Table> part,
                    std::shared_ptr <arrow::Table> supplier);
 
+void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<JoinExecutor*> tree, int alg_flag);
+
+
 void RunAllQueries(std::shared_ptr <arrow::Table> customer, 
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
-				int alg_flag);
+				int alg_flag,
+				bool enum_flag);
 
 int Query1_1(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
-				int alg_flag);
+				int alg_flag,
+				bool enum_flag);
 
 
 int Query1_2(std::shared_ptr <arrow::Table> customer,
@@ -53,35 +67,40 @@ int Query1_2(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
-				int alg_flag);
+				int alg_flag,
+				bool enum_flag);
 
 int Query1_3(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
-				int alg_flag);
+				int alg_flag,
+				bool enum_flag);
 
 int Query2_1(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
-				int alg_flag);
+				int alg_flag,
+				bool enum_flag);
 
 int Query2_2(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
-				int alg_flag);
+				int alg_flag,
+				bool enum_flag);
 
 int Query2_3(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> date,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
-				int alg_flag);
+				int alg_flag,
+				bool enum_flag);
 
 
 int Query3_1(std::shared_ptr <arrow::Table> customer,
@@ -89,7 +108,8 @@ int Query3_1(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
-				int alg_flag);
+				int alg_flag,
+				bool enum_flag);
 
 
 int Query3_2(std::shared_ptr <arrow::Table> customer,
@@ -97,7 +117,8 @@ int Query3_2(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
-				int alg_flag);
+				int alg_flag,
+				bool enum_flag);
 
 
 int Query3_3(std::shared_ptr <arrow::Table> customer,
@@ -105,7 +126,8 @@ int Query3_3(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
-				int alg_flag);
+				int alg_flag,
+				bool enum_flag);
 
 
 
@@ -114,7 +136,8 @@ int Query3_4(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
-				int alg_flag);
+				int alg_flag,
+				bool enum_flag);
 
 
 int Query4_1(std::shared_ptr <arrow::Table> customer,
@@ -122,7 +145,8 @@ int Query4_1(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
-				int alg_flag);
+				int alg_flag,
+				bool enum_flag);
 
 
 int Query4_2(std::shared_ptr <arrow::Table> customer,
@@ -130,7 +154,8 @@ int Query4_2(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
-				int alg_flag);
+				int alg_flag,
+				bool enum_flag);
 
 
 int Query4_3(std::shared_ptr <arrow::Table> customer,
@@ -138,7 +163,8 @@ int Query4_3(std::shared_ptr <arrow::Table> customer,
 				std::shared_ptr <arrow::Table> lineorder,
 				std::shared_ptr <arrow::Table> part,
 				std::shared_ptr <arrow::Table> supplier,
-				int alg_flag);
+				int alg_flag,
+				bool enum_flag);
 
 
 #endif //CSV_TO_ARROW_CPP_QUERIES_H

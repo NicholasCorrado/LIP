@@ -57,13 +57,19 @@ int ui(){
         std::string alg;
         std::cout << "Choose an algorithm [lip] or [hash]\n>>> ";
         std::cin >> alg;
-        run(q, alg);
+
+        std::string s_enum_flag;
+        std::cout << "Enumerate all plans? [y/n]\n>>> ";
+        std::cin >> s_enum_flag;
+
+        bool enum_flag = (s_enum_flag == "y" || s_enum_flag == "Y");
+        run(q, alg, enum_flag);
         
     }
     return 0;
 }
 
-int run(std::string q, std::string alg){
+int run(std::string q, std::string alg, bool enum_flag){
 
     std::string file_path_customer  = "./benchmark/customer.tbl";
     std::string file_path_date      = "./benchmark/date.tbl";
@@ -121,33 +127,33 @@ int run(std::string q, std::string alg){
     }
 
     if (q == "1.1") {
-        Query1_1(customer, date, lineorder, part, supplier, alg_flag);
+        Query1_1(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else if (q == "1.2") {
-        Query1_2(customer, date, lineorder, part, supplier, alg_flag);
+        Query1_2(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else if (q == "1.3") {
-        Query1_3(customer, date, lineorder, part, supplier, alg_flag);
+        Query1_3(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else if (q == "2.1") {
-        Query2_1(customer, date, lineorder, part, supplier, alg_flag);
+        Query2_1(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else if (q == "2.2") {
-        Query2_2(customer, date, lineorder, part, supplier, alg_flag);
+        Query2_2(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else if (q == "2.3") {
-        Query2_3(customer, date, lineorder, part, supplier, alg_flag);
+        Query2_3(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else if (q == "3.1") {
-        Query3_1(customer, date, lineorder, part, supplier, alg_flag);
+        Query3_1(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else if (q == "3.2") {
-        Query3_2(customer, date, lineorder, part, supplier, alg_flag);
+        Query3_2(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else if (q == "3.3") {
-        Query3_3(customer, date, lineorder, part, supplier, alg_flag);
+        Query3_3(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else if (q == "3.4") {
-        Query3_4(customer, date, lineorder, part, supplier, alg_flag);
+        Query3_4(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else if (q == "4.1") {
-        Query4_1(customer, date, lineorder, part, supplier, alg_flag);
+        Query4_1(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else if (q == "4.2") {
-        Query4_2(customer, date, lineorder, part, supplier, alg_flag);
+        Query4_2(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else if (q == "4.3") {
-        Query4_3(customer, date, lineorder, part, supplier, alg_flag);
+        Query4_3(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else if (q == "all") {
-        RunAllQueries(customer, date, lineorder, part, supplier, alg_flag);
+        RunAllQueries(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else {
         std::cout << "Unknown query entered." << std::endl;
     }
@@ -390,8 +396,8 @@ int main_xiating(){
     supplier    = build_table(file_path_supplier,  pool, supplier_schema);
 
 
-    RunAllQueries(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    RunAllQueries(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    RunAllQueries(customer, date, lineorder, part, supplier, ALG::HASH_JOIN, false);
+    RunAllQueries(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD, false);
     
 
     return 0;
@@ -408,47 +414,47 @@ void RunAllQueries_nick(std::shared_ptr <arrow::Table> customer,
     int hashjoin_time = 0;
     int LIPjoin_time = 0;
 
-    hashjoin_time = Query1_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    LIPjoin_time  = Query1_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    hashjoin_time = Query1_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
+    LIPjoin_time  = Query1_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
     std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query1_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    LIPjoin_time  = Query1_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    hashjoin_time = Query1_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
+    LIPjoin_time  = Query1_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
     std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query1_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    LIPjoin_time  = Query1_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-
-    hashjoin_time = Query2_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    LIPjoin_time  = Query2_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query2_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    LIPjoin_time  = Query2_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query2_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    LIPjoin_time  = Query2_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    hashjoin_time = Query1_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
+    LIPjoin_time  = Query1_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
     std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
 
-    hashjoin_time = Query3_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    LIPjoin_time  = Query3_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    hashjoin_time = Query2_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
+    LIPjoin_time  = Query2_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
     std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query3_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    LIPjoin_time  = Query3_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    hashjoin_time = Query2_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
+    LIPjoin_time  = Query2_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
     std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query3_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    LIPjoin_time  = Query3_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query3_4(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    LIPjoin_time  = Query3_4(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    hashjoin_time = Query2_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
+    LIPjoin_time  = Query2_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
     std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
 
-    hashjoin_time = Query4_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    LIPjoin_time  = Query4_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    hashjoin_time = Query3_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
+    LIPjoin_time  = Query3_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
     std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query4_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    LIPjoin_time  = Query4_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    hashjoin_time = Query3_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
+    LIPjoin_time  = Query3_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
     std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query4_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN);
-    LIPjoin_time  = Query4_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD);
+    hashjoin_time = Query3_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
+    LIPjoin_time  = Query3_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+    hashjoin_time = Query3_4(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
+    LIPjoin_time  = Query3_4(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+
+    hashjoin_time = Query4_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
+    LIPjoin_time  = Query4_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+    hashjoin_time = Query4_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
+    LIPjoin_time  = Query4_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
+    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+    hashjoin_time = Query4_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
+    LIPjoin_time  = Query4_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
     std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
 }
 
@@ -457,32 +463,73 @@ void RunAllQueries(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
                 std::shared_ptr <arrow::Table> supplier,
-                int alg_flag)
+                int alg_flag,
+                bool enum_flag)
 {
-    Query1_1(customer, date, lineorder, part, supplier, alg_flag);
-    Query1_2(customer, date, lineorder, part, supplier, alg_flag);
-    Query1_3(customer, date, lineorder, part, supplier, alg_flag);
+    Query1_1(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
+    Query1_2(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
+    Query1_3(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     
 
-    Query2_1(customer, date, lineorder, part, supplier, alg_flag);
-    Query2_2(customer, date, lineorder, part, supplier, alg_flag); 
-    Query2_3(customer, date, lineorder, part, supplier, alg_flag);
+    Query2_1(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
+    Query2_2(customer, date, lineorder, part, supplier, alg_flag, enum_flag); 
+    Query2_3(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     
 
-    Query3_1(customer, date, lineorder, part, supplier, alg_flag);
-    Query3_2(customer, date, lineorder, part, supplier, alg_flag);
-    Query3_3(customer, date, lineorder, part, supplier, alg_flag);
-    Query3_4(customer, date, lineorder, part, supplier, alg_flag);
+    Query3_1(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
+    Query3_2(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
+    Query3_3(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
+    Query3_4(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
 
     
-    Query4_1(customer, date, lineorder, part, supplier, alg_flag);
-    Query4_2(customer, date, lineorder, part, supplier, alg_flag);
-    Query4_3(customer, date, lineorder, part, supplier, alg_flag);
+    Query4_1(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
+    Query4_2(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
+    Query4_3(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
      
 }
 
 
+void RunAllPlans(std::shared_ptr <arrow::Table> lineorder, std::vector<JoinExecutor*> tree, int alg_flag){
+    std::vector<JoinExecutor*> curTree;
+    std::map<JoinExecutor*, bool> map;
+    for(int i = 0; i < tree.size(); i++){
+        map[tree[i]] = false;
+    }
+    RunAllPlans_util(lineorder, tree, alg_flag, curTree, map);
+}
+
+void RunAllPlans_util(std::shared_ptr <arrow::Table> lineorder, 
+                        std::vector<JoinExecutor*> tree, 
+                        int alg_flag, 
+                        std::vector<JoinExecutor*> curTree, 
+                        std::map<JoinExecutor*, bool> map){
+    if(curTree.size() >= tree.size()){
+        AlgorithmSwitcher(lineorder, curTree, alg_flag);
+        return;
+    }
+    for(int i = 0; i < tree.size(); i++){
+        if (!map[tree[i]]){
+            // first add it
+            curTree.push_back(tree[i]); 
+            map[tree[i]] = true;
+
+            RunAllPlans_util(lineorder,
+                                tree,
+                                alg_flag,
+                                curTree,
+                                map);
+
+            // then remove it
+            curTree.pop_back();
+            map[tree[i]] = false;
+        }
+    }
+}
+
+
+
 void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<JoinExecutor*> tree, int alg_flag){
+    auto start = std::chrono::high_resolution_clock::now();
     std::shared_ptr <arrow::Table> result_table = nullptr;
     switch (alg_flag){
         case ALG::HASH_JOIN:
@@ -498,8 +545,12 @@ void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<Joi
             std::cout << "Unknown algorithm" << std::endl;
             break;
     }
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    
     if (result_table != nullptr)
-        std::cout << "Rows " << result_table -> num_rows() << std::endl; 
+        std::cout << "Rows " << result_table -> num_rows() << std::endl;
+    std::cout << "RunningTime " << duration.count() << std::endl;
 }
 
 
@@ -509,11 +560,54 @@ int Query1_1(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
                 std::shared_ptr <arrow::Table> supplier,
-                int alg_flag)
+                int alg_flag,
+                bool enum_flag)
 {
     std::cout << "Running query 1.1 ..." << std::endl;
-    auto start = std::chrono::high_resolution_clock::now();
+    
+    arrow::NumericScalar<arrow::Int64Type> one(1);
+    arrow::NumericScalar<arrow::Int64Type> three(3);
+    arrow::NumericScalar<arrow::Int64Type> twentyfive(25);
+    
+    lineorder = SelectBetween(lineorder, "DISCOUNT", 
+                                std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(one), 
+                                std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(three));
+    lineorder = Select(lineorder, "QUANTITY", 
+                                std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(twentyfive), arrow::compute::CompareOperator::LESS);
 
+    // WHERE lo_dicount between 1 and 3 and lo_quantity < 25;
+
+    SelectExecutor *date_s_exe = new SelectExecutorInt("YEAR", 1993, arrow::compute::CompareOperator::EQUAL);
+    
+    // WHERE date = 1993 
+    SelectExecutorTree *s_tree = new SelectExecutorTree(date, date_s_exe);
+
+    JoinExecutor *date_j_exe = new JoinExecutor(s_tree, "DATE KEY", "ORDER DATE");
+    
+
+    std::vector <JoinExecutor*> tree = {date_j_exe};
+
+    if (enum_flag){
+        RunAllPlans(lineorder, tree, alg_flag);
+    }
+    else{
+        AlgorithmSwitcher(lineorder, tree, alg_flag); 
+    }
+    
+    return 0;
+}
+
+
+int Query1_1_enum(std::shared_ptr <arrow::Table> customer, 
+                std::shared_ptr <arrow::Table> date,
+                std::shared_ptr <arrow::Table> lineorder,
+                std::shared_ptr <arrow::Table> part,
+                std::shared_ptr <arrow::Table> supplier,
+                int alg_flag,
+                bool enum_flag)
+{
+    std::cout << "Running query 1.1 ..." << std::endl;
+    
     arrow::NumericScalar<arrow::Int64Type> one(1);
     arrow::NumericScalar<arrow::Int64Type> three(3);
     arrow::NumericScalar<arrow::Int64Type> twentyfive(25);
@@ -538,14 +632,8 @@ int Query1_1(std::shared_ptr <arrow::Table> customer,
 
     AlgorithmSwitcher(lineorder, tree, alg_flag);
 
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "RunningTime " << duration.count() << std::endl;
-
-    return duration.count();
+    return 0;
 }
-
-
 
 // WE NEED SELECT ON FACT TABLE HERE
 int Query1_2(std::shared_ptr <arrow::Table> customer, 
@@ -553,7 +641,8 @@ int Query1_2(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
                 std::shared_ptr <arrow::Table> supplier,
-                int alg_flag)
+                int alg_flag,
+                bool enum_flag)
 {
     std::cout << "Running query 1.2 ..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
@@ -585,13 +674,13 @@ int Query1_2(std::shared_ptr <arrow::Table> customer,
 
     std::vector <JoinExecutor*> tree = {date_j_exe};
 
-    AlgorithmSwitcher(lineorder, tree, alg_flag);
-
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "RunningTime " << duration.count() << std::endl;
-
-    return duration.count();
+    if (enum_flag){
+        RunAllPlans(lineorder, tree, alg_flag);
+    }
+    else{
+        AlgorithmSwitcher(lineorder, tree, alg_flag); 
+    }
+    return 0;
 }
 
 
@@ -602,7 +691,8 @@ int Query1_3(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
                 std::shared_ptr <arrow::Table> supplier,
-                int alg_flag)
+                int alg_flag,
+                bool enum_flag)
 {
     std::cout << "Running query 1.3 ..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
@@ -632,13 +722,13 @@ int Query1_3(std::shared_ptr <arrow::Table> customer,
 
     std::vector <JoinExecutor*> tree = {date_j_exe};
 
-    AlgorithmSwitcher(lineorder, tree, alg_flag);
-
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "RunningTime " << duration.count() << std::endl;
-
-    return duration.count();
+    if (enum_flag){
+        RunAllPlans(lineorder, tree, alg_flag);
+    }
+    else{
+        AlgorithmSwitcher(lineorder, tree, alg_flag); 
+    }
+    return 0;
 }
 
 
@@ -650,7 +740,8 @@ int Query2_1(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
                 std::shared_ptr <arrow::Table> supplier,
-                int alg_flag)
+                int alg_flag,
+                bool enum_flag)
 {
     std::cout << "Running query 2.1 ..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
@@ -680,12 +771,13 @@ int Query2_1(std::shared_ptr <arrow::Table> customer,
 
     std::vector <JoinExecutor*> tree = {date_j_exe, part_j_exe, supplier_j_exe};
 
-    AlgorithmSwitcher(lineorder, tree, alg_flag);
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "RunningTime " << duration.count() << std::endl;
-
-    return duration.count();
+    if (enum_flag){
+        RunAllPlans(lineorder, tree, alg_flag);
+    }
+    else{
+        AlgorithmSwitcher(lineorder, tree, alg_flag); 
+    }
+    return 0;
 }
 
 
@@ -696,7 +788,8 @@ int Query2_2(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
                 std::shared_ptr <arrow::Table> supplier,
-                int alg_flag)
+                int alg_flag,
+                bool enum_flag)
 {
     std::cout << "Running query 2.2 ..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
@@ -722,16 +815,14 @@ int Query2_2(std::shared_ptr <arrow::Table> customer,
 
 
     std::vector <JoinExecutor*> tree = {date_j_exe, part_j_exe, supplier_j_exe};
-
-    AlgorithmSwitcher(lineorder, tree, alg_flag);
-
-
-
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "RunningTime " << duration.count() << std::endl;
-
-    return duration.count();
+    
+    if (enum_flag){
+        RunAllPlans(lineorder, tree, alg_flag);
+    }
+    else{
+        AlgorithmSwitcher(lineorder, tree, alg_flag); 
+    }
+    return 0;
 }
 
 
@@ -740,7 +831,8 @@ int Query2_3(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
                 std::shared_ptr <arrow::Table> supplier,
-                int alg_flag)
+                int alg_flag,
+                bool enum_flag)
 {
     std::cout << "Running query 2.3 ..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
@@ -769,14 +861,13 @@ int Query2_3(std::shared_ptr <arrow::Table> customer,
 
     std::vector <JoinExecutor*> tree = {date_j_exe, part_j_exe, supplier_j_exe};
 
-    AlgorithmSwitcher(lineorder, tree, alg_flag);
-
-
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "RunningTime " << duration.count() << std::endl;
-
-    return duration.count();
+    if (enum_flag){
+        RunAllPlans(lineorder, tree, alg_flag);
+    }
+    else{
+        AlgorithmSwitcher(lineorder, tree, alg_flag); 
+    }
+    return 0;
 }
 
 
@@ -785,7 +876,8 @@ int Query3_1(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
                 std::shared_ptr <arrow::Table> supplier,
-                int alg_flag)
+                int alg_flag,
+                bool enum_flag)
 {
     std::cout << "Running query 3.1 ..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
@@ -813,16 +905,13 @@ int Query3_1(std::shared_ptr <arrow::Table> customer,
 
     std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
 
-    AlgorithmSwitcher(lineorder, tree, alg_flag);
-
-
-
-
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "RunningTime " << duration.count() << std::endl;
-
-    return duration.count();
+    if (enum_flag){
+        RunAllPlans(lineorder, tree, alg_flag);
+    }
+    else{
+        AlgorithmSwitcher(lineorder, tree, alg_flag); 
+    }
+    return 0;
 }
 
 
@@ -831,7 +920,8 @@ int Query3_2(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
                 std::shared_ptr <arrow::Table> supplier,
-                int alg_flag)
+                int alg_flag,
+                bool enum_flag)
 {
     std::cout << "Running query 3.2 ..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
@@ -860,13 +950,13 @@ int Query3_2(std::shared_ptr <arrow::Table> customer,
 
     std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
 
-    AlgorithmSwitcher(lineorder, tree, alg_flag);
-
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "RunningTime " << duration.count() << std::endl;
-
-    return duration.count();
+    if (enum_flag){
+        RunAllPlans(lineorder, tree, alg_flag);
+    }
+    else{
+        AlgorithmSwitcher(lineorder, tree, alg_flag); 
+    }
+    return 0;
 }
 
 
@@ -876,7 +966,8 @@ int Query3_3(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
                 std::shared_ptr <arrow::Table> supplier,
-                int alg_flag)
+                int alg_flag,
+                bool enum_flag)
 {
     std::cout << "Running query 3.3 ..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
@@ -915,16 +1006,13 @@ int Query3_3(std::shared_ptr <arrow::Table> customer,
 
     std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
 
-    AlgorithmSwitcher(lineorder, tree, alg_flag);
-
-
-
-
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "RunningTime " << duration.count() << std::endl;
-
-    return duration.count();
+    if (enum_flag){
+        RunAllPlans(lineorder, tree, alg_flag);
+    }
+    else{
+        AlgorithmSwitcher(lineorder, tree, alg_flag); 
+    }
+    return 0;
 }
 
 
@@ -935,7 +1023,8 @@ int Query3_4(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
                 std::shared_ptr <arrow::Table> supplier,
-                int alg_flag)
+                int alg_flag,
+                bool enum_flag)
 {
     std::cout << "Running query 3.4 ..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
@@ -972,14 +1061,13 @@ int Query3_4(std::shared_ptr <arrow::Table> customer,
 
     std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
 
-    AlgorithmSwitcher(lineorder, tree, alg_flag);
-
-
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "RunningTime " << duration.count() << std::endl;
-
-    return duration.count();
+    if (enum_flag){
+        RunAllPlans(lineorder, tree, alg_flag);
+    }
+    else{
+        AlgorithmSwitcher(lineorder, tree, alg_flag); 
+    }
+    return 0;
 }
 
 
@@ -990,7 +1078,8 @@ int Query4_1(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
                 std::shared_ptr <arrow::Table> supplier,
-                int alg_flag)
+                int alg_flag,
+                bool enum_flag)
 {
     std::cout << "Running query 4.1 ..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
@@ -1024,15 +1113,13 @@ int Query4_1(std::shared_ptr <arrow::Table> customer,
 
     std::vector <JoinExecutor*> tree = {customer_j_exe, part_j_exe, supplier_j_exe};
 
-    AlgorithmSwitcher(lineorder, tree, alg_flag);
-
-
-
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "RunningTime " << duration.count() << std::endl;
-
-    return duration.count();
+    if (enum_flag){
+        RunAllPlans(lineorder, tree, alg_flag);
+    }
+    else{
+        AlgorithmSwitcher(lineorder, tree, alg_flag); 
+    }
+    return 0;
 }
 
 
@@ -1045,7 +1132,8 @@ int Query4_2(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
                 std::shared_ptr <arrow::Table> supplier,
-                int alg_flag)
+                int alg_flag,
+                bool enum_flag)
 {
     std::cout << "Running query 4.2 ..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
@@ -1086,19 +1174,18 @@ int Query4_2(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *customer_j_exe = new JoinExecutor(customer_s_exe_tree, "CUST KEY", "CUST KEY");
     JoinExecutor *part_j_exe = new JoinExecutor(part_s_exe_tree, "PART KEY", "PART KEY");
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
-    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "SUPP KEY", "SUPP KEY");
+    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "DATE KEY", "ORDER DATE");
     
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, part_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {customer_j_exe, part_j_exe, supplier_j_exe, date_j_exe};
 
-    AlgorithmSwitcher(lineorder, tree, alg_flag);
-
-
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "RunningTime " << duration.count() << std::endl;
-
-    return duration.count();
+    if (enum_flag){
+        RunAllPlans(lineorder, tree, alg_flag);
+    }
+    else{
+        AlgorithmSwitcher(lineorder, tree, alg_flag); 
+    }
+    return 0;
 }
 
 
@@ -1108,7 +1195,8 @@ int Query4_3(std::shared_ptr <arrow::Table> customer,
                 std::shared_ptr <arrow::Table> lineorder,
                 std::shared_ptr <arrow::Table> part,
                 std::shared_ptr <arrow::Table> supplier,
-                int alg_flag)
+                int alg_flag,
+                bool enum_flag)
 {
     std::cout << "Running query 4.3 ..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
@@ -1145,20 +1233,19 @@ int Query4_3(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *customer_j_exe = new JoinExecutor(customer_s_exe_tree, "CUST KEY", "CUST KEY");
     JoinExecutor *part_j_exe = new JoinExecutor(part_s_exe_tree, "PART KEY", "PART KEY");
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
-    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "SUPP KEY", "SUPP KEY");
+    JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "DATE KEY", "ORDER DATE");
     
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, part_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {customer_j_exe, part_j_exe, supplier_j_exe, date_j_exe};
 
-    AlgorithmSwitcher(lineorder, tree, alg_flag);
+    if (enum_flag){
+        RunAllPlans(lineorder, tree, alg_flag);
+    }
+    else{
+        AlgorithmSwitcher(lineorder, tree, alg_flag); 
+    }
 
-
-
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "RunningTime " << duration.count() << std::endl;
-
-    return duration.count();
+    return 0;
 }
 
 
