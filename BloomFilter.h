@@ -12,7 +12,7 @@ class BloomFilter{
 private:
     int numberOfCells;
 	int numberOfHashes;
-	bool* cells;
+	std::vector<bool> cells;
 	int* seeds;
 	
 	std::string foreign_key;

@@ -245,10 +245,7 @@ BloomFilter::BloomFilter(){
 	numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
 	numberOfCells = int(n * numberOfHashes / log(2));
 
-	cells = (bool*)malloc(numberOfCells * sizeof(bool));
-	for(int i = 0; i < numberOfCells; ++i){
-		cells[i] = false;
-	}
+	cells = std::vector<bool>(numberOfCells, false);
 
 	seeds = (int*)malloc(numberOfHashes * sizeof(int));
 	for(int i = 0; i < numberOfHashes; ++i){
@@ -267,10 +264,7 @@ BloomFilter::BloomFilter(int num_insert){
     numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
     numberOfCells = int(n * numberOfHashes / log(2));
 
-    cells = (bool*)malloc(numberOfCells * sizeof(bool));
-    for(int i = 0; i < numberOfCells; ++i){
-        cells[i] = false;
-    }
+    cells = std::vector<bool>(numberOfCells, false);
 
     seeds = (int*)malloc(numberOfHashes * sizeof(int));
     for(int i = 0; i < numberOfHashes; ++i){
@@ -290,10 +284,7 @@ BloomFilter::BloomFilter(std::vector<long long> elements){
 	numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
 	numberOfCells = int(n * numberOfHashes / log(2));
 
-	cells = (bool*)malloc(numberOfCells * sizeof(bool));
-	for(int i = 0; i < numberOfCells; ++i){
-		cells[i] = false;
-	}
+	cells = std::vector<bool>(numberOfCells, false);
 
 	seeds = (int*)malloc(numberOfHashes * sizeof(int));
 	for(int i = 0; i < numberOfHashes; ++i){
@@ -319,10 +310,7 @@ BloomFilter::BloomFilter(std::vector<std::string> elements){
 	numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
 	numberOfCells = int(n * numberOfHashes / log(2));
 
-	cells = (bool*)malloc(numberOfCells * sizeof(bool));
-	for(int i = 0; i < numberOfCells; ++i){
-		cells[i] = false;
-	}
+	cells = std::vector<bool>(numberOfCells, false);
 
 	seeds = (int*)malloc(numberOfHashes * sizeof(int));
 	for(int i = 0; i < numberOfHashes; ++i){
