@@ -13,3 +13,4 @@
 /scripts/*
 !/scripts/*.py
 !run
+!/util/

@@ -1,12 +1,13 @@
 #include "Join.h"
 #include "util/util.h"
+#include "util/sparsepp/spp.h"
 
 std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table, std::string left_field, 
                                         std::shared_ptr<arrow::Table> right_table, std::string right_field) {
 
     if (left_table == nullptr || right_table == nullptr) return nullptr;
 
-    std::map<long long, bool> hash;
+    spp::sparse_hash_map<long long, bool> hash;
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
@@ -134,7 +135,6 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     int* indices;
 
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
-        // Note that we
         int n_rows = in_batch -> num_rows();
         indices = (int*)malloc(n_rows * sizeof(int));
         int index_size = n_rows;
