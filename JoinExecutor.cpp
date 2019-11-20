@@ -61,24 +61,9 @@ SelectExecutorTree::ConstructBloomFilterNoFK(std::string dim_primary_key){
     if (root == nullptr){
         while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
             // NICK HELP:
-            // NEED A NCIER WAY THAT WHEN ROOT IS NULL, JUST INSERT THE KEYS.
-            arrow::Status status;
-
-            arrow::BooleanBuilder boolean_builder;
-            std::shared_ptr<arrow::BooleanArray> boolean_array;
-
-            status = boolean_builder.AppendValues(in_batch->num_rows(), true);
-            EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
-            status = boolean_builder.Finish(&boolean_array);
-            EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
-
-            filter = /* just need this to be all true*/ new arrow::compute::Datum(boolean_array);
-
-        
-            auto* out = new arrow::compute::Datum();
-            status = arrow::compute::Filter(&function_context, in_batch->GetColumnByName(dim_primary_key), *filter, out);
-
-            std::shared_ptr<arrow::Int64Array> keys = std::static_pointer_cast<arrow::Int64Array>(out->make_array());
+            // NEED A NCIER WAY THAT WHEN ROOT IS NULL, JUST INSERT THE KEYS
+            //@TODO Check that this works
+            std::shared_ptr<arrow::Int64Array> keys = std::static_pointer_cast<arrow::Int64Array>(in_batch->GetColumnByName(dim_primary_key));
 
             for (int i=0;i<keys->length(); i++) {
                 bf->Insert(keys->Value(i));
