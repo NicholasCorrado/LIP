@@ -33,15 +33,15 @@ def GetDictionary(data_directories):
 
 	return ret
 
-def main():
-	hash_file = "./scripts/data/hash_enum"
-	lip_file = "./scripts/data/lip_enum"
-	xiating_file = "./scripts/data/xiating_enum"
+def plot():
+	hash_file_base = "./scripts/data/hash_enum"
+	lip_file_base = "./scripts/data/lip_enum"
+	xiating_file_base = "./scripts/data/xiating_enum"
 
 
-	hash_dict = GetDictionary([hash_file])
-	lip_dict = GetDictionary([lip_file])
-	xiating_dict = GetDictionary([xiating_file])
+	hash_dict = GetDictionary([hash_file_base])
+	lip_dict = GetDictionary([lip_file_base])
+	xiating_dict = GetDictionary([xiating_file_base])
 
 
 	lip_time = []
@@ -66,6 +66,42 @@ def main():
 
 	plt.show()
 
+
+def plot_no():
+	hash_file_base = "./scripts/data/hash_enum_"
+	lip_file_base = "./scripts/data/lip_enum_"
+	#xiating_file_base = "./scripts/data/xiating_enum_"
+
+
+	hash_dict = GetDictionary([hash_file_base + str(i) for i in range(1, 11)])
+	lip_dict = GetDictionary([lip_file_base + str(i) for i in range(1, 11)])
+	#xiating_dict = GetDictionary([xiating_file_base])
+
+
+	lip_time = []
+	hash_time = []
+	xiating_time = []
+	index = []
+	cnt = 1
+
+	for q in lip_dict:
+		index.append(cnt)
+		# lip_time.append(sum(lip_dict[q]) / len(lip_dict[q]))
+		lip_time.append(min(lip_dict[q]))
+		hash_time.append(min(hash_dict[q]))
+		#xiating_time.append(min(xiating_dict[q]))
+
+		cnt += 1
+	lip_plot = plt.plot(index, lip_time, '-o')
+	hash_plot = plt.plot(index, hash_time, '-o')
+	#xiating_plot = plt.plot(index, xiating_time, '-o')
+	
+	plt.gca().legend(('LIP Standard', 'Hash-join', 'Xiating'))
+
+	plt.show()
+
+def main():
+	plot()
 if __name__ == "__main__":
 	main()
 

@@ -6,7 +6,7 @@
 #include<vector>
 #include<algorithm>
 #include <chrono>
-
+#include <functional>
 #include "BloomFilter.h"
 
 
@@ -184,6 +184,22 @@ unsigned int MurmurHashStr(const std::string x, int seed){
 }
 
 
+unsigned int hash_function(long long x, int seed) {
+	x = (x<<32)^seed;
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = (x >> 16) ^ x;
+    return x;
+}
+
+
+unsigned int Hash(long long x, int seed){
+	return hash_function(x, seed);
+}
+
+unsigned HashStr(const std::string x, int seed){
+	return MurmurHashStr(x, seed);
+}
 
 
 /* 
@@ -340,7 +356,7 @@ void BloomFilter::Reset(){
 */
 void BloomFilter::Insert(long long value){
 	for(int i = 0; i < numberOfHashes; ++i){
-		int index = MurmurHash(&value, seeds[i]) % numberOfCells;
+		int index = Hash(value, seeds[i]) % numberOfCells;
 		cells[index] = true;
 	}
 }
@@ -350,7 +366,7 @@ void BloomFilter::Insert(long long value){
 */
 void BloomFilter::Insert(std::string value){
 	for(int i = 0; i < numberOfHashes; ++i){
-		int index = MurmurHashStr(value, seeds[i]) % numberOfCells;
+		int index = HashStr(value, seeds[i]) % numberOfCells;
 		cells[index] = true;
 	}
 }
@@ -362,7 +378,7 @@ void BloomFilter::Insert(std::string value){
 */
 bool BloomFilter::Search(long long value){
 	for(int i = 0; i < numberOfHashes; ++i){
-		int index = MurmurHash(&value, seeds[i]) % numberOfCells;
+		int index = Hash(value, seeds[i]) % numberOfCells;
 		if (!cells[index]) return false;
 	}
 	return true;
@@ -375,7 +391,7 @@ bool BloomFilter::Search(long long value){
 */
 bool BloomFilter::Search(std::string value){
 	for(int i = 0; i < numberOfHashes; ++i){
-		int index = MurmurHashStr(value, seeds[i]) % numberOfCells;
+		int index = HashStr(value, seeds[i]) % numberOfCells;
 		if (!cells[index]) return false;
 	}
 	return true;

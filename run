@@ -8,15 +8,12 @@ fi
 
 echo $query
 
-
-for i in `seq 1 10`;
-do
-	echo $i
-	echo "hash"
-	./csv_to_arrow $query hash y > scripts/data/hash_enum_$i
-	echo "lip"
-	./csv_to_arrow $query lip y > scripts/data/lip_enum_$i
-done 
+echo "hash"
+./csv_to_arrow $query hash y > scripts/data/hash_enum
+echo "lip"
+./csv_to_arrow $query lip y > scripts/data/lip_enum
+echo "xiating"
+./csv_to_arrow $query xiating y > scripts/data/xiating_enum
 
 
-# python3 ./scripts/plot.py
+python3 ./scripts/plot.py
