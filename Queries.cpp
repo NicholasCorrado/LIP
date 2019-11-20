@@ -71,11 +71,18 @@ int ui(){
 
 int run(std::string q, std::string alg, bool enum_flag){
 
-    std::string file_path_customer  = "./benchmark/customer.tbl";
-    std::string file_path_date      = "./benchmark/date.tbl";
-    std::string file_path_lineorder = "./benchmark/lineorder.tbl";
-    std::string file_path_part      = "./benchmark/part.tbl";
-    std::string file_path_supplier  = "./benchmark/supplier.tbl";
+    std::string file_path_customer  = "./benchmarks/benchmark-original/customer.tbl";
+    std::string file_path_date      = "./benchmarks/benchmark-original/date.tbl";
+    std::string file_path_lineorder = "./benchmarks/benchmark-original/lineorder.tbl";
+    std::string file_path_part      = "./benchmarks/benchmark-original/part.tbl";
+    std::string file_path_supplier  = "./benchmarks/benchmark-original/supplier.tbl";
+
+
+    // std::string file_path_customer  = "./benchmarks/benchmark-skew/customer.tbl";
+    // std::string file_path_date      = "./benchmarks/benchmark-skew/date.tbl";
+    // std::string file_path_lineorder = "./benchmarks/benchmark-skew/lineorder.tbl";
+    // std::string file_path_part      = "./benchmarks/benchmark-skew/part.tbl";
+    // std::string file_path_supplier  = "./benchmarks/benchmark-skew/supplier.tbl";
 
 
     std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
@@ -548,8 +555,8 @@ void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<Joi
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     
-    if (result_table != nullptr)
-        std::cout << "Rows " << result_table -> num_rows() << std::endl;
+    int numOfRows = result_table != nullptr ? result_table -> num_rows() : 0;
+    std::cout << "Rows " << numOfRows << std::endl;
     std::cout << "RunningTime " << duration.count() << std::endl;
 }
 

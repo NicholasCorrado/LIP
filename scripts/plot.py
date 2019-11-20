@@ -30,6 +30,7 @@ def GetDictionary(data_directories):
 				
 				if line == "" or line.split()[0] == "Running":
 					break
+		file.close()
 
 	return ret
 
@@ -73,8 +74,8 @@ def plot_no():
 	#xiating_file_base = "./scripts/data/xiating_enum_"
 
 
-	hash_dict = GetDictionary([hash_file_base + str(i) for i in range(1, 11)])
-	lip_dict = GetDictionary([lip_file_base + str(i) for i in range(1, 11)])
+	hash_dict = GetDictionary([hash_file_base + str(i) for i in range(1, 101)])
+	lip_dict = GetDictionary([lip_file_base + str(i) for i in range(1, 101)])
 	#xiating_dict = GetDictionary([xiating_file_base])
 
 
@@ -101,7 +102,7 @@ def plot_no():
 	plt.show()
 
 def main():
-	plot()
+	plot_no()
 if __name__ == "__main__":
 	main()
 

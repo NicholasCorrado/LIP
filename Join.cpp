@@ -6,7 +6,9 @@
 std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table, std::string left_field, 
                                         std::shared_ptr<arrow::Table> right_table, std::string right_field) {
 
-    if (left_table == nullptr || right_table == nullptr) return nullptr;
+    if (left_table == nullptr || right_table == nullptr
+        || left_table -> num_rows() == 0 
+        || right_table -> num_rows() == 0) return nullptr;
 
     spp::sparse_hash_map<long long, bool> hash;
 
