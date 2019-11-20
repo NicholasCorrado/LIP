@@ -52,6 +52,7 @@ def main():
 
 	for q in lip_dict:
 		index.append(cnt)
+		# lip_time.append(sum(lip_dict[q]) / len(lip_dict[q]))
 		lip_time.append(min(lip_dict[q]))
 		hash_time.append(min(hash_dict[q]))
 		xiating_time.append(min(xiating_dict[q]))

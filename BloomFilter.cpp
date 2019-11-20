@@ -11,7 +11,7 @@
 
 
 
-#define FALSE_POSITIVE_RATE 0.001
+#define FALSE_POSITIVE_RATE 0.1
 #define MAX_SEED 65535
 #define S 4
 #define DEFAULT_INSERT 500000
