@@ -54,6 +54,8 @@ SelectExecutorTree::ConstructBloomFilterNoFK(std::string dim_primary_key){
     std::shared_ptr<arrow::RecordBatch> in_batch;
     auto* reader = new arrow::TableBatchReader(*dim_table);
 
+    //auto start = std::chrono::high_resolution_clock::now();
+    
     BloomFilter* bf = new BloomFilter(500000);
 
     
@@ -90,7 +92,11 @@ SelectExecutorTree::ConstructBloomFilterNoFK(std::string dim_primary_key){
         }
     
     }
+    // auto stop = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     
+    // std::cout << "BloomBuild " << duration.count() << std::endl;
+
     return bf;
 
 }
