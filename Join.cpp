@@ -14,7 +14,6 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
-
     auto* reader = new arrow::TableBatchReader(*right_table);
 
     //auto start = std::chrono::high_resolution_clock::now();
@@ -241,7 +240,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
 
 
     std::shared_ptr<arrow::Table> result_table;
-    status = arrow::Table::FromRecordBatches(out_batches, &result_table);
+    if (out_batches.size() > 0)
+        status = arrow::Table::FromRecordBatches(out_batches, &result_table);
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
     //return result_table;
     //std::cout << "FilterProbe " << 1.0 * accu / count << std::endl;
@@ -372,7 +372,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPXiating(std::shared_ptr<arrow::
 
 
     std::shared_ptr<arrow::Table> result_table;
-    status = arrow::Table::FromRecordBatches(out_batches, &result_table);
+    if (out_batches.size() > 0)
+        status = arrow::Table::FromRecordBatches(out_batches, &result_table);
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
     //return result_table;
     return EvaluateJoinTree(result_table, joinExecutors);

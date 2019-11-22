@@ -16,4 +16,4 @@ echo "xiating"
 ./csv_to_arrow $query xiating y > scripts/data/xiating_enum
 
 
-python3 ./scripts/plot.py
+python3 ./scripts/plot_one.py

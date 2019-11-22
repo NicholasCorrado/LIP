@@ -103,7 +103,7 @@ def plot_no():
 	plt.show()
 
 def main():
-	plot_no()
+	plot()
 if __name__ == "__main__":
 	main()
 

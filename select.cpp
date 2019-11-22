@@ -132,6 +132,9 @@ std::shared_ptr<arrow::Table> Select(std::shared_ptr<arrow::Table> table,
                                         std::string select_field, 
                                         std::shared_ptr<arrow::Scalar> value, 
                                         arrow::compute::CompareOperator op) {
+    if (table == nullptr || table -> num_rows() == 0){
+        return table;
+    }
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
@@ -181,7 +184,9 @@ std::shared_ptr<arrow::Table> SelectBetween(std::shared_ptr<arrow::Table> table,
                                                 std::shared_ptr<arrow::Scalar> lo, 
                                                 std::shared_ptr<arrow::Scalar> hi){
 
-
+    if (table == nullptr || table -> num_rows() == 0){
+        return table;
+    }
 
     std::shared_ptr<arrow::Table> result_table = table;
 
@@ -200,6 +205,9 @@ std::shared_ptr<arrow::Table> SelectBetween(std::shared_ptr<arrow::Table> table,
 // select queries on columns with string data if we really want to.
 std::shared_ptr<arrow::Table> SelectString(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, arrow::compute::CompareOperator op) {
 
+    if (table == nullptr || table -> num_rows() == 0){
+        return table;
+    }
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
     std::unique_ptr<arrow::RecordBatchBuilder> out_batch_builder;
@@ -242,6 +250,9 @@ std::shared_ptr<arrow::Table> SelectString(std::shared_ptr<arrow::Table> table, 
 
 std::shared_ptr<arrow::Table> SelectStringBetween(std::shared_ptr<arrow::Table> table, std::string select_field, std::string lo, std::string hi) {
 
+    if (table == nullptr || table -> num_rows() == 0){
+        return table;
+    }
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
     std::unique_ptr<arrow::RecordBatchBuilder> out_batch_builder;
