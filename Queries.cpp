@@ -78,11 +78,11 @@ int run(std::string q, std::string alg, bool enum_flag){
     // std::string file_path_supplier  = "./benchmarks/benchmark-original/supplier.tbl";
 
 
-    std::string file_path_customer  = "./benchmarks/benchmark-skew/customer.tbl";
-    std::string file_path_date      = "./benchmarks/benchmark-skew/date.tbl";
-    std::string file_path_lineorder = "./benchmarks/benchmark-skew/lineorder.tbl";
-    std::string file_path_part      = "./benchmarks/benchmark-skew/part.tbl";
-    std::string file_path_supplier  = "./benchmarks/benchmark-skew/supplier.tbl";
+    std::string file_path_customer  = "./benchmarks/benchmark-original/customer.tbl";
+    std::string file_path_date      = "./benchmarks/benchmark-original/date.tbl";
+    std::string file_path_lineorder = "./benchmarks/benchmark-original/lineorder.tbl";
+    std::string file_path_part      = "./benchmarks/benchmark-original/part.tbl";
+    std::string file_path_supplier  = "./benchmarks/benchmark-original/supplier.tbl";
 
 
     std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
@@ -778,7 +778,7 @@ int Query2_1(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {date_j_exe, part_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {part_j_exe, supplier_j_exe, date_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -823,7 +823,7 @@ int Query2_2(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {date_j_exe, part_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {part_j_exe, supplier_j_exe, date_j_exe};
     
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -868,7 +868,7 @@ int Query2_3(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {date_j_exe, part_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {part_j_exe, supplier_j_exe, date_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -912,7 +912,7 @@ int Query3_1(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {customer_j_exe, supplier_j_exe, date_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -957,7 +957,7 @@ int Query3_2(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {customer_j_exe, supplier_j_exe, date_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -1013,7 +1013,7 @@ int Query3_3(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {supplier_j_exe, customer_j_exe, date_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -1068,7 +1068,7 @@ int Query3_4(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {supplier_j_exe, date_j_exe, customer_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -1120,7 +1120,7 @@ int Query4_1(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, part_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {supplier_j_exe, customer_j_exe,  part_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -1186,7 +1186,7 @@ int Query4_2(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "DATE KEY", "ORDER DATE");
     
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, part_j_exe, supplier_j_exe, date_j_exe};
+    std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe, part_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
