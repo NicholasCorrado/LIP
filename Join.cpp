@@ -243,9 +243,9 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     if (out_batches.size() > 0)
         status = arrow::Table::FromRecordBatches(out_batches, &result_table);
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
-    //return result_table;
+    return result_table;
     //std::cout << "FilterProbe " << 1.0 * accu / count << std::endl;
-    return EvaluateJoinTree(result_table, joinExecutors);
+    //return EvaluateJoinTree(result_table, joinExecutors);
 }
 
 

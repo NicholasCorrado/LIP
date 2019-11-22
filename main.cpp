@@ -18,5 +18,8 @@ int main(int argc, char *argv[]){
 	else{
 		std::cout << "Invalid arguments." << std::endl;
 	}
+
+
+
     return 0;
 }
