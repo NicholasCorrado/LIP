@@ -22,4 +22,13 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
 
 std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPXiating(std::shared_ptr<arrow::Table> fact_table, 
                                                 std::vector<JoinExecutor*> joinExecutors);
+
+
+std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPResurrection(std::shared_ptr<arrow::Table> fact_table, 
+                                                std::vector<JoinExecutor*> joinExecutors);
+
+std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table> fact_table, 
+                                                std::vector<JoinExecutor*> joinExecutors);
+
+
 #endif

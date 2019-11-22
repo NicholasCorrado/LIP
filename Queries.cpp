@@ -128,6 +128,10 @@ int run(std::string q, std::string alg, bool enum_flag){
         alg_flag = ALG::HASH_JOIN;
     } else if (alg == "xiating") {
         alg_flag = ALG::LIP_XIATING;
+    } else if (alg == "resur") {
+        alg_flag = ALG::LIP_RESURRECTION;
+    } else if (alg == "lipk") {
+        alg_flag = ALG::LIP_K;
     } else {
         alg_flag = ALG::UNKNOWN;
     }
@@ -548,6 +552,12 @@ void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<Joi
             break;
         case ALG::LIP_XIATING:
             result_table = EvaluateJoinTreeLIPXiating(lineorder, tree);
+            break;
+        case ALG::LIP_RESURRECTION:
+            result_table = EvaluateJoinTreeLIPResurrection(lineorder, tree);
+            break;
+        case ALG::LIP_K:
+            result_table = EvaluateJoinTreeLIPK(lineorder, tree);
             break;
         default:
             std::cout << "Unknown algorithm" << std::endl;

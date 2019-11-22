@@ -16,7 +16,9 @@
 enum ALG{
 	HASH_JOIN,
 	LIP_STANDARD,
-	LIP_XIATING,
+	LIP_XIATING, // cut off forever
+	LIP_RESURRECTION,
+	LIP_K, // remember the previous k tuples
 	UNKNOWN
 };
 
