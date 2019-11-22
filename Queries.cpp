@@ -77,12 +77,11 @@ int run(std::string q, std::string alg, bool enum_flag){
     // std::string file_path_part      = "./benchmarks/benchmark-original/part.tbl";
     // std::string file_path_supplier  = "./benchmarks/benchmark-original/supplier.tbl";
 
-
-    std::string file_path_customer  = "./benchmarks/benchmark-skew/customer.tbl";
-    std::string file_path_date      = "./benchmarks/benchmark-skew/date.tbl";
-    std::string file_path_lineorder = "./benchmarks/benchmark-skew/lineorder.tbl";
-    std::string file_path_part      = "./benchmarks/benchmark-skew/part.tbl";
-    std::string file_path_supplier  = "./benchmarks/benchmark-skew/supplier.tbl";
+    std::string file_path_customer  = "./benchmarks/benchmark-original/customer.tbl";
+    std::string file_path_date      = "./benchmarks/benchmark-original/date.tbl";
+    std::string file_path_lineorder = "./benchmarks/benchmark-original/lineorder.tbl";
+    std::string file_path_part      = "./benchmarks/benchmark-original/part.tbl";
+    std::string file_path_supplier  = "./benchmarks/benchmark-original/supplier.tbl";
 
 
     std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
@@ -159,6 +158,8 @@ int run(std::string q, std::string alg, bool enum_flag){
         Query4_2(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else if (q == "4.3") {
         Query4_3(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
+    } else if (q == "dim") {
+        main_n_dim(alg_flag, enum_flag);
     } else if (q == "all") {
         RunAllQueries(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else {
@@ -776,7 +777,7 @@ int Query2_1(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {date_j_exe, part_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {part_j_exe, supplier_j_exe, date_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -821,7 +822,7 @@ int Query2_2(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {date_j_exe, part_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {part_j_exe, supplier_j_exe, date_j_exe};
     
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -866,7 +867,7 @@ int Query2_3(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {date_j_exe, part_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {part_j_exe, supplier_j_exe, date_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -910,7 +911,7 @@ int Query3_1(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {customer_j_exe, supplier_j_exe, date_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -955,7 +956,7 @@ int Query3_2(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {customer_j_exe, supplier_j_exe, date_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -1011,7 +1012,7 @@ int Query3_3(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {supplier_j_exe, customer_j_exe, date_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -1066,7 +1067,7 @@ int Query3_4(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {supplier_j_exe, date_j_exe, customer_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -1118,7 +1119,7 @@ int Query4_1(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *supplier_j_exe = new JoinExecutor(supplier_s_exe_tree, "SUPP KEY", "SUPP KEY");
 
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, part_j_exe, supplier_j_exe};
+    std::vector <JoinExecutor*> tree = {supplier_j_exe, customer_j_exe,  part_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -1184,7 +1185,7 @@ int Query4_2(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "DATE KEY", "ORDER DATE");
     
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, part_j_exe, supplier_j_exe, date_j_exe};
+    std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe, part_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -1256,4 +1257,65 @@ int Query4_3(std::shared_ptr <arrow::Table> customer,
 }
 
 
+
+
+void main_n_dim(int alg_flag, bool enum_flag){
+    std::string path_base  = "./benchmarks/benchmark-n-dim/";
+
+    std::vector<std::vector<std::string>> dim_schemas;
+    std::vector<std::string> fact_schema;
+
+    for(int i = 0; i < 10; i++){
+        std::string schema = "K" + std::to_string(i);
+
+        fact_schema.push_back(schema);
+
+        std::vector<std::string> schema_v = {schema};
+        dim_schemas.push_back(schema_v);
+    }
+
+    std::vector<std::shared_ptr<arrow::Table>> dim_tables;
+
+    arrow::MemoryPool *pool = arrow::default_memory_pool();
+
+    for(int i = 0; i < 10; i++){
+        std::string filename = "dim" + std::to_string(i) + ".tbl";
+
+        std::shared_ptr<arrow::Table> table = build_table(path_base + filename, pool, dim_schemas[i]);
+
+        dim_tables.push_back(table);
+    }
+
+    std::shared_ptr<arrow::Table> fact_table = build_table(path_base + "fact.tbl", pool, fact_schema);
+
+    Query_n_dim(fact_table, dim_tables, alg_flag, enum_flag);
+}
+
+
+int Query_n_dim(std::shared_ptr<arrow::Table> fact_table, 
+                    std::vector<std::shared_ptr<arrow::Table>> dim_tables, 
+                    int alg_flag, bool enum_flag){
+
+    std::cout << "Running query n-dim ..." << std::endl;
+
+    std::vector<JoinExecutor*> tree;
+
+    for(int i = 0; i < 10; i++){
+        std::string key = "K" + std::to_string(i);
+
+        SelectExecutorTree *s_exe_t_i = new SelectExecutorTree(dim_tables[i], nullptr);
+        JoinExecutor* j_exe = new JoinExecutor(s_exe_t_i, key, key);
+        tree.push_back(j_exe);
+    }
+
+    
+    if (enum_flag){
+        RunAllPlans(fact_table, tree, alg_flag);
+    }
+    else{
+        AlgorithmSwitcher(fact_table, tree, alg_flag); 
+    }
+    return 0;
+
+}
 
