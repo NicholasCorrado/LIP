@@ -77,7 +77,6 @@ int run(std::string q, std::string alg, bool enum_flag){
     // std::string file_path_part      = "./benchmarks/benchmark-original/part.tbl";
     // std::string file_path_supplier  = "./benchmarks/benchmark-original/supplier.tbl";
 
-
     std::string file_path_customer  = "./benchmarks/benchmark-original/customer.tbl";
     std::string file_path_date      = "./benchmarks/benchmark-original/date.tbl";
     std::string file_path_lineorder = "./benchmarks/benchmark-original/lineorder.tbl";

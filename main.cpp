@@ -13,7 +13,7 @@ int main(int argc, char *argv[]){
 	}
 	else if (argc >= 4){
 		bool enum_flag = (argv[3] == "y" || argv[3] == "Y");
-		run(argv[1], argv[2], argv[3]);
+		run(argv[1], argv[2], enum_flag);
 	}
 	else{
 		std::cout << "Invalid arguments." << std::endl;
