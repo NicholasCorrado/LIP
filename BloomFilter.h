@@ -26,6 +26,7 @@ public:
     BloomFilter(int num_insert);
 	BloomFilter(std::vector<long long> elements);
 	BloomFilter(std::vector<std::string> elements);
+    BloomFilter(int num_insert, int num_cells);
 	
 	double GetFilterRate();
 	void IncrementCount();
@@ -41,5 +42,7 @@ public:
 	bool Search(long long value);
 	bool Search(std::string value);
 };
+
+void TestTrueNegative();
 
 #endif
