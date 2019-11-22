@@ -11,7 +11,7 @@
 
 
 
-#define FALSE_POSITIVE_RATE 0.1
+#define FALSE_POSITIVE_RATE 0.001
 #define MAX_SEED 65535
 #define S 4
 #define DEFAULT_INSERT 500000
@@ -277,7 +277,8 @@ BloomFilter::BloomFilter(){
 BloomFilter::BloomFilter(int num_insert){
     Reset();
     int n = num_insert;
-    numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
+    //numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
+    numberOfHashes = int (round( - log(FALSE_POSITIVE_RATE) / log(2)));
     numberOfCells = int(n * numberOfHashes / log(2));
 
     cells = std::vector<bool>(numberOfCells, false);
@@ -337,6 +338,22 @@ BloomFilter::BloomFilter(std::vector<std::string> elements){
 	for(int i = 0; i < n; ++i){
 		Insert(elements[i]);
 	}
+}
+
+
+BloomFilter::BloomFilter(int num_insert, int num_cells){
+    Reset();
+    int n = num_insert;
+    //numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
+    numberOfHashes = int (round( - log(FALSE_POSITIVE_RATE) / log(2)));
+    numberOfCells = num_cells;
+
+    cells = std::vector<bool>(numberOfCells, false);
+
+    seeds = (int*)malloc(numberOfHashes * sizeof(int));
+    for(int i = 0; i < numberOfHashes; ++i){
+        seeds[i] = rand() % MAX_SEED;
+    }
 }
 
 
@@ -573,6 +590,31 @@ int test_random_string(){
 	return 0;
 }
 
+void TestTrueNegative() {
+
+    int num_probes = 1000000;
+    int num_insert = 60000;
+
+    for (int num_cells=1000; num_cells<1000000; num_cells = num_cells + 1000) {
+        //for (int num_insert = 100; num_insert< 2*num_cells; num_insert = num_insert + 100) {
+            BloomFilter *bf = new BloomFilter(num_insert, num_cells);
+
+            for (int i = 0; i < num_insert; i++) {
+                bf->Insert(rand() % 1000000);
+            }
+
+
+            auto start = std::chrono::high_resolution_clock::now();
+            // Should be all misses + some false positive
+            for (int i = 0; i < num_probes; i++) {
+                bf->Search(1000000 + rand() % 1000000);
+            }
+            auto stop = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+            std::cout << num_cells << "," << num_insert << "," << duration.count() << std::endl;
+        //}
+    }
+}
 
 int local_main(){
 	test_false_positive();
