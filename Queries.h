@@ -167,6 +167,14 @@ int Query4_3(std::shared_ptr <arrow::Table> customer,
 				bool enum_flag);
 
 
+void main_n_dim(int alg_flag, bool enum_flag);
+
+
+int Query_n_dim(std::shared_ptr<arrow::Table> fact_table, 
+                    std::vector<std::shared_ptr<arrow::Table>> dim_tables, 
+                    int alg_flag, bool enum_flag);
+
+
 #endif //CSV_TO_ARROW_CPP_QUERIES_H
 
 

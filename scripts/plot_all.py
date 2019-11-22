@@ -68,15 +68,18 @@ def plot():
 	plt.show()
 
 
+
+RANGE = range(1122000, 1122003)
+
 def plot_no():
 	hash_file_base = "./scripts/data/hash_enum_"
 	lip_file_base = "./scripts/data/lip_enum_"
 	xiating_file_base = "./scripts/data/xiating_enum_"
 
 
-	hash_dict = GetDictionary([hash_file_base + str(i) for i in range(1, 119)])
-	lip_dict = GetDictionary([lip_file_base + str(i) for i in range(1, 119)])
-	xiating_dict = GetDictionary([xiating_file_base + str(i) for i in range(1, 119)])
+	hash_dict = GetDictionary([hash_file_base + str(i) for i in RANGE])
+	lip_dict = GetDictionary([lip_file_base + str(i) for i in RANGE])
+	xiating_dict = GetDictionary([xiating_file_base + str(i) for i in RANGE])
 
 
 	lip_time = []
