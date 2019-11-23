@@ -415,7 +415,37 @@ bool BloomFilter::Search(std::string value){
 }
 
 
+void BloomFilter::SetMemory(int _memory){
+	memory_k = _memory;
+}
 
+
+void BloomFilter::BatchEndUpdate(){
+
+	if (pass_queue.size() == memory_k 
+			&& pass_queue.size() == memory_k){
+
+		int old_pass = pass_queue.front();
+		int old_count = count_queue.front();
+
+		pass_queue.pop();
+		count_queue.pop();
+
+		pass_queue_sum -= old_pass;
+		count_queue_sum -= old_count;
+		
+	}	
+	
+	pass_queue.push(pass);
+	pass_queue_sum += pass;
+
+	pass = 0;
+
+	count_queue.push(count);
+	count_queue_sum += count;
+	
+	count = 0;
+}
 
 
 /*
@@ -487,6 +517,7 @@ void sort_filters(){
 			integers.push_back(val);
 		}
 		bf[i] = new BloomFilter(integers);
+		bf[i] -> SetMemory(3);
 	}
 
 

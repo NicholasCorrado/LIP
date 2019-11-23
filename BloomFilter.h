@@ -5,7 +5,7 @@
 #include<stdlib.h>
 #include<vector>
 #include<string>
-
+#include<queue>
 
 class BloomFilter{
 
@@ -18,6 +18,14 @@ private:
 	std::string foreign_key;
 	int count;
 	int pass;
+
+
+	int pass_queue_sum;
+	int count_queue_sum;
+
+	int memory_k;
+	std::queue<int> pass_queue;
+	std::queue<int> count_queue;
 
 public:
 
@@ -41,6 +49,9 @@ public:
 
 	bool Search(long long value);
 	bool Search(std::string value);
+
+	void SetMemory(int _memory);
+	void BatchEndUpdate();
 };
 
 void TestTrueNegative();
