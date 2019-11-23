@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
+import sys
 
 def GetQueryName(line):
 	return line.split()[2]
@@ -37,12 +37,9 @@ def GetDictionary(data_directories):
 
 
 
-RANGE = range(1122000, 1122007)
+def produce_plot(hash_file_base, start, end):
 
-
-def produce_plot(hash_file_base):
-
-	hash_dict = GetDictionary([hash_file_base + str(i) for i in RANGE])
+	hash_dict = GetDictionary([hash_file_base + str(i) for i in range(start, end)])
 	hash_time = []
 	
 	for q in hash_dict:
@@ -52,12 +49,12 @@ def produce_plot(hash_file_base):
 
 	return hash_time	
 
-def plot():
-	hash_plot = produce_plot("./scripts/data/hash_enum_")
-	lip_plot  = produce_plot("./scripts/data/lip_enum_")
-	xiating_plot = produce_plot("./scripts/data/xiating_enum_")
-	resur_plot = produce_plot("./scripts/data/resur_enum_")
-	lipk_plot = produce_plot("./scripts/data/lipk_enum_")
+def plot(start, end):
+	hash_plot = produce_plot("./scripts/data/hash_enum_", start, end)
+	lip_plot  = produce_plot("./scripts/data/lip_enum_", start, end)
+	xiating_plot = produce_plot("./scripts/data/xiating_enum_", start, end)
+	resur_plot = produce_plot("./scripts/data/resur_enum_", start, end)
+	lipk_plot = produce_plot("./scripts/data/lipk_enum_", start, end)
 
 
 
@@ -71,7 +68,10 @@ def plot():
 	plt.show()
 
 def main():
-	plot()
+	if len(sys.argv) < 3:
+		plot(0, 1)
+	else:
+		plot(int(sys.argv[1]), int(sys.argv[2]))
 if __name__ == "__main__":
 	main()
 
