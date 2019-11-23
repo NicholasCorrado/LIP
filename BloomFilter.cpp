@@ -8,7 +8,7 @@
 #include <chrono>
 #include <functional>
 #include "BloomFilter.h"
-
+#include "util/sparsepp/spp.h"
 
 
 #define FALSE_POSITIVE_RATE 0.001
@@ -614,6 +614,64 @@ void TestTrueNegative() {
             std::cout << num_cells << "," << num_insert << "," << duration.count() << std::endl;
         //}
     }
+}
+
+
+
+void dummy2() {
+    return;
+}
+
+void dummy() {
+    dummy2();
+    return;
+}
+
+#include <arrow/api.h>
+void CostOfBloomFilterProbe() {
+    int num_probes = 10000000;
+    int num_insert = 1000000;
+
+    //for (int num_cells=1000; num_cells<1000000; num_cells = num_cells + 1000) {
+        //for (int num_insert = 100; num_insert< 2*num_cells; num_insert = num_insert + 100) {
+        BloomFilter *bf = new BloomFilter(num_insert, 1000000);
+
+        for (int i = 0; i < num_insert; i++) {
+            //bf->Insert(rand() % 1000000);
+        }
+
+        auto start = std::chrono::high_resolution_clock::now();
+        // Should be all misses + some false positive
+        for (int i = 0; i < num_probes; i++) {
+            bf->Search(i);
+            //dummy();
+        }
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+        std::cout << num_insert << "," << duration.count() << std::endl;
+        //}
+    //}
+}
+
+
+
+void CostOfHashTableProbe() {
+    spp::sparse_hash_map<long long, bool> hash;
+    //std::cout << hash.max_size() << std::endl;
+
+    int num_insert = 1000000;
+    int num_probes = 10000000;
+    for (int i=0; i<num_insert; i++) {
+        //hash[rand() % 10] = true;
+    }
+
+    auto start = std::chrono::high_resolution_clock::now();
+    for (int i=0; i<num_probes; i++) {
+       hash.count(i);
+    }
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << num_insert << "," << duration.count() << std::endl;
 }
 
 int local_main(){

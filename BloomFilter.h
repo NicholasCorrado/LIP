@@ -44,5 +44,7 @@ public:
 };
 
 void TestTrueNegative();
+void CostOfHashTableProbe();
+void CostOfBloomFilterProbe();
 
 #endif
