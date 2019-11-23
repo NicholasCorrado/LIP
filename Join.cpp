@@ -122,6 +122,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTree(std::shared_ptr<arrow::Table> fac
     return ret_table;
 }
 
+void dummy() {return;}
+void dummy2() {dummy();}
 
 std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> fact_table, 
                                                 std::vector<JoinExecutor*> joinExecutors){
@@ -213,6 +215,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
         }
 
         std::sort(filters.begin(), filters.end(), BloomFilterCompare);
+
 
         arrow::Int64Builder indices_builder;
         std::shared_ptr<arrow::Array> indices_array;

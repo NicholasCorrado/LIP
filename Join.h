@@ -8,6 +8,9 @@
 #include "JoinExecutor.h"
 #include <map>
 
+void dummy();
+void dummy2();
+
 std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table, 
 												std::string left_field, 
 												std::shared_ptr<arrow::Table> right_table, 
