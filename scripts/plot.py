@@ -34,79 +34,44 @@ def GetDictionary(data_directories):
 
 	return ret
 
-def plot():
-	hash_file_base = "./scripts/data/hash_enum"
-	lip_file_base = "./scripts/data/lip_enum"
-	xiating_file_base = "./scripts/data/xiating_enum"
-
-
-	hash_dict = GetDictionary([hash_file_base])
-	lip_dict = GetDictionary([lip_file_base])
-	xiating_dict = GetDictionary([xiating_file_base])
-
-
-	lip_time = []
-	hash_time = []
-	xiating_time = []
-	index = []
-	cnt = 1
-
-	for q in lip_dict:
-		index.append(cnt)
-		# lip_time.append(sum(lip_dict[q]) / len(lip_dict[q]))
-		lip_time.append(min(lip_dict[q]))
-		hash_time.append(min(hash_dict[q]))
-		xiating_time.append(min(xiating_dict[q]))
-
-		cnt += 1
-	lip_plot = plt.plot(index, lip_time, '-o')
-	hash_plot = plt.plot(index, hash_time, '-o')
-	xiating_plot = plt.plot(index, xiating_time, '-o')
-	
-	plt.gca().legend(('LIP Standard', 'Hash-join', 'Xiating'))
-
-	plt.show()
 
 
 
-RANGE = range(1122000, 1122147)
+RANGE = range(1122000, 1122007)
 
-def plot_no():
-	hash_file_base = "./scripts/data/hash_enum_"
-	lip_file_base = "./scripts/data/lip_enum_"
-	xiating_file_base = "./scripts/data/xiating_enum_"
 
+def produce_plot(hash_file_base):
 
 	hash_dict = GetDictionary([hash_file_base + str(i) for i in RANGE])
-	lip_dict = GetDictionary([lip_file_base + str(i) for i in RANGE])
-	xiating_dict = GetDictionary([xiating_file_base + str(i) for i in RANGE])
-
-
-	lip_time = []
 	hash_time = []
-	xiating_time = []
-	index = []
-	cnt = 1
-
-	for q in lip_dict:
-		index.append(cnt)
-		# lip_time.append(sum(lip_dict[q]) / len(lip_dict[q]))
-		lip_time.append(min(lip_dict[q]))
-		hash_time.append(min(hash_dict[q]))
-		xiating_time.append(min(xiating_dict[q]))
-		# xiating_time.append(sum(xiating_dict[q]) / len(xiating_dict[q]))
-
-		cnt += 1
-	lip_plot = plt.plot(index, lip_time, '-o')
-	hash_plot = plt.plot(index, hash_time, '-o')
-	xiating_plot = plt.plot(index, xiating_time, '-o')
 	
-	plt.gca().legend(('LIP Standard', 'Hash-join', 'Xiating'))
+	for q in hash_dict:
+		hash_time.append(min(hash_dict[q]))
+	index = [i for i in range(1, len(hash_time)+1)]
+	hash_plot = plt.plot(index, hash_time, '-o')
+
+	return hash_time	
+
+def plot():
+	hash_plot = produce_plot("./scripts/data/hash_enum_")
+	lip_plot  = produce_plot("./scripts/data/lip_enum_")
+	xiating_plot = produce_plot("./scripts/data/xiating_enum_")
+	resur_plot = produce_plot("./scripts/data/resur_enum_")
+	lipk_plot = produce_plot("./scripts/data/lipk_enum_")
+
+
+
+	# lip_plot = plt.plot(index, lip_time, '-o')
+	# xiating_plot = plt.plot(index, xiating_time, '-o')
+	# resur_plot = plt.plot(index, resur_time, '-o')
+	# lipk_plot = plt.plot(index, lipk_time, '-o')
+
+	plt.gca().legend(('Hash', 'LIP', 'Xiating', 'resur', 'LIPk'))
 
 	plt.show()
 
 def main():
-	plot_no()
+	plot()
 if __name__ == "__main__":
 	main()
 
