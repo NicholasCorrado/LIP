@@ -55,7 +55,7 @@ SelectExecutorTree::ConstructBloomFilterNoFK(std::string dim_primary_key){
     auto* reader = new arrow::TableBatchReader(*dim_table);
 
     //auto start = std::chrono::high_resolution_clock::now();
-    BloomFilter* bf = new BloomFilter(365);
+    BloomFilter* bf = new BloomFilter(500000);
 
     
 
