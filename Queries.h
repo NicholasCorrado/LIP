@@ -24,10 +24,9 @@ enum ALG{
 
 int ui();
 
-int run(std::string q, std::string alg, bool enum_flag);
 
-int main_nick();
 int main_xiating();
+int run(std::string, std::string, std::string, bool );
 
 void RunAllPlans(std::shared_ptr <arrow::Table> lineorder, std::vector<JoinExecutor*> tree, int alg_flag);
 

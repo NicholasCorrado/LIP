@@ -9,8 +9,9 @@ int main(int argc, char *argv[]){
 	if (argc <= 1){
 		ui();
 	}
-	else if (argc == 3){
-        run(argv[1], argv[2], false);
+	else if (argc == 4){
+    // ./csv_to_arrow [4.2] [lip/hash] [SF]
+        run(argv[1], argv[2], argv[3], false);
 	}
 	else if (argc == 4){
         if ((std::string) argv[1] == "test") {
@@ -19,7 +20,7 @@ int main(int argc, char *argv[]){
         }
         else {
             bool enum_flag = (strcmp(argv[3], "y") == 0 || strcpy(argv[3], "Y") == 0);
-            run(argv[1], argv[2], enum_flag);
+            run(argv[1], argv[2], argv[3], enum_flag);
         }
 	}
 	else if (argc == 5) {
