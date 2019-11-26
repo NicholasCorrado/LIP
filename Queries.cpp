@@ -15,11 +15,11 @@
 
 int run(std::string q, std::string alg, std::string SF, bool enum_flag) {
 
-    std::string file_path_customer  = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/customer.tbl";
-    std::string file_path_date      = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/date.tbl";
-    std::string file_path_lineorder = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/lineorder.tbl";
-    std::string file_path_part      = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/part.tbl";
-    std::string file_path_supplier  = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/supplier.tbl";
+    std::string file_path_customer  = "./benchmarks/benchmark-" + SF + "/customer.tbl";
+    std::string file_path_date      = "./benchmarks/benchmark-" + SF + "/date.tbl";
+    std::string file_path_lineorder = "./benchmarks/benchmark-" + SF + "/lineorder.tbl";
+    std::string file_path_part      = "./benchmarks/benchmark-" + SF + "/part.tbl";
+    std::string file_path_supplier  = "./benchmarks/benchmark-" + SF + "/supplier.tbl";
 
     std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
                                                    "MKT SEGMENT"};
@@ -41,8 +41,6 @@ int run(std::string q, std::string alg, std::string SF, bool enum_flag) {
     std::shared_ptr<arrow::Table> lineorder   = build_table(file_path_lineorder, pool, lineorder_schema);
     std::shared_ptr<arrow::Table> part        = build_table(file_path_part,      pool, part_schema);
     std::shared_ptr<arrow::Table> supplier    = build_table(file_path_supplier,  pool, supplier_schema);
-
-
     int alg_flag;
 
     if (alg == "lip") {
@@ -59,6 +57,7 @@ int run(std::string q, std::string alg, std::string SF, bool enum_flag) {
         alg_flag = ALG::UNKNOWN;
     }
 
+    return 0;
     if (q == "1.1") {
         Query1_1(customer, date, lineorder, part, supplier, alg_flag, enum_flag);
     } else if (q == "1.2") {

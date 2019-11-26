@@ -15,3 +15,7 @@
 !run
 !/util/
 !/util/*
+!/third-party/
+!/third-party/*
+/third-party/arrow/
+/third-party/arrow/*

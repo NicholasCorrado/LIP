@@ -8,12 +8,31 @@ fi
 
 echo $query
 
-echo "hash"
-./csv_to_arrow $query hash y > scripts/data/hash_enum
-echo "lip"
-./csv_to_arrow $query lip y > scripts/data/lip_enum
-echo "xiating"
-./csv_to_arrow $query xiating y > scripts/data/xiating_enum
+flag=y
+
+i=404
+
+alg=hash
+echo $alg
+./csv_to_arrow $query $alg $flag > scripts/data/${alg}_enum_$i
 
 
-python3 ./scripts/plot_one.py
+alg=lip
+echo $alg
+./csv_to_arrow $query $alg $flag > scripts/data/${alg}_enum_$i
+
+
+alg=xiating
+echo $alg
+./csv_to_arrow $query $alg $flag > scripts/data/${alg}_enum_$i
+
+alg=resur
+echo $alg
+./csv_to_arrow $query $alg $flag > scripts/data/${alg}_enum_$i
+
+alg=lipk
+echo $alg
+./csv_to_arrow $query $alg $flag > scripts/data/${alg}_enum_$i
+
+
+python3 ./scripts/plot.py

@@ -146,6 +146,20 @@ class SquareDistribution(Distribution):
 		self.normalize()
 		self.computeAccu()
 
+
+class XSquareDistribution(Distribution):
+
+	def __init__(self, groundSet):
+		self.groundSet = groundSet
+
+		n = len(groundSet)
+
+		self.dist = [i*i for i in range(n)]
+
+
+		self.normalize()
+		self.computeAccu()
+
 def test():
 	
 	gs = [i for i in range(10)]

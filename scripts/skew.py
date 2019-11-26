@@ -67,7 +67,7 @@ def GenerateRows(rows):
 
 
 	custDist = RandomDistribution(custKeyList)
-	partDist = SquareDistribution(partKeyList)
+	partDist = XSquareDistribution(partKeyList)
 	suppDist = RandomDistribution(suppKeyList)
 	dateDist = UniformDistribution(dateKeyList)
 
@@ -81,10 +81,10 @@ def GenerateRows(rows):
 			print(i / (rows / 100), "printed.")
 		toPrint = sampleLine
 
-		toPrint[FIELD["CUST KEY"]] = custDist.sample(i, rows)
-		toPrint[FIELD["PART KEY"]] = partDist.sample(i, rows)
-		toPrint[FIELD["SUPP KEY"]] = suppDist.sample(i, rows)
-		toPrint[FIELD["ORDER DATE"]] = dateDist.sample(i, rows)
+		toPrint[FIELD["CUST KEY"]] = custDist.sample()
+		toPrint[FIELD["PART KEY"]] = partDist.sample()
+		toPrint[FIELD["SUPP KEY"]] = suppDist.sample()
+		toPrint[FIELD["ORDER DATE"]] = dateDist.sample()
 
 		toPrintLine = "|".join(toPrint)
 		print(toPrintLine, file=outfile)
