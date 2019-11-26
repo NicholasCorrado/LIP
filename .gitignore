@@ -16,6 +16,4 @@
 !/util/
 !/util/*
 !/third-party/
-/third-party/*
-!/third-party/apache-arrow/
-!/third-party/apache-arrow/*
+!/third-party/*
