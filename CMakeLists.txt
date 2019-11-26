@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+
 project(csv_to_arrow_cpp)
 
 set(CMAKE_CXX_STANDARD 14)

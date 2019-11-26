@@ -10,13 +10,18 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
         || left_table -> num_rows() == 0 
         || right_table -> num_rows() == 0) return nullptr;
 
-    spp::sparse_hash_map<long long, bool> hash;
+    spp::sparse_hash_map<long long, bool> hash(right_table->num_rows());
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
     auto* reader = new arrow::TableBatchReader(*right_table);
 
-    //auto start = std::chrono::high_resolution_clock::now();
+    std::chrono::high_resolution_clock::time_point start;
+    std::chrono::high_resolution_clock::time_point stop;
+    std::chrono::high_resolution_clock::duration duration;
+
+
+//    start = std::chrono::high_resolution_clock::now();
     
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
         auto col = std::static_pointer_cast<arrow::Int64Array>(in_batch->GetColumnByName(right_field));
@@ -26,10 +31,9 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
             hash[key] = true;
         }
     }
-    // auto stop = std::chrono::high_resolution_clock::now();
-    // auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    // std::cout << "HashBuild " << duration.count() << std::endl;
-
+//    stop = std::chrono::high_resolution_clock::now();
+//    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+//    std::cout << "HashBuild " << right_field << " " << duration.count() << std::endl;
 
     std::vector<std::shared_ptr<arrow::ArrayData>> out_arrays;      // vector of arrays corresponding to outputted columns in a given batch
     std::unique_ptr<arrow::RecordBatchBuilder> out_batch_builder;   // to build a RecordBatch from a vector of arrays
@@ -43,8 +47,8 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
     arrow::Int64Builder array_builder;
     //@TODO array_builder should be initially resize to minimize the amount of resizing done during insertions.
 
-    // long long accu = 0;
-    // long long count = 0;
+//    long long accu = 0;
+//    long long count = 0;
 
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
         // resize to maximum possible size to avoid resizing many times upon insertion.
@@ -54,16 +58,16 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
 
         for (int i=0; i<col->length(); i++) {
             long long key = col -> Value(i);
-
-            //start = std::chrono::high_resolution_clock::now();
+//
+//            start = std::chrono::high_resolution_clock::now();
     
             int res = hash.count(key);
 
-            // stop = std::chrono::high_resolution_clock::now();
-            // duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    
-            // accu += duration.count();
-            // count++;
+//            stop = std::chrono::high_resolution_clock::now();
+//            duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+//
+//            accu += duration.count();
+//            count++;
             if ( res > 0 ) {
                 //@TODO: Keep the join implementation consistent!!!!!!!
                 // In LIP join, we use an int array to hold the indices. So, hash join and LIP are implemented differently.
@@ -94,7 +98,8 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
 
         out_arrays.clear();
     }
-    //std::cout << "HashProbe " << 1.0 * accu / count << std::endl;
+//    std::cout << "HashProbePer " << 1.0 * accu / count << std::endl;
+//    std::cout << "HashProbe " << accu << std::endl;
 
     std::shared_ptr<arrow::Table> result_table;
     status = arrow::Table::FromRecordBatches(out_batches, &result_table);
@@ -122,12 +127,14 @@ std::shared_ptr<arrow::Table> EvaluateJoinTree(std::shared_ptr<arrow::Table> fac
     return ret_table;
 }
 
-void dummy() {return;}
-void dummy2() {dummy();}
-
 std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> fact_table, 
                                                 std::vector<JoinExecutor*> joinExecutors){
-    
+
+    std::chrono::high_resolution_clock::time_point start;
+    std::chrono::high_resolution_clock::time_point stop;
+    std::chrono::high_resolution_clock::duration duration;
+
+
     int n_dim = joinExecutors.size();
 
     if (n_dim == 0){
@@ -136,12 +143,16 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     // Construct the array of bloom filters
     std::vector<BloomFilter*> filters;
 
+//    start = std::chrono::high_resolution_clock::now();
     for(int i = 0; i < n_dim; i++){
         
         BloomFilter* bf = joinExecutors[i] -> ConstructBloomFilter();
         
         filters.push_back(bf);
     }
+//    stop = std::chrono::high_resolution_clock::now();
+//    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+//    std::cout << "BuildFilters " <<  duration.count() << std::endl;
     
     // prepare to probe each fact
     arrow::Status status;
@@ -155,12 +166,13 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     status = arrow::RecordBatchBuilder::Make(fact_table->schema(), arrow::default_memory_pool(), &out_batch_builder);
 
     auto* reader = new arrow::TableBatchReader(*fact_table);
-    //reader->set_chunksize(2 << 10);
+   // reader->set_chunksize(2 << 10);
     int* indices;
 
 
-    // long long accu = 0;
-    // long long count = 0;
+     long long accu = 0;
+     long long count = 0;
+
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
         int n_rows = in_batch -> num_rows();
         indices = (int*)malloc(n_rows * sizeof(int));
@@ -189,15 +201,17 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
                 long long key_i = col_j -> Value(actual_index);
 
                 bf_j -> IncrementCount();
-    
-                //auto start = std::chrono::high_resolution_clock::now();
+
+                start = std::chrono::high_resolution_clock::now();
 
                 bool res = bf_j -> Search(key_i);
 
-                //auto stop = std::chrono::high_resolution_clock::now();
-                //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-                //accu += duration.count();
-                //count++;
+                stop = std::chrono::high_resolution_clock::now();
+                //duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+                duration = (stop - start);
+                accu += duration.count();
+                //std::cout << "duration = " << duration.count() << std::endl;
+                count++;
 
                 if ( !res) {
                     //AddRowToRecordBatch(i, in_batch, out_batch_builder);
@@ -241,16 +255,16 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
         out_arrays.clear();
     }
 
-
     std::shared_ptr<arrow::Table> result_table;
     if (out_batches.size() > 0)
         status = arrow::Table::FromRecordBatches(out_batches, &result_table);
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
     //return result_table;
-    //std::cout << "FilterProbe " << 1.0 * accu / count << std::endl;
+    std::cout << "FilterProbePer " << 1.0 * accu / count / 1000 << std::endl;
+    std::cout << "FilterProbe " << accu / 1000 << std::endl;
+
     return EvaluateJoinTree(result_table, joinExecutors);
 }
-
 
 
 std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPXiating(std::shared_ptr<arrow::Table> fact_table, 

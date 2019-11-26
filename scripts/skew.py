@@ -3,7 +3,7 @@ import random, os
 os.chdir("./scripts")
 from dist import *
 os.chdir("..")
-input_dir = "./benchmarks/benchmark-original/"
+input_dir = "./benchmarks/benchmark-1/"
 output_dir = "./benchmarks/benchmark-skew/"
 
 FACT_SCHEMA = ["ORDER KEY", "LINE NUMBER", "CUST KEY", "PART KEY", "SUPP KEY",

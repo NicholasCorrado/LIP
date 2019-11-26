@@ -12,77 +12,14 @@
 #include "Queries.h"
 #include "select.h"
 #include "util/util.h"
-/*
 
-All queries status:
+int run(std::string q, std::string alg, std::string SF, bool enum_flag) {
 
-    1.1 - need select on fact table, now just select
-    1.2 - need select on fact table, now just select
-    1.3 - need select on fact table, 
-            need evaluating and on one dim table
-
-    2.1 - need retrieve all dim table
-    2.2 - need between on string, retrieve all dim table
-    2.3 - need retrieve all dim table
-
-    3.1 - done
-    3.2 - done
-    3.3 - need evaluating or on one dim table
-    3.4 - need evaluating or on one dim table
-
-    4.1 - need evaluating or on one dim table
-    4.2 - need evaluating or on one dim table
-    4.3 - need evaluating or on one dim table
-
-
-*/
-
-
-int ui(){
-    while(true){
-        std::cout << "To run a specific query [2.3] or [all]" << std::endl;
-        std::cout << "To run main_nick, enter nick" << std::endl;
-        std::string q;
-        std::cout << ">>> ";
-        std::cin >> q;
-
-        if (q == "nick"){
-            main_nick();
-            continue;
-        }
-        if (q == "quit" || q == "exit"){
-            break;
-        }
-
-        std::string alg;
-        std::cout << "Choose an algorithm [lip] or [hash]\n>>> ";
-        std::cin >> alg;
-
-        std::string s_enum_flag;
-        std::cout << "Enumerate all plans? [y/n]\n>>> ";
-        std::cin >> s_enum_flag;
-
-        bool enum_flag = (s_enum_flag == "y" || s_enum_flag == "Y");
-        run(q, alg, enum_flag);
-        
-    }
-    return 0;
-}
-
-int run(std::string q, std::string alg, bool enum_flag){
-
-    // std::string file_path_customer  = "./benchmarks/benchmark-original/customer.tbl";
-    // std::string file_path_date      = "./benchmarks/benchmark-original/date.tbl";
-    // std::string file_path_lineorder = "./benchmarks/benchmark-original/lineorder.tbl";
-    // std::string file_path_part      = "./benchmarks/benchmark-original/part.tbl";
-    // std::string file_path_supplier  = "./benchmarks/benchmark-original/supplier.tbl";
-
-    std::string file_path_customer  = "./benchmarks/benchmark-original/customer.tbl";
-    std::string file_path_date      = "./benchmarks/benchmark-original/date.tbl";
-    std::string file_path_lineorder = "./benchmarks/benchmark-original/lineorder.tbl";
-    std::string file_path_part      = "./benchmarks/benchmark-original/part.tbl";
-    std::string file_path_supplier  = "./benchmarks/benchmark-original/supplier.tbl";
-
+    std::string file_path_customer  = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/customer.tbl";
+    std::string file_path_date      = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/date.tbl";
+    std::string file_path_lineorder = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/lineorder.tbl";
+    std::string file_path_part      = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/part.tbl";
+    std::string file_path_supplier  = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/supplier.tbl";
 
     std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
                                                    "MKT SEGMENT"};
@@ -97,28 +34,14 @@ int run(std::string q, std::string alg, bool enum_flag){
     std::vector<std::string> part_schema        = {"PART KEY", "NAME", "MFGR", "CATEGORY", "BRAND", "COLOR", "TYPE", "SIZE", "CONTAINER"};
     std::vector<std::string> supplier_schema    = {"SUPP KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE"};
 
-    std::shared_ptr<arrow::Table> customer;
-    std::shared_ptr<arrow::Table> date;
-    std::shared_ptr<arrow::Table> lineorder;
-    std::shared_ptr<arrow::Table> part;
-    std::shared_ptr<arrow::Table> supplier;
-
     arrow::MemoryPool *pool = arrow::default_memory_pool();
 
-    customer    = build_table(file_path_customer,  pool, customer_schema);
-    date        = build_table(file_path_date,      pool, date_schema);
-    lineorder   = build_table(file_path_lineorder, pool, lineorder_schema);
-    part        = build_table(file_path_part,      pool, part_schema);
-    supplier    = build_table(file_path_supplier,  pool, supplier_schema);
+    std::shared_ptr<arrow::Table> customer    = build_table(file_path_customer,  pool, customer_schema);
+    std::shared_ptr<arrow::Table> date        = build_table(file_path_date,      pool, date_schema);
+    std::shared_ptr<arrow::Table> lineorder   = build_table(file_path_lineorder, pool, lineorder_schema);
+    std::shared_ptr<arrow::Table> part        = build_table(file_path_part,      pool, part_schema);
+    std::shared_ptr<arrow::Table> supplier    = build_table(file_path_supplier,  pool, supplier_schema);
 
-
-    if (q == "nick") {
-        main_nick();
-        return 0;
-    }
-    if (q == "exit" || q == "quit") {
-        return 0;
-    }
 
     int alg_flag;
 
@@ -169,306 +92,43 @@ int run(std::string q, std::string alg, bool enum_flag){
     } else {
         std::cout << "Unknown query entered." << std::endl;
     }
-    return 0;
-}
-
-int main_nick() {
-
-    std::string file_path_customer  = "benchmark/customer.tbl";
-    std::string file_path_date      = "benchmark/date.tbl";
-    std::string file_path_lineorder = "benchmark/lineorder.tbl";
-    std::string file_path_part      = "benchmark/part.tbl";
-    std::string file_path_supplier  = "benchmark/supplier.tbl";
-
-
-    std::vector <std::string> customer_schema = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
-                                                 "MKT SEGMENT"};
-    std::vector <std::string> date_schema = {"DATE KEY", "DATE", "DAY OF WEEK", "MONTH", "YEAR", "YEAR MONTH NUM",
-                                             "YEAR MONTH", "DAY NUM IN WEEK", "DAY NUM IN MONTH", "MONTH NUM IN YEAR",
-                                             "DAY NUM IN YEAR",
-                                             "WEEK NUM IN YEAR", "SELLING SEASON", "LAST DAY IN WEEK FL",
-                                             "LAST DAT IN MONTH FL", "HOLIDAY FL", "WEEKDAY FL",};
-    std::vector <std::string> lineorder_schema = {"ORDER KEY", "LINE NUMBER", "CUST KEY", "PART KEY", "SUPP KEY",
-                                                  "ORDER DATE", "ORD PRIORITY", "SHIP PRIORITY", "QUANTITY",
-                                                  "EXTENDED PRICE", "ORD TOTAL PRICE", "DISCOUNT", "REVENUE",
-                                                  "SUPPLY COST", "TAX", "COMMIT DATE", "SHIP MODE"};
-    std::vector <std::string> part_schema = {"PART KEY", "NAME", "MFGR", "CATEGORY", "BRAND", "COLOR", "TYPE", "SIZE",
-                                             "CONTAINER"};
-    std::vector <std::string> supplier_schema = {"SUPP KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE"};
-
-    std::shared_ptr <arrow::Table> customer;
-    std::shared_ptr <arrow::Table> date;
-    std::shared_ptr <arrow::Table> lineorder;
-    std::shared_ptr <arrow::Table> part;
-    std::shared_ptr <arrow::Table> supplier;
-
-    arrow::MemoryPool *pool = arrow::default_memory_pool();
-
-    customer = build_table(file_path_customer, pool, customer_schema);
-    date = build_table(file_path_date, pool, date_schema);
-    lineorder = build_table(file_path_lineorder, pool, lineorder_schema);
-    part = build_table(file_path_part, pool, part_schema);
-    supplier = build_table(file_path_supplier, pool, supplier_schema);
-
-    std::cout << "customer->num_rows() = " << customer->num_rows() << std::endl;
-    std::cout << "date->num_rows() = " << date->num_rows() << std::endl;
-    std::cout << "lineorder->num_rows() = " << lineorder->num_rows() << std::endl;
-    std::cout << "part->num_rows() = " << part->num_rows() << std::endl;
-    std::cout << "supplier->num_rows() = " << supplier->num_rows() << std::endl;
-
-    write_to_file("arrow-output/customer.arrow", customer);
-    write_to_file("arrow-output/date.arrow", date);
-    write_to_file("arrow-output/lineorder.arrow", lineorder);
-    write_to_file("arrow-output/supplier.arrow", supplier);
-    write_to_file("arrow-output/part.arrow", part);
-
-    //result_table = Select(customer, "MKT SEGMENT", "AUTOMOBILE", Operator::EQUAL);
-    //PrintTable(result_table);
-
-    //result_table = Select(date, "YEAR", 1994, Operator::EQUAL);
-    // arrow::NumericScalar<arrow::Int64Type> myscalar(1992);
-    // auto value = std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(myscalar);
-    // arrow::NumericScalar<arrow::Int64Type> myscalar2(1994);
-    // auto value2 = std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(myscalar);
-    // arrow::NumericScalar<arrow::Int64Type> myscalar3(10);
-    // auto size = std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(myscalar);
-
-    //result_table = Select(date, "YEAR", value, arrow::compute::CompareOperator::EQUAL);
-    //PrintTable(result_table);
-
-
-    //BloomFilter* bf_part = BuildFilter(part, "SIZE", size,arrow::compute::CompareOperator::GREATER_EQUAL,"PART KEY", "PART KEY");
-    //BloomFilter* bf_date = BuildFilter(date, "YEAR", value, value2, "DATE KEY", "ORDER DATE");
-
-    // BloomFilter* bf_part = BuildFilter(part, "SIZE", size,arrow::compute::CompareOperator::GREATER_EQUAL,"PART KEY");
-    // BloomFilter* bf_date = BuildFilter(date, "YEAR", value, value2, "DATE KEY");
-    // std::cout<<"Join lineorder and customer on CUST KEY"<<std::endl;
-    // std::shared_ptr<arrow::Table> ret = HashJoin(lineorder, "CUST KEY", customer, "CUST KEY");
-    // //PrintTable(ret);
-    // std::cout<<"ret->num_rows() = " << ret->num_rows()<<std::endl;
-
-    // //result_table = Select(date, "YEAR", value, arrow::; compute::CompareOperator::EQUAL);
-    // arrow::NumericScalar<arrow::Int64Type> one(1);
-    // std::shared_ptr<arrow::Scalar> test;
-
-    // auto custkey = std::make_shared<arrow::NumericScalar<arrow::Int64Type>>(one);
-    // result_table = Select(customer, "CUST KEY", custkey, arrow::compute::CompareOperator::EQUAL);
-    // std::cout<<"ret->num_rows() = " << ret->num_rows()<<std::endl;
-    // std::cout<<"Join lineorder and customer on CUST KEY where customer.CUST KEY = 1"<<std::endl;
-    //ret = HashJoin(lineorder, "CUST KEY", result_table, "CUST KEY");
-    //PrintTable(ret);
-    //std::cout<<"ret->num_rows() = " << ret->num_rows()<<std::endl;
-    //PrintTable(ret);
-
-    /*
-    SelectExecutor *date_s_exe = new SelectExecutorInt(date, "YEAR", 1995, arrow::compute::CompareOperator::EQUAL);
-    SelectExecutor *customer_s_exe = new SelectExecutorInt(customer, "CUST KEY", 5,arrow::compute::CompareOperator::EQUAL);
-    //SelectExecutor *customer_s_exe = new SelectExecutorStr(customer, "REGION", "AMERICA",arrow::compute::CompareOperator::EQUAL);
-    JoinExecutor *j_exe1 = new JoinExecutor(date_s_exe, "DATE KEY", "ORDER DATE");
-    JoinExecutor *j_exe2 = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
-
-    //std::vector<JoinExecutor*> tree = {j_exe1, j_exe2};
-    std::vector < JoinExecutor * > tree = {j_exe1, j_exe2};
-    std::cout << "Join lineorder and customer and date " << std::endl;
-    std::shared_ptr <arrow::Table> t1 = EvaluateJoinTreeLIP(lineorder, tree);
-    //PrintTable(t1);
-    std::cout << t1->num_rows() << std::endl;
-    std::shared_ptr <arrow::Table> t2 = EvaluateJoinTree(lineorder, tree);
-    //PrintTable(t2);
-    std::cout << t2->num_rows() << std::endl;
-    */
-    //SelectExecutor* customer_s_exe = new SelectExecutorCompare(customer, "CUST KEY", 1, arrow::compute::CompareOperator::EQUAL);
-    //JoinExecutor* j_exe = new JoinExecutor(customer_s_exe, "CUST KEY", "CUST KEY");
-
-
-
-    /*
-    auto* s_date_1 = new SelectExecutorInt(date, "YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
-    auto* s_date_2 = new SelectExecutorInt(date, "YEAR", 1995, arrow::compute::CompareOperator::EQUAL);
-    std::vector<SelectExecutor*> children = {s_date_1, s_date_2};
-    auto* s_comp = new SelectExecutorComposite(children);
-
-    auto* s_customer = new SelectExecutorInt(customer, "CUST KEY", 1, arrow::compute::CompareOperator::EQUAL);
-    //auto* j1 = new JoinExecutor(s_date, "DATE KEY", "ORDER DATE");
-    //auto* j2 = new JoinExecutor(s_customer, "CUST KEY", "CUST KEY");
-    auto* j = new JoinExecutor(s_comp, "DATE KEY", "ORDER DATE");
-    std::shared_ptr<arrow::Table> result;
-
-    result = j->join(lineorder);
-    PrintTable(result);
-    std::vector<JoinExecutor*> tree = {j};
-    //auto result = j1->join(lineorder);
-    result = EvaluateJoinTreeLIP(lineorder, tree);
-    PrintTable(result);
-    std::cout << result->num_rows() << std::endl;
-*/
-
-    /*
-    std::shared_ptr <arrow::Table> result_table;
-    auto* s_date_1 = new SelectExecutorBetween("YEAR", 1992, 1994);
-    auto* s_date_2 = new SelectExecutorInt("YEAR", 1992, arrow::compute::CompareOperator::EQUAL);
-    auto* s_customer = new SelectExecutorInt("CUST KEY", 2, arrow::compute::CompareOperator::EQUAL);
-    auto* s_customer_str = new SelectExecutorStrBetween("REGION", "ASIA", "AMERICA");
-
-    std::vector<SelectExecutor*> s_children = {s_date_1, s_customer_str};
-    auto* s_date_tree = new SelectExecutorTree(date, s_date_1);
-    auto* s_customer_str_tree = new SelectExecutorTree(customer, s_customer_str);
-
-    auto* j_date = new JoinExecutor(s_date_tree, "DATE KEY", "ORDER DATE");
-    auto* j_customer = new JoinExecutor(s_customer_str_tree, "CUST KEY", "CUST KEY");
-
-    std::vector<JoinExecutor*> j = {j_customer, j_date};
-    result_table = EvaluateJoinTreeLIP(lineorder, j);
-    PrintTable(result_table, 1);
-    */
-    // To select all tuples, pass a null SelectExecutor to the tree.
-
-
-    //auto* j_date = new JoinExecutor(s_date_tree, "DATE KEY", "ORDER DATE");
-    //auto* j_customer = new JoinExecutor(s_customer_tree, "CUST KEY", "CUST KEY");
-
-    /*
-    result_table = s_customer_tree->Select();
-    PrintTable(result_table);
-    std::cout<<result_table->num_rows()<<std::endl;
-
-    result_table = j_customer->join(lineorder);
-    PrintTable(result_table);
-    std::cout<<result_table->num_rows()<<std::endl;
-    */
-    // result_table = EvaluateJoinTree(lineorder,j);
-    // PrintTable(result_table, 1);
-    
-    
-    //result_table = j_date->join(lineorder);
-    //PrintTable(result_table);
-    //std::cout << result_table->num_rows() << std::endl;
-
-
-    //@TODO: what??????? AHHH okay you can use a select executor for only one query, since the reader is at the end each time you try to reuse it.
-    //std::shared_ptr<arrow::Table> t1 = j_customer->join(lineorder);
-
-
-    //std::shared_ptr<arrow::RecordBatch> b;
-    //status = s_customer_tree->reader->Next(&b);
-    //std::cout<<"customer len = "  << (b == nullptr) << std::endl;
-    //std::shared_ptr<arrow::Table> t2 = j_date->join(lineorder);
-    //Instead of selecting all rows for join with no selects, just leave the option to not do a select.
-    //auto* j_final = new JoinExecutor(nullptr, j_customer);
-
-
-    //PrintTable(result_table);
-    //std::cout << result_table->num_rows() << std::endl;
-//    std::vector<JoinExecutor*> j = {j_customer, j_date};
-//    result_table = EvaluateJoinTree(lineorder,j);
-//    std::cout<<result_table->num_rows()<<std::endl;
-//    PrintTable(result_table);
-//
-//    return 0;
-
-    RunAllQueries_nick(customer, date, lineorder, part, supplier);
-    return 0;
-}
-
-
-
-int main_xiating(){
-    std::string file_path_customer  = "./benchmark/customer.tbl";
-    std::string file_path_date      = "./benchmark/date.tbl";
-    std::string file_path_lineorder = "./benchmark/lineorder.tbl";
-    std::string file_path_part      = "./benchmark/part.tbl";
-    std::string file_path_supplier  = "./benchmark/supplier.tbl";
-
-
-    std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
-                                                   "MKT SEGMENT"};
-    std::vector<std::string> date_schema        = {"DATE KEY", "DATE", "DAY OF WEEK", "MONTH", "YEAR", "YEAR MONTH NUM",
-                                                   "YEAR MONTH", "DAY NUM IN WEEK", "DAY NUM IN MONTH", "MONTH NUM IN YEAR",
-                                                   "WEEK NUM IN YEAR", "SELLING SEASON", "LAST DAY IN WEEK FL",
-                                                   "LAST DAT IN MONTH FL", "HOLIDAY FL", "WEEKDAY FL", "DAY NUM YEAR"};
-    std::vector<std::string> lineorder_schema   = {"ORDER KEY", "LINE NUMBER", "CUST KEY", "PART KEY", "SUPP KEY",
-                                                   "ORDER DATE", "ORD PRIORITY", "SHIP PRIORITY", "QUANTITY",
-                                                   "EXTENDED PRICE", "ORD TOTAL PRICE", "DISCOUNT", "REVENUE",
-                                                   "SUPPLY COST", "TAX", "COMMIT DATE", "SHIP MODE"};
-    std::vector<std::string> part_schema        = {"PART KEY", "NAME", "MFGR", "CATEGORY", "BRAND", "COLOR", "TYPE", "SIZE", "CONTAINER"};
-    std::vector<std::string> supplier_schema    = {"SUPP KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE"};
-
-    std::shared_ptr<arrow::Table> customer;
-    std::shared_ptr<arrow::Table> date;
-    std::shared_ptr<arrow::Table> lineorder;
-    std::shared_ptr<arrow::Table> part;
-    std::shared_ptr<arrow::Table> supplier;
-
-    arrow::MemoryPool *pool = arrow::default_memory_pool();
-
-    customer    = build_table(file_path_customer,  pool, customer_schema);
-    date        = build_table(file_path_date,      pool, date_schema);
-    lineorder   = build_table(file_path_lineorder, pool, lineorder_schema);
-    part        = build_table(file_path_part,      pool, part_schema);
-    supplier    = build_table(file_path_supplier,  pool, supplier_schema);
-
-
-    RunAllQueries(customer, date, lineorder, part, supplier, ALG::HASH_JOIN, false);
-    RunAllQueries(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD, false);
-    
 
     return 0;
 }
 
 
-void RunAllQueries_nick(std::shared_ptr <arrow::Table> customer,
-                   std::shared_ptr <arrow::Table> date,
-                   std::shared_ptr <arrow::Table> lineorder,
-                   std::shared_ptr <arrow::Table> part,
-                   std::shared_ptr <arrow::Table> supplier)
-{
+int ui(){
+    while(true){
+        std::cout << "To run a specific query [2.3] or [all]" << std::endl;
+        std::cout << "To run main_nick, enter nick" << std::endl;
+        std::string q;
+        std::cout << ">>> ";
+        std::cin >> q;
 
-    int hashjoin_time = 0;
-    int LIPjoin_time = 0;
+        if (q == "quit" || q == "exit"){
+            break;
+        }
 
-    hashjoin_time = Query1_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
-    LIPjoin_time  = Query1_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query1_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
-    LIPjoin_time  = Query1_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query1_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
-    LIPjoin_time  = Query1_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+        std::string alg;
+        std::cout << "Choose an algorithm [lip] or [hash]\n>>> ";
+        std::cin >> alg;
 
-    hashjoin_time = Query2_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
-    LIPjoin_time  = Query2_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query2_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
-    LIPjoin_time  = Query2_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query2_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
-    LIPjoin_time  = Query2_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+        std::string SF;
+        std::cout << "SF = ?\n>>> ";
+        std::cin >> SF;
 
-    hashjoin_time = Query3_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
-    LIPjoin_time  = Query3_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query3_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
-    LIPjoin_time  = Query3_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query3_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
-    LIPjoin_time  = Query3_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query3_4(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
-    LIPjoin_time  = Query3_4(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+        std::string s_enum_flag;
+        std::cout << "Enumerate all plans? [y/n]\n>>> ";
+        std::cin >> s_enum_flag;
 
-    hashjoin_time = Query4_1(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
-    LIPjoin_time  = Query4_1(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query4_2(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
-    LIPjoin_time  = Query4_2(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
-    hashjoin_time = Query4_3(customer, date, lineorder, part, supplier, ALG::HASH_JOIN,false);
-    LIPjoin_time  = Query4_3(customer, date, lineorder, part, supplier, ALG::LIP_STANDARD,false);
-    std::cout<< "DELTA = " << hashjoin_time - LIPjoin_time <<"\n" <<std::endl;
+        bool enum_flag = (s_enum_flag == "y" || s_enum_flag == "Y");
+        run(q, alg, SF, enum_flag);
+        
+    }
+    return 0;
 }
+
+
 
 void RunAllQueries(std::shared_ptr <arrow::Table> customer, 
                 std::shared_ptr <arrow::Table> date,
@@ -569,6 +229,7 @@ void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<Joi
     int numOfRows = result_table != nullptr ? result_table -> num_rows() : 0;
     std::cout << "Rows " << numOfRows << std::endl;
     std::cout << "RunningTime " << duration.count() << std::endl;
+    //std::cout << duration.count() << std::endl;
 }
 
 
@@ -581,6 +242,8 @@ int Query1_1(std::shared_ptr <arrow::Table> customer,
                 int alg_flag,
                 bool enum_flag)
 {
+
+
     std::cout << "Running query 1.1 ..." << std::endl;
     
     arrow::NumericScalar<arrow::Int64Type> one(1);
