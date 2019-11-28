@@ -29,9 +29,9 @@ def c(n, k):
 """
 
 class Distribution:
-	groundSet = []
-	dist = []
-	accuDist = []
+	groundSet = []  # list of possible key values
+	dist = []		# weights corresponding to how likely we are to select a key in the ground set (not normalized--must call normalize() method to do that)
+	accuDist = [] 	# partitioning of the interval [0,1]
 
 	"""
 		The user can throw in a random set of numbers for distribution
@@ -145,6 +145,31 @@ class SquareDistribution(Distribution):
 
 		self.normalize()
 		self.computeAccu()
+
+
+class SquareDistribution2(Distribution):
+
+	def __init__(self, groundSet):
+		self.groundSet = groundSet
+
+		n = len(groundSet)
+
+		self.dist = [0 for i in range(n)]
+		exclude = [i for i in range(2000)]
+
+		i = 0
+		while i < n:
+			if i in exclude:
+				i += 1
+				continue
+
+			self.dist[i] = 1
+			i += 1
+			
+
+		self.normalize()
+		self.computeAccu()
+
 
 def test():
 	

@@ -69,7 +69,7 @@ def plot(start, end):
 
 def main():
 	if len(sys.argv) < 3:
-		plot(0, 1)
+		plot(1, 2)
 	else:
 		plot(int(sys.argv[1]), int(sys.argv[2]))
 if __name__ == "__main__":

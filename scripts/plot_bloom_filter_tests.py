@@ -56,11 +56,12 @@ def plot():
 	# insert_bf_4, time_bf_4 = np.loadtxt("../probe-tests/bf_probe_4.dat",delimiter=",", unpack=True, skiprows=1);
 	# insert_bf_5, time_bf_5 = np.loadtxt("../probe-tests/bf_probe_5.dat",delimiter=",", unpack=True, skiprows=1);
 
-	plt.plot(search_bf_1, time_bf_avg, label="n = 1k")
-	plt.plot(search_ht_1, time_ht_avg, label="n = 1k")
+	plt.plot(search_bf_1[:200], time_bf_avg[:200], label="Bloom filter")
+	#plt.plot(search_ht_1, time_ht_avg, label="Hash table")
 	plt.ylabel("Average Duration")
 	plt.xlabel("Number of elements inserted")
 	plt.xscale("log")
+	plt.yscale("log")
 	plt.legend()
 	plt.show()
 
@@ -115,7 +116,7 @@ def plot():
 
 	plt.show()
 
-def plot():
+def plot2():
 
 	t42_1 = np.loadtxt("../data/data-1/q41.dat",delimiter=",", unpack=True)
 	t42_5 = np.loadtxt("../data/data-5/q41.dat",delimiter=",", unpack=True)
@@ -138,48 +139,6 @@ def parse():
 	# label41, t41 = np.loadtxt("../data/data-1/q41.dat",delimiter=",", unpack=True)
 	# label42, t42 = np.loadtxt("../data/data-1/q42.dat",delimiter=",", unpack=True)
 	# label43, t43 = np.loadtxt("../data/data-1/q43.dat",delimiter=",", unpack=True)
-
-	t41 =[7783000,
-	7242000,
-	5961000,
-	42878000,
-	45424000,
-	46392000,
-	34461000,
-	29491000,
-	37638000,
-	41083000,
-	24549000,
-	33038000,
-	29026000]
-
-	t42=[8310000,
-	6104000,
-	6929000,
-	43520000,
-	27462000,
-	41143000,
-	43440000,
-	32518000,
-	32469000,
-	33581000,
-	21603000,
-	29501000,
-	17041000]
-
-	t43=[13308000,
-	5267000,
-	14083000,
-	48038000,
-	40251000,
-	42725000,
-	43179000,
-	45416000,
-	20831000,
-	36588000,
-	23333000,
-	18368000,
-	17710000]
 
 	plt.plot(t41, '-', label='1')
 	plt.plot(t42, '-', label='5')
@@ -213,7 +172,7 @@ def parse():
 
 
 def main():
-	parse()
+	plot()
 if __name__ == "__main__":
 	main()
 
