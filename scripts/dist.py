@@ -147,12 +147,26 @@ class SquareDistribution(Distribution):
 		self.computeAccu()
 
 
+<<<<<<< HEAD
 class SquareDistribution2(Distribution):
 
 	def __init__(self, groundSet):
 		self.groundSet = groundSet
 
 		n = len(groundSet)
+		self.dist = [0 for i in range(n)]
+		exclude = [i for i in range(2000)]
+
+		i = 0
+		while i < n:
+			if i in exclude:
+				i += 1
+				continue
+
+			self.dist[i] = 1
+			i += 1
+
+class SineDistribution(Distribution):
 
 		self.dist = [0 for i in range(n)]
 		exclude = [i for i in range(2000)]
@@ -165,7 +179,10 @@ class SquareDistribution2(Distribution):
 
 			self.dist[i] = 1
 			i += 1
-			
+
+		import math
+		self.dist = [math.sin(i * 2 * math.pi / n) + 1 for i in range(n)]
+
 
 		self.normalize()
 		self.computeAccu()
@@ -191,10 +208,10 @@ def test():
 
 def main():
 
-	D = UniformDistribution([i for i in range(10)])
+	D = SineDistribution([i for i in range(10)])
 
-	for i in range(100):
-		d = D.sample(i,100)
+	for i in range(1):
+		d = D.sample(i,1)
 		print(i,d)
 if __name__ == "__main__":
 	main()
