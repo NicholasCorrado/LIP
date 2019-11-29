@@ -193,12 +193,21 @@ def test():
 		count[key] = count[key] / num
 		print(key, abs(count[key] - D.dist[key]))
 
+
+
 def main():
 
-	D = SineDistribution([i for i in range(100)])
+	D = UniformDistribution([i for i in range(10)])
 
-	for i in range(100):
-		d = D.sample(i,100)
-		print(i,d)
+
+	# for i in range(100):
+	# 	d = D.sample(i,100)
+	# 	print(i,d)
+
+
+
 if __name__ == "__main__":
 	main()
+
+
+

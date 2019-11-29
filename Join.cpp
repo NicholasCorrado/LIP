@@ -170,9 +170,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
    // reader->set_chunksize(2 << 10);
     int* indices;
 
-
-     long long accu = 0;
-     long long count = 0;
+//     long long accu = 0;
+//     long long count = 0;
 
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
         int n_rows = in_batch -> num_rows();
@@ -203,18 +202,16 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
 
                 bf_j -> IncrementCount();
 
-                start = std::chrono::high_resolution_clock::now();
+//                start = std::chrono::high_resolution_clock::now();
 
-                bool res = bf_j -> Search(key_i);
+//                stop = std::chrono::high_resolution_clock::now();
+//                //duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+//                duration = (stop - start);
+//                accu += duration.count();
+//                //std::cout << "duration = " << duration.count() << std::endl;
+//                count++;
 
-                stop = std::chrono::high_resolution_clock::now();
-                //duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-                duration = (stop - start);
-                accu += duration.count();
-                //std::cout << "duration = " << duration.count() << std::endl;
-                count++;
-
-                if ( !res) {
+                if ( !bf_j -> Search(key_i)) {
                     //AddRowToRecordBatch(i, in_batch, out_batch_builder);
                     // swap the position at index_i and index_size - 1;
                     int tmp = indices[index_i];
@@ -263,7 +260,6 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     //return result_table;
 //    std::cout << "PerFilterProbe " << 1.0 * accu / count / 1000 << std::endl;
 //    std::cout << "FilterProbe " << accu / 1000 << std::endl;
-
     return EvaluateJoinTree(result_table, joinExecutors);
 }
 
