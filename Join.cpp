@@ -227,7 +227,10 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
         }
 
         std::sort(filters.begin(), filters.end(), BloomFilterCompare);
-
+//        for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
+//            std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRate();
+//        }
+//        std::cout << std::endl;
 
         arrow::Int64Builder indices_builder;
         std::shared_ptr<arrow::Array> indices_array;
@@ -541,13 +544,16 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
     std::vector<BloomFilter*> filters;
 
     for(int i = 0; i < n_dim; i++){
-        
         BloomFilter* bf = joinExecutors[i] -> ConstructBloomFilter();
         bf -> SetMemory(3);
         filters.push_back(bf);
     }
     // long long chunk_size = 2 << 10;
-
+    std::cout << "init = ";
+    for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
+        std::cout << filters[filter_index]->GetForeignKey() << " ";
+    }
+    std::cout << std::endl;
     // prepare to probe each fact
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
@@ -569,7 +575,6 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
 
 
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
-
         int n_rows = in_batch->num_rows();
         indices = (int *) malloc(n_rows * sizeof(int));
         int index_size = n_rows;
@@ -579,11 +584,13 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
             indices[i] = i;
         }
         double prev_filter_rate = 0;
-        double selectivity = 1;
+        //double selectivity = 1;
+
+
         for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
             BloomFilter *bf_j = filters[filter_index];
-            selectivity = selectivity*bf_j->GetFilterRate();
-
+            //selectivity = selectivity*bf_j->GetFilterRate();
+            //selectivity = selectivity*bf_j->GetFilterRateK();
             std::string foreign_key_j = bf_j->GetForeignKey();
 
             auto col_j = std::static_pointer_cast<arrow::Int64Array>(
@@ -611,12 +618,18 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
                     bf_j->IncrementPass();
                 }
             }
+            //std::cout<<bf_j->GetForeignKey() << " pass = " << pass << std::endl;
         }
 
-        std::sort(filters.begin(), filters.end(), BloomFilterCompare);
+
         for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
-            filters[filter_index] -> BatchEndUpdate(); 
+            filters[filter_index] -> BatchEndUpdate();
         }
+//        std::sort(filters.begin(), filters.end(), BloomFilterCompareK);
+//        for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
+//            std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRateK();
+//        }
+//        std::cout << std::endl;
         /*
         for(int p = 0; p < n_dim; p++){
             std::cout << filters[p] -> GetFilterRate() << " ";

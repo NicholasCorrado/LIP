@@ -24,6 +24,7 @@ BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table,
 							std::string key_field);
 
 bool BloomFilterCompare( BloomFilter *lhs,  BloomFilter *rhs);
+bool BloomFilterCompareK( BloomFilter *lhs,  BloomFilter *rhs);
 
 BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table,
                             std::string select_field,

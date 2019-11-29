@@ -365,6 +365,8 @@ BloomFilter::BloomFilter(int num_insert, int num_cells){
 void BloomFilter::Reset(){
 	pass = 0;
 	count = 0;
+	pass_queue_sum = 0;
+	count_queue_sum = 0;
 }
 
 
@@ -443,8 +445,16 @@ void BloomFilter::BatchEndUpdate(){
 
 	count_queue.push(count);
 	count_queue_sum += count;
-	
+
 	count = 0;
+}
+
+double BloomFilter::GetFilterRateK() {
+
+    if (count_queue_sum > 0)
+        return 1.0 * pass_queue_sum / count_queue_sum;
+    else
+        return 1;
 }
 
 
@@ -499,6 +509,10 @@ bool BloomFilterCompare( BloomFilter *lhs,  BloomFilter *rhs)
   return lhs -> GetFilterRate() < rhs -> GetFilterRate();
 }
 
+bool BloomFilterCompareK( BloomFilter *lhs,  BloomFilter *rhs)
+{
+    return lhs -> GetFilterRateK() < rhs -> GetFilterRateK();
+}
 
 
 /*

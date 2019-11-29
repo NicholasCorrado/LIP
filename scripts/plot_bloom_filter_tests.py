@@ -39,14 +39,14 @@ def plot():
 	# plt.plot(insert_bf_1000k, time_bf_1000k, label="n = 1000k")
 
 
-	search_bf_1, time_bf_1 = np.loadtxt("../probe-tests/probe_empty_filter_1.dat",delimiter=",", unpack=True, skiprows=1);
-	search_bf_2, time_bf_2 = np.loadtxt("../probe-tests/probe_empty_filter_2.dat",delimiter=",", unpack=True, skiprows=1);
-	search_bf_3, time_bf_3 = np.loadtxt("../probe-tests/probe_empty_filter_3.dat",delimiter=",", unpack=True, skiprows=1);
-	search_bf_4, time_bf_4 = np.loadtxt("../probe-tests/probe_empty_filter_4.dat",delimiter=",", unpack=True, skiprows=1);
-	search_bf_5, time_bf_5 = np.loadtxt("../probe-tests/probe_empty_filter_5.dat",delimiter=",", unpack=True, skiprows=1);
+	search_bf_1, time_bf_1 = np.loadtxt("./probe-tests/probe_empty_filter_1.dat",delimiter=",", unpack=True, skiprows=1);
+	search_bf_2, time_bf_2 = np.loadtxt("./probe-tests/probe_empty_filter_2.dat",delimiter=",", unpack=True, skiprows=1);
+	search_bf_3, time_bf_3 = np.loadtxt("./probe-tests/probe_empty_filter_3.dat",delimiter=",", unpack=True, skiprows=1);
+	search_bf_4, time_bf_4 = np.loadtxt("./probe-tests/probe_empty_filter_4.dat",delimiter=",", unpack=True, skiprows=1);
+	search_bf_5, time_bf_5 = np.loadtxt("./probe-tests/probe_empty_filter_5.dat",delimiter=",", unpack=True, skiprows=1);
 
-	search_ht_1, time_ht_1 = np.loadtxt("../probe-tests/probe_empty_table_1.dat",delimiter=",", unpack=True, skiprows=1);
-	search_ht_2, time_ht_2 = np.loadtxt("../probe-tests/probe_empty_table_2.dat",delimiter=",", unpack=True, skiprows=1);
+	search_ht_1, time_ht_1 = np.loadtxt("./probe-tests/probe_empty_table_1.dat",delimiter=",", unpack=True, skiprows=1);
+	search_ht_2, time_ht_2 = np.loadtxt("./probe-tests/probe_empty_table_2.dat",delimiter=",", unpack=True, skiprows=1);
 
 #	time_avg = ( np.array(time_bf_1) + np.array(time_bf_2) + np.array(time_bf_3)+ + np.array(time_bf_4) + np.array(time_bf_5) ) / 5
 	time_bf_avg = np.median( np.array([time_bf_1, time_bf_2, time_bf_3, time_bf_4, time_bf_5]), axis=0 )
@@ -56,19 +56,17 @@ def plot():
 	# insert_bf_4, time_bf_4 = np.loadtxt("../probe-tests/bf_probe_4.dat",delimiter=",", unpack=True, skiprows=1);
 	# insert_bf_5, time_bf_5 = np.loadtxt("../probe-tests/bf_probe_5.dat",delimiter=",", unpack=True, skiprows=1);
 
-	plt.plot(search_bf_1[:200], time_bf_avg[:200], label="Bloom filter")
-	#plt.plot(search_ht_1, time_ht_avg, label="Hash table")
+	plt.plot(search_bf_1, time_bf_avg, label="Bloom filter")
+	plt.plot(search_ht_1, time_ht_avg, label="Hash table")
 	plt.ylabel("Average Duration")
 	plt.xlabel("Number of elements inserted")
 	plt.xscale("log")
-	plt.yscale("log")
 	plt.legend()
 	plt.show()
 
 	plt.plot(search_ht_1, time_ht_avg/time_bf_avg, label="n = 1k")
 	plt.ylabel("Average Duration")
 	plt.xlabel("Number of elements inserted")
-	plt.xscale("log")
 	plt.legend()
 	plt.show()
 

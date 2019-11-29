@@ -37,6 +37,7 @@ public:
     BloomFilter(int num_insert, int num_cells);
 	
 	double GetFilterRate();
+    double GetFilterRateK();
 	void IncrementCount();
 	void IncrementPass();
 	void Reset();
