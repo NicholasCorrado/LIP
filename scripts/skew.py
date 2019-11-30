@@ -3,7 +3,7 @@ import random, os
 #os.chdir("./scripts")
 from dist import *
 #os.chdir("..")
-input_dir = "./benchmarks/benchmark-5/"
+input_dir = "./benchmarks/benchmark-1/"
 output_dir = "./benchmarks/benchmark-skew/"
 
 FACT_SCHEMA = ["ORDER KEY", "LINE NUMBER", "CUST KEY", "PART KEY", "SUPP KEY",
@@ -77,14 +77,14 @@ def GenerateRows():
 	
 	infile = open(table_file, "r")
 
-	output_file = output_dir + "lineorder.tbl"
+	output_file = output_dir + "lineorder-1997-1998-20-20.tbl"
 	outfile = open(output_file, "w")
 
 	line = infile.readline()[:-1]
 	sampleLine = line.split("|")
 	lineno = 1
 
-	infile.close()
+
 
 	custDist = UniformDistribution(custKeyList)
 	partDist = UniformDistribution(partKeyList)
@@ -96,13 +96,60 @@ def GenerateRows():
 	print("# Suppkey:", len(suppKeyList))
 	print("# Datekey:", len(dateKeyList))
 
+	# dim_file = open(input_dir + "part.tbl")
+	# line = dim_file.readline()[:-1]
+
+	# good_keys = []
+	# line = dim_file.readline()[:-1]
+	# while line != "":
+			
+	# 	debris = line.split("|"	)
+
+	# 	if debris[2] == "MFGR#1" or debris[2] == "MFGR#2":
+	# 		good_keys.append(debris[0])
+
+	# 	line = dim_file.readline()[:-1]
+
+	# dim_file.close()
+
 	# Here, we can control which part of the distribution from which we want to generate tuples
 	# We can even sample from different distributions over time!
+	for batch_num in range(NUM_BATCHES):
+		print("Writing batch", batch_num, "...")
+		for i in range(6000000//NUM_BATCHES):
+			line = infile.readline()[:-1]
+			debris = line.split("|")
+
+			# odd batches have no 1993 keys
+			# even batcheas have only 1993 keys
+			if batch_num % 20 < 10:
+				debris[5] = "19970101"
+				print("1997")
+			elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
+				debris[5] = "19920101"
+				print("else")
+
+			# if batch_num < NUM_BATCHES//2:
+			# 	debris[5] = "19970101"
+			# elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
+			# 	debris[5] = "19920101"
+			
+
+			# if batch_num % 4 != 3 and (debris[3] in good_keys):
+			# 	debris[3] = "-1"
+			# if batch_num % 4 == 3:
+			# 	debris[3] = "1"
+
+			toPrintLine = "|".join(debris)
+			print(toPrintLine, file=outfile)
+
+	infile.close()
+	outfile.close()
+
+
 	# for k in range(NUM_BATCHES):
-	# 	print(k)
-	# 	for i in range(rows):
-	# 		if (i % (rows / 100) == 0):
-	# 			print(i / (rows / 100), "printed.")
+	# 	print("Writing batch ", k, "...")
+	# 	for i in range(6000000//NUM_BATCHES):
 	# 		toPrint = sampleLine
 
 	# 		# toPrint[FIELD["CUST KEY"]] = custDist.sample(i, rows)
@@ -113,44 +160,23 @@ def GenerateRows():
 	# 		toPrint[FIELD["CUST KEY"]] = custDist.sample()
 	# 		toPrint[FIELD["PART KEY"]] = partDist.sample()
 	# 		toPrint[FIELD["SUPP KEY"]] = suppDist.sample()
-	# 		toPrint[FIELD["ORDER DATE"]] = dateDist.sample(i, rows)
+	# 		toPrint[FIELD["ORDER DATE"]] = dateDist.sample()
 
 	# 		toPrintLine = "|".join(toPrint)
 	# 		print(toPrintLine, file=outfile)
 
+	# 	# UPDATE DISTRIBUTIONS HERE
+	# 	for i in range(len(dateDist.dist)):
+	# 		if dateKeyList[i].startswith("1993"):
+
+	# 			if (k % 20 < 10):
+	# 				dateDist.dist[i] += 0.1/365
+	# 			else:
+	# 				dateDist.dist[i] /= 2 
+	# 	dateDist.normalize()
+	# 	dateDist.computeAccu()
+
 	# outfile.close()
-
-
-	for k in range(NUM_BATCHES):
-		print("Writing batch ", k, "...")
-		for i in range(6000000//NUM_BATCHES):
-			toPrint = sampleLine
-
-			# toPrint[FIELD["CUST KEY"]] = custDist.sample(i, rows)
-			# toPrint[FIELD["PART KEY"]] = partDist.sample(i, rows)
-			# toPrint[FIELD["SUPP KEY"]] = suppDist.sample(i, rows)
-			# toPrint[FIELD["ORDER DATE"]] = dateDist.sample(i, rows)
-
-			toPrint[FIELD["CUST KEY"]] = custDist.sample()
-			toPrint[FIELD["PART KEY"]] = partDist.sample()
-			toPrint[FIELD["SUPP KEY"]] = suppDist.sample()
-			toPrint[FIELD["ORDER DATE"]] = dateDist.sample()
-
-			toPrintLine = "|".join(toPrint)
-			print(toPrintLine, file=outfile)
-
-		# UPDATE DISTRIBUTIONS HERE
-		for i in range(len(dateDist.dist)):
-			if dateKeyList[i].startswith("1993"):
-
-				if (k % 20 < 10):
-					dateDist.dist[i] += 0.1/365
-				else:
-					dateDist.dist[i] /= 2 
-		dateDist.normalize()
-		dateDist.computeAccu()
-
-	outfile.close()
 
 
 """

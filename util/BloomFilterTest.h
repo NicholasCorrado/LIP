@@ -8,7 +8,10 @@
 #endif //CSV_TO_ARROW_CPP_BLOOMFILTERTEST_H
 #include <string>
 
-void ProbeTest(const char*, int);
+void ProbeTest(const char*);
+void BloomFilterProbeCostHit();
+void BloomFilterProbeCostMiss();
+void HashTableProbeCostHit();
+void HashTableProbeCostMiss();
 void CostOfHashTableProbe();
-void CostOfBloomFilterProbe();
 void TestTrueNegative();

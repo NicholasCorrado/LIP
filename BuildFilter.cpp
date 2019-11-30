@@ -30,7 +30,7 @@ BuildFilter(std::shared_ptr<arrow::Table> table,
 
     // We were using the default constructor, which uses the default filter size of 500000!!!
     //BloomFilter* bf = new BloomFilter();
-    BloomFilter* bf = new BloomFilter(table->num_rows());
+    BloomFilter* bf = new BloomFilter(table->num_rows(), K_MEMORY);
 
     // Instantiate things needed for a call to Compare()
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
@@ -81,7 +81,7 @@ BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, std::string select
     
     auto* reader = new arrow::TableBatchReader(*table);
 
-    BloomFilter* bf = new BloomFilter(table->num_rows());
+    BloomFilter* bf = new BloomFilter(table->num_rows(), K_MEMORY);
     // The Status outcome object returned by ReadNext() does NOT return an error when you are already at the final
     // record batch; it sets the output batch to nullptr and returns Status::OK(). Hence, we must also check that the
     // output batch is not nullptr.
@@ -125,7 +125,7 @@ BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, std::string select
 
     auto* reader = new arrow::TableBatchReader(*table);
 
-    BloomFilter* bf = new BloomFilter(table->num_rows());
+    BloomFilter* bf = new BloomFilter(table->num_rows(), K_MEMORY);
     // The Status outcome object returned by ReadNext() does NOT return an error when you are already at the final
     // record batch; it sets the output batch to nullptr and returns Status::OK(). Hence, we must also check that the
     // output batch is not nullptr.
@@ -177,7 +177,7 @@ BuildFilter(std::shared_ptr<arrow::Table> table,
     
     auto* reader = new arrow::TableBatchReader(*table);
 
-    BloomFilter* bf = new BloomFilter(table->num_rows());
+    BloomFilter* bf = new BloomFilter(table->num_rows(), K_MEMORY);
 
     // Instantiate things needed for a call to Compare()
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());

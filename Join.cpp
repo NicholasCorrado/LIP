@@ -167,7 +167,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     status = arrow::RecordBatchBuilder::Make(fact_table->schema(), arrow::default_memory_pool(), &out_batch_builder);
 
     auto* reader = new arrow::TableBatchReader(*fact_table);
-   // reader->set_chunksize(2 << 10);
+   //reader->set_chunksize(2 << 13);
     int* indices;
 
 //     long long accu = 0;
@@ -545,14 +545,10 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
 
     for(int i = 0; i < n_dim; i++){
         BloomFilter* bf = joinExecutors[i] -> ConstructBloomFilter();
-        bf -> SetMemory(3);
+        //bf -> SetMemory(2);
         filters.push_back(bf);
     }
     // long long chunk_size = 2 << 10;
-    std::cout << "init = ";
-    for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
-        std::cout << filters[filter_index]->GetForeignKey() << " ";
-    }
     std::cout << std::endl;
     // prepare to probe each fact
     arrow::Status status;
@@ -625,7 +621,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
         for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
             filters[filter_index] -> BatchEndUpdate();
         }
-//        std::sort(filters.begin(), filters.end(), BloomFilterCompareK);
+        std::sort(filters.begin(), filters.end(), BloomFilterCompareK);
 //        for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
 //            std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRateK();
 //        }
@@ -671,4 +667,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
 
 
 
-	
+
+
+
+
+

@@ -7,6 +7,8 @@
 #include<string>
 #include<queue>
 
+#define K_MEMORY 3
+
 class BloomFilter{
 
 private:
@@ -27,15 +29,15 @@ private:
 	std::queue<int> pass_queue;
 	std::queue<int> count_queue;
 
+
+
 public:
 
-    ///int numberOfCells;
 	BloomFilter();
-    BloomFilter(int num_insert);
+    BloomFilter(int num_insert, int k);
 	BloomFilter(std::vector<long long> elements);
 	BloomFilter(std::vector<std::string> elements);
-    BloomFilter(int num_insert, int num_cells);
-	
+
 	double GetFilterRate();
     double GetFilterRateK();
 	void IncrementCount();
@@ -58,5 +60,7 @@ public:
 void TestTrueNegative();
 void CostOfHashTableProbe();
 void CostOfBloomFilterProbe();
+
+
 
 #endif

@@ -55,7 +55,7 @@ SelectExecutorTree::ConstructBloomFilterNoFK(std::string dim_primary_key){
     auto* reader = new arrow::TableBatchReader(*dim_table);
 
     //auto start = std::chrono::high_resolution_clock::now();
-    BloomFilter* bf = new BloomFilter(dim_table->num_rows()/2); //estimate selectivity = 0.5; horrible
+    BloomFilter* bf = new BloomFilter(dim_table->num_rows()/2, K_MEMORY); //estimate selectivity = 0.5; horrible
 
     
 
