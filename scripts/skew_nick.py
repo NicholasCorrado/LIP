@@ -1,6 +1,6 @@
 
-input_dir = "../benchmarks/"
-output_dir = "../benchmarks/benchmarks_skew/"
+input_dir = "../benchmarks/benchmark-1/"
+output_dir = "../benchmarks/benchmark-skew/"
 
 
 # Make duplicates of tuples satisfying some condition.
@@ -22,10 +22,9 @@ def skew(tablename, condition, time):
 			for i in range(time):
 				# Don't just duplicate the line; make sure you assign it a unique key too! 
 				# Otherwise the Bloom filter isn't accurate!
-				new_list = [str(key)] + line.split("|")[1:]
+				new_list = line.split("|")
 				new_line = "|".join(new_list)
-				print(new_line, file=outfile)
-				key += 1		
+				print(new_line, file=outfile)	
 		line = infile.readline()[:-1]
 
 	infile.close()
@@ -35,7 +34,7 @@ def main():
 	tablename = "date.tbl"
 
 	def date_condition(line):
-		return line.split("|")[4] == "1992"
+		return line.split("|")[4] == "1993"
 	def supplier_condition(line):
 		return line.split("|")
 	def dummy(line):

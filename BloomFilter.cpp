@@ -16,7 +16,6 @@
 #define S 4
 #define DEFAULT_INSERT 500000
 
-
 /*
 	
 	HASH BELOW
@@ -274,7 +273,7 @@ BloomFilter::BloomFilter(){
 
 	The user can pass in a how many inserts will be performed.
 */
-BloomFilter::BloomFilter(int num_insert){
+BloomFilter::BloomFilter(int num_insert, int k){
     Reset();
     int n = num_insert;
     //numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
@@ -286,6 +285,12 @@ BloomFilter::BloomFilter(int num_insert){
     seeds = (int*)malloc(numberOfHashes * sizeof(int));
     for(int i = 0; i < numberOfHashes; ++i){
         seeds[i] = rand() % MAX_SEED;
+    }
+
+    memory_k = k;
+    for (int i=0; i<memory_k; i++) {
+        pass_queue.push(0);
+        count_queue.push(0);
     }
 }
 
@@ -341,21 +346,6 @@ BloomFilter::BloomFilter(std::vector<std::string> elements){
 }
 
 
-BloomFilter::BloomFilter(int num_insert, int num_cells){
-    Reset();
-    int n = num_insert;
-    //numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
-    numberOfHashes = int (round( - log(FALSE_POSITIVE_RATE) / log(2)));
-    numberOfCells = num_cells;
-
-    cells = std::vector<bool>(numberOfCells, false);
-
-    seeds = (int*)malloc(numberOfHashes * sizeof(int));
-    for(int i = 0; i < numberOfHashes; ++i){
-        seeds[i] = rand() % MAX_SEED;
-    }
-}
-
 
 /*
 	Reset the count and pass counter
@@ -396,10 +386,12 @@ void BloomFilter::Insert(std::string value){
 	false otherwise.	
 */
 bool BloomFilter::Search(long long value){
+
 	for(int i = 0; i < numberOfHashes; ++i){
 		int index = Hash(value, seeds[i]) % numberOfCells;
 		if (!cells[index]) return false;
 	}
+
 	return true;
 }
 
@@ -424,28 +416,19 @@ void BloomFilter::SetMemory(int _memory){
 
 void BloomFilter::BatchEndUpdate(){
 
-	if (pass_queue.size() == memory_k 
-			&& pass_queue.size() == memory_k){
+    pass_queue_sum  -= pass_queue.front();
+    count_queue_sum -= count_queue.front();
 
-		int old_pass = pass_queue.front();
-		int old_count = count_queue.front();
+    pass_queue.pop();
+    count_queue.pop();
 
-		pass_queue.pop();
-		count_queue.pop();
-
-		pass_queue_sum -= old_pass;
-		count_queue_sum -= old_count;
-		
-	}	
-	
 	pass_queue.push(pass);
+    count_queue.push(count);
+
 	pass_queue_sum += pass;
-
-	pass = 0;
-
-	count_queue.push(count);
 	count_queue_sum += count;
 
+    pass = 0;
 	count = 0;
 }
 
@@ -513,7 +496,6 @@ bool BloomFilterCompareK( BloomFilter *lhs,  BloomFilter *rhs)
 {
     return lhs -> GetFilterRateK() < rhs -> GetFilterRateK();
 }
-
 
 /*
 	Sample test program to test adaptive filters.

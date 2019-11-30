@@ -12,15 +12,9 @@ for i in `seq 1 1`;
 do
     echo $i
     echo "hash"
-    ./csv_to_arrow $query hash 100 > scripts/data/hash_enum_$i
+    ./csv_to_arrow $query nick 20 > scripts/data/hash_enum_$i
     echo "lip"
-    ./csv_to_arrow $query lip 100 > scripts/data/lip_enum_$i
-    echo "xiating"
-    ./csv_to_arrow $query xiating 100 > scripts/data/xiating_enum_$i
-    echo "resur"
-    ./csv_to_arrow $query resur 100 > scripts/data/resur_enum_$i
-    echo "lipk"
-    ./csv_to_arrow $query lipk 100 > scripts/data/lipk_enum_$i
+    ./csv_to_arrow $query lip 20 > scripts/data/lip_enum_$i
 done
 
 python3 ./scripts/plot.py

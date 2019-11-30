@@ -4,15 +4,15 @@ import numpy as np
 
 def plot():
 
-	# insert_ht, time_ht = np.loadtxt("../probe-tests/ht_build.dat",delimiter=",", unpack=True, skiprows=1);
-	# insert_bf, time_bf = np.loadtxt("../probe-tests/bf_build.dat",delimiter=",", unpack=True, skiprows=1);
+	insert_ht, time_ht = np.loadtxt("./probe-tests/ht_build.dat",delimiter=",", unpack=True, skiprows=1);
+	insert_bf, time_bf = np.loadtxt("./probe-tests/bf_build.dat",delimiter=",", unpack=True, skiprows=1);
 
-	# plt.plot(insert_ht, time_ht, label="Hash Table")
-	# plt.plot(insert_bf, time_bf, label="Bloom Filter")
-	# plt.ylabel("Duration")
-	# plt.xlabel("Number of elements inserted")
-	# plt.legend()
-	# plt.show()
+	plt.plot(insert_ht, time_ht, label="Hash Table")
+	plt.plot(insert_bf, time_bf, label="Bloom Filter")
+	plt.ylabel("Duration")
+	plt.xlabel("Number of elements inserted")
+	plt.legend()
+	plt.show()
 
 	# # insert_bf_10k, time_bf_10k = np.loadtxt("../probe-tests/bf_probe_10000.dat",delimiter=",", unpack=True, skiprows=1);
 	# # insert_bf_20k, time_bf_20k = np.loadtxt("../probe-tests/bf_probe_20000.dat",delimiter=",", unpack=True, skiprows=1);
@@ -20,23 +20,25 @@ def plot():
 	# # insert_bf_40k, time_bf_40k = np.loadtxt("../probe-tests/bf_probe_40000.dat",delimiter=",", unpack=True, skiprows=1);
 
 	# # insert_bf_500, time_bf_500 = np.loadtxt("./probe-tests/bf_probe_500.dat",delimiter=",", unpack=True, skiprows=1);
-	# insert_bf_1k, time_bf_1k = np.loadtxt("../probe-tests/bf_probe_1k.dat",delimiter=",", unpack=True, skiprows=1);
-	# insert_bf_5k, time_bf_5k = np.loadtxt("../probe-tests/bf_probe_5k.dat",delimiter=",", unpack=True, skiprows=1);
-	# insert_bf_10k, time_bf_10k = np.loadtxt("../probe-tests/bf_probe_10k.dat",delimiter=",", unpack=True, skiprows=1);
-	# insert_bf_20k, time_bf_20k = np.loadtxt("../probe-tests/bf_probe_20k.dat",delimiter=",", unpack=True, skiprows=1);
-	# insert_bf_50k, time_bf_50k = np.loadtxt("../probe-tests/bf_probe_50k.dat",delimiter=",", unpack=True, skiprows=1);
-	# insert_bf_100k, time_bf_100k = np.loadtxt("../probe-tests/bf_probe_100k.dat",delimiter=",", unpack=True, skiprows=1);
-	# insert_bf_500k, time_bf_500k = np.loadtxt("../probe-tests/bf_probe_500k.dat",delimiter=",", unpack=True, skiprows=1);
-	# insert_bf_1000k, time_bf_1000k = np.loadtxt("../probe-tests/bf_probe_1000k.dat",delimiter=",", unpack=True, skiprows=1);
+	insert_bf_1k, time_bf_1k = np.loadtxt("./probe-tests/bf_probe_1k.dat",delimiter=",", unpack=True, skiprows=1);
+	insert_bf_5k, time_bf_5k = np.loadtxt("./probe-tests/bf_probe_5k.dat",delimiter=",", unpack=True, skiprows=1);
+	insert_bf_10k, time_bf_10k = np.loadtxt("./probe-tests/bf_probe_10k.dat",delimiter=",", unpack=True, skiprows=1);
+	insert_bf_20k, time_bf_20k = np.loadtxt("./probe-tests/bf_probe_20k.dat",delimiter=",", unpack=True, skiprows=1);
+	insert_bf_50k, time_bf_50k = np.loadtxt("./probe-tests/bf_probe_50k.dat",delimiter=",", unpack=True, skiprows=1);
+	insert_bf_100k, time_bf_100k = np.loadtxt("./probe-tests/bf_probe_100k.dat",delimiter=",", unpack=True, skiprows=1);
+	insert_bf_500k, time_bf_500k = np.loadtxt("./probe-tests/bf_probe_500k.dat",delimiter=",", unpack=True, skiprows=1);
+	insert_bf_1000k, time_bf_1000k = np.loadtxt("./probe-tests/bf_probe_1000k.dat",delimiter=",", unpack=True, skiprows=1);
 
-	# plt.plot(insert_bf_1k, time_bf_1k, label="n = 1k")
-	# plt.plot(insert_bf_5k, time_bf_5k, label="n = 5k")
-	# plt.plot(insert_bf_10k, time_bf_10k, label="n = 10k")
-	# plt.plot(insert_bf_20k, time_bf_20k, label="n = 20k")
-	# plt.plot(insert_bf_50k, time_bf_50k, label="n = 50k")
-	# plt.plot(insert_bf_100k, time_bf_100k, label="n = 100k")
-	# plt.plot(insert_bf_500k, time_bf_500k, label="n = 500k")
-	# plt.plot(insert_bf_1000k, time_bf_1000k, label="n = 1000k")
+	plt.plot(insert_bf_1k, time_bf_1k, label="n = 1k")
+	plt.plot(insert_bf_5k, time_bf_5k, label="n = 5k")
+	plt.plot(insert_bf_10k, time_bf_10k, label="n = 10k")
+	plt.plot(insert_bf_20k, time_bf_20k, label="n = 20k")
+	plt.plot(insert_bf_50k, time_bf_50k, label="n = 50k")
+	plt.plot(insert_bf_100k, time_bf_100k, label="n = 100k")
+	plt.plot(insert_bf_500k, time_bf_500k, label="n = 500k")
+	plt.plot(insert_bf_1000k, time_bf_1000k, label="n = 1000k")
+	plt.xscale("log")
+	plt.show()
 
 
 	search_bf_1, time_bf_1 = np.loadtxt("./probe-tests/probe_empty_filter_1.dat",delimiter=",", unpack=True, skiprows=1);
@@ -132,6 +134,59 @@ def plot2():
 	plt.legend()
 	plt.show()
 
+def plot_bf():
+	insert_ht_1,  time_ht_1 = np.loadtxt("./probe-tests/ht_probe_1.dat",delimiter=",", unpack=True);
+	insert_ht_2,  time_ht_2 = np.loadtxt("./probe-tests/ht_probe_2.dat",delimiter=",", unpack=True);
+	insert_ht_3,  time_ht_3 = np.loadtxt("./probe-tests/ht_probe_3.dat",delimiter=",", unpack=True);
+	insert_ht_4,  time_ht_4 = np.loadtxt("./probe-tests/ht_probe_4.dat",delimiter=",", unpack=True);
+	insert_ht_5,  time_ht_5 = np.loadtxt("./probe-tests/ht_probe_5.dat",delimiter=",", unpack=True);
+	insert_ht_6,  time_ht_6 = np.loadtxt("./probe-tests/ht_probe_6.dat",delimiter=",", unpack=True);
+	insert_ht_7,  time_ht_7 = np.loadtxt("./probe-tests/ht_probe_7.dat",delimiter=",", unpack=True);
+	insert_ht_8,  time_ht_8 = np.loadtxt("./probe-tests/ht_probe_8.dat",delimiter=",", unpack=True);
+	insert_ht_9,  time_ht_9 = np.loadtxt("./probe-tests/ht_probe_9.dat",delimiter=",", unpack=True);
+	insert_ht_10, time_ht_10 = np.loadtxt("./probe-tests/ht_probe_10.dat",delimiter=",", unpack=True);
+
+
+	insert_bf_1,  time_bf_1 = np.loadtxt("./probe-tests/bf_probe_1.dat",delimiter=",", unpack=True);
+	insert_bf_2,  time_bf_2 = np.loadtxt("./probe-tests/bf_probe_2.dat",delimiter=",", unpack=True);
+	insert_bf_3,  time_bf_3 = np.loadtxt("./probe-tests/bf_probe_3.dat",delimiter=",", unpack=True);
+	insert_bf_4,  time_bf_4 = np.loadtxt("./probe-tests/bf_probe_4.dat",delimiter=",", unpack=True);
+	insert_bf_5,  time_bf_5 = np.loadtxt("./probe-tests/bf_probe_5.dat",delimiter=",", unpack=True);
+	insert_bf_6,  time_bf_6 = np.loadtxt("./probe-tests/bf_probe_6.dat",delimiter=",", unpack=True);
+	insert_bf_7,  time_bf_7 = np.loadtxt("./probe-tests/bf_probe_7.dat",delimiter=",", unpack=True);
+	insert_bf_8,  time_bf_8 = np.loadtxt("./probe-tests/bf_probe_8.dat",delimiter=",", unpack=True);
+	insert_bf_9,  time_bf_9 = np.loadtxt("./probe-tests/bf_probe_9.dat",delimiter=",", unpack=True);
+	insert_bf_10, time_bf_10 = np.loadtxt("./probe-tests/bf_probe_10.dat",delimiter=",", unpack=True);
+
+	bf = np.median(np.array( [time_bf_1, time_bf_2, time_bf_3, time_bf_4, time_bf_5, time_bf_6, time_bf_7, time_bf_8, time_bf_9, time_bf_10]), axis = 0)
+	ht = np.median(np.array( [time_ht_1, time_ht_2, time_ht_3, time_ht_4, time_ht_5, time_ht_6, time_ht_7, time_ht_8, time_ht_9, time_ht_10]), axis = 0)
+
+	insert_bf_full,  time_bf_full = np.loadtxt("./probe-tests/bf_probe_full_1.dat",delimiter=",", unpack=True)
+	insert_ht_full,  time_ht_full = np.loadtxt("./probe-tests/ht_probe_full_1.dat",delimiter=",", unpack=True)
+	plt.plot(insert_bf_1, bf, label="n = 1k")
+	plt.plot(insert_ht_1, ht, label="n = 1k")
+	plt.xscale("log")
+	plt.show()
+
+	plt.plot(insert_ht_1, ht/bf, label="n = 1k")
+	plt.xscale("log")
+	plt.show()
+
+	# plt.plot(insert_bf_full, time_bf_full/bf, label="n = 1k")
+	plt.plot(insert_bf_full, time_bf_full, label="n = 1k")
+	plt.plot(insert_ht_full, time_ht_full, label="n = 1k")
+	plt.plot(insert_bf_1, bf, label="n = 1k")
+	plt.xscale("log")
+	plt.show()
+
+
+	insert_bf_miss_avg,  time_bf_miss_avg = np.loadtxt("./probe-tests/bf_probe_full_miss_2.dat",delimiter=",", unpack=True)
+	insert_ht_miss_avg,  time_ht_miss_avg = np.loadtxt("./probe-tests/ht_probe_full_miss_1.dat",delimiter=",", unpack=True)
+	plt.plot(insert_bf_miss_avg, time_bf_miss_avg)
+	plt.plot(insert_ht_miss_avg, time_ht_miss_avg)
+	plt.xscale("log")
+	plt.show()
+
 def parse():
 
 	# label41, t41 = np.loadtxt("../data/data-1/q41.dat",delimiter=",", unpack=True)
@@ -168,9 +223,27 @@ def parse():
 
 	# print(l)
 
+def plot_probe():
+
+	insert1,  bf_miss_1 = np.loadtxt("./probe-tests/bf_miss_1.dat",delimiter=",", unpack=True)
+	insert2,  bf_hit_1 = np.loadtxt("./probe-tests/bf_hit_1.dat",delimiter=",", unpack=True)
+	insert3,  ht_miss_1 = np.loadtxt("./probe-tests/ht_miss_1.dat",delimiter=",", unpack=True)
+	insert4,  ht_hit_1 = np.loadtxt("./probe-tests/ht_hit_1.dat",delimiter=",", unpack=True)
+	plt.plot(insert1, bf_miss_1, label="Bloom filter miss")
+	plt.plot(insert2, bf_hit_1, label="Bloom filter hit")
+	plt.plot(insert3, ht_miss_1, label="hash table miss")
+	plt.plot(insert4, ht_hit_1, label="hash table hit")
+	plt.xscale("log")
+	plt.ylim(10000000,300000000)
+	plt.legend()
+	plt.show()
+
+	for n in ht_miss_1:
+		print(n)
+
 
 def main():
-	plot()
+	plot_probe()
 if __name__ == "__main__":
 	main()
 

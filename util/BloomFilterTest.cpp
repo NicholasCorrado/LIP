@@ -57,7 +57,7 @@ void CostOFBloomFilterBuild() {
 
         start = std::chrono::high_resolution_clock::now();
 
-        BloomFilter *bf = new BloomFilter(num_insert);
+        BloomFilter *bf = new BloomFilter(num_insert, 3);
         for (int i = 0; i < num_insert; i++) {
             bf->Insert(rand());
         }
@@ -96,85 +96,6 @@ void CostOfHashTableBuild() {
     }
 }
 
-void CostOfBloomFilterProbe(int dummy) {
-
-
-    std::chrono::high_resolution_clock::time_point start;
-    std::chrono::high_resolution_clock::time_point stop;
-    std::chrono::high_resolution_clock::duration duration;
-
-    int num_probes = 1000000;
-
-    for (int num_insert=500; num_insert<50000; num_insert+=500) {
-        BloomFilter *bf = new BloomFilter(num_insert);
-
-
-        start = std::chrono::high_resolution_clock::now();
-
-        // Should be all hits
-        for (int i = 0; i < num_probes; i++) {
-            bf->Search(i);
-        }
-
-        stop = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        std::cout << num_insert<< "," << duration.count() << std::endl;
-
-    }
-
-
-    for (int num_insert=50000; num_insert<1000000; num_insert+=10000) {
-        BloomFilter *bf = new BloomFilter(num_insert);
-
-
-        start = std::chrono::high_resolution_clock::now();
-
-        // Should be all hits
-        for (int i = 0; i < num_probes; i++) {
-            bf->Search(i);
-        }
-
-        stop = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        std::cout << num_insert<< "," << duration.count() << std::endl;
-
-    }
-
-    for (int num_insert=1000000; num_insert<10000000; num_insert+=100000) {
-        BloomFilter *bf = new BloomFilter(num_insert);
-
-        start = std::chrono::high_resolution_clock::now();
-
-        // Should be all hits
-        for (int i = 0; i < num_probes; i++) {
-            bf->Search(i);
-        }
-
-        stop = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        std::cout << num_insert<< "," << duration.count() << std::endl;
-
-    }
-
-    for (int num_insert=10000000; num_insert<=30000000; num_insert+=1000000) {
-        BloomFilter *bf = new BloomFilter(num_insert);
-
-        start = std::chrono::high_resolution_clock::now();
-
-        // Should be all hits
-        for (int i = 0; i < num_probes; i++) {
-            bf->Search(i);
-        }
-
-        stop = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        std::cout << num_insert<< "," << duration.count() << std::endl;
-
-    }
-
-
-
-}
 
 
 
@@ -188,79 +109,307 @@ void CostOfHashTableProbe() {
 
     for (int num_insert=500; num_insert<50000; num_insert+=500) {
         spp::sparse_hash_map<long long, bool> hash(num_insert);
+        for (int i = 0; i < num_insert; i++) {
 
+            hash[rand() % (INT_MAX / 2)] = true;
+        }
 
+        long long accu = 0;
         start = std::chrono::high_resolution_clock::now();
 
         // Should be all hits
         for (int i = 0; i < num_probes; i++) {
-            hash.count(i);
+
+            int random = rand() % INT_MAX + (INT_MAX / 2);
+
+            // Isolate random number generation from probing
+            start = std::chrono::high_resolution_clock::now();
+
+            hash.count(random);
+
+            stop = std::chrono::high_resolution_clock::now();
+            duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            accu += duration.count();
         }
-
-        stop = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        std::cout << num_insert<< "," << duration.count() << std::endl;
-
+        std::cout << num_insert << "," << accu << std::endl;
     }
 
 
     for (int num_insert=50000; num_insert<1000000; num_insert+=10000) {
         spp::sparse_hash_map<long long, bool> hash(num_insert);
+        for (int i = 0; i < num_insert; i++) {
 
+            hash[rand() % (INT_MAX / 2)] = true;
+        }
 
+        long long accu = 0;
         start = std::chrono::high_resolution_clock::now();
 
         // Should be all hits
         for (int i = 0; i < num_probes; i++) {
-            hash.count(i);
+
+            int random = rand() % INT_MAX + (INT_MAX / 2);
+
+            // Isolate random number generation from probing
+            start = std::chrono::high_resolution_clock::now();
+
+            hash.count(random);
+
+            stop = std::chrono::high_resolution_clock::now();
+            duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            accu += duration.count();
         }
-
-        stop = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        std::cout << num_insert<< "," << duration.count() << std::endl;
-
+        std::cout << num_insert << "," << accu << std::endl;
     }
 
     for (int num_insert=1000000; num_insert<10000000; num_insert+=100000) {
         spp::sparse_hash_map<long long, bool> hash(num_insert);
+        for (int i = 0; i < num_insert; i++) {
 
+            hash[rand() % (INT_MAX / 2)] = true;
+        }
 
+        long long accu = 0;
         start = std::chrono::high_resolution_clock::now();
 
         // Should be all hits
         for (int i = 0; i < num_probes; i++) {
-            hash.count(i);
+
+            int random = rand() % INT_MAX + (INT_MAX / 2);
+
+            // Isolate random number generation from probing
+            start = std::chrono::high_resolution_clock::now();
+
+            hash.count(random);
+
+            stop = std::chrono::high_resolution_clock::now();
+            duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            accu += duration.count();
         }
-
-        stop = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        std::cout << num_insert<< "," << duration.count() << std::endl;
-
+        std::cout << num_insert << "," << accu << std::endl;
     }
 
     for (int num_insert=10000000; num_insert<=30000000; num_insert+=1000000) {
         spp::sparse_hash_map<long long, bool> hash(num_insert);
+        for (int i = 0; i < num_insert; i++) {
 
+            hash[rand() % (INT_MAX / 2)] = true;
+        }
 
+        long long accu = 0;
         start = std::chrono::high_resolution_clock::now();
 
         // Should be all hits
         for (int i = 0; i < num_probes; i++) {
-            hash.count(i);
+
+            int random = rand() % INT_MAX + (INT_MAX / 2);
+
+            // Isolate random number generation from probing
+            start = std::chrono::high_resolution_clock::now();
+
+            hash.count(random);
+
+            stop = std::chrono::high_resolution_clock::now();
+            duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            accu += duration.count();
         }
-
-        stop = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        std::cout << num_insert<< "," << duration.count() << std::endl;
-
+        std::cout << num_insert << "," << accu << std::endl;
     }
 }
 
-void ProbeTest(const char* alg, int n) {
 
-    if ((std::string) alg == "bloom") {
-        //CostOfBloomFilterProbe(n);
-        CostOfHashTableProbe();
+void HashTableProbeCostMiss() {
+
+    std::chrono::high_resolution_clock::time_point start;
+    std::chrono::high_resolution_clock::time_point stop;
+    std::chrono::high_resolution_clock::duration duration;
+
+    int num_probes = 1000000;
+
+    int num_insert = 500;
+    while (num_insert <= 3000000) {
+
+        spp::sparse_hash_map<long long, bool> hash(num_insert);
+        for (int i = 0; i < num_insert; i++) {
+            hash[rand() % (INT_MAX/2)]=true;
+        }
+
+        long long accu = 0;
+
+        // Should be all misses + false positives
+        for (int i = 0; i < num_probes; i++) {
+
+            int random = rand() % INT_MAX + (INT_MAX/2);
+
+            // Isolate random number generation from probing
+            start = std::chrono::high_resolution_clock::now();
+
+            hash.count(random);
+
+            stop = std::chrono::high_resolution_clock::now();
+            duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            accu += duration.count();
+        }
+        std::cout << num_insert<< "," << accu << std::endl;
+
+        if (num_insert < 50000) num_insert += 500;
+        else if (num_insert < 1000000) num_insert += 10000;
+        else num_insert += 100000; // else if (num_insert < 3000000)
+    }
+}
+
+
+void HashTableProbeCostHit() {
+
+    std::chrono::high_resolution_clock::time_point start;
+    std::chrono::high_resolution_clock::time_point stop;
+    std::chrono::high_resolution_clock::duration duration;
+
+    int num_probes = 1000000;
+
+    int num_insert = 500;
+    while (num_insert <= 3000000) {
+
+        // Save the random numbers we insert into the filter so we know which values to probe
+        // that will always be hits (while still being random)
+        int randoms[num_insert];
+
+        spp::sparse_hash_map<long long, bool> hash(num_insert);
+        for (int i = 0; i < num_insert; i++) {
+            randoms[i] = rand();
+            hash[randoms[i]]=true;
+        }
+
+        long long accu = 0;
+
+        // Should be all misses + false positives
+        for (int i = 0; i < num_probes; i++) {
+
+            // Isolate random number generation from probing
+            int random = randoms[i%num_insert];
+            start = std::chrono::high_resolution_clock::now();
+
+            hash.count(random);
+
+            stop = std::chrono::high_resolution_clock::now();
+            duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            accu += duration.count();
+        }
+        std::cout << num_insert<< "," << accu << std::endl;
+
+        if (num_insert < 50000) num_insert += 500;
+        else if (num_insert < 1000000) num_insert += 10000;
+        else num_insert += 100000; // else if (num_insert < 3000000)
+    }
+}
+
+
+void BloomFilterProbeCostMiss() {
+
+    std::chrono::high_resolution_clock::time_point start;
+    std::chrono::high_resolution_clock::time_point stop;
+    std::chrono::high_resolution_clock::duration duration;
+
+    int num_probes = 1000000;
+
+    int num_insert = 500;
+    while (num_insert <= 3000000) {
+
+        BloomFilter *bf = new BloomFilter(num_insert, 3);
+        for (int i = 0; i < num_insert; i++) {
+            bf->Insert(rand() % (INT_MAX/2));
+        }
+
+        long long accu = 0;
+
+        // Should be all misses + false positives
+        for (int i = 0; i < num_probes; i++) {
+
+            int random = rand() % INT_MAX + (INT_MAX/2);
+
+            // Isolate random number generation from probing
+            start = std::chrono::high_resolution_clock::now();
+
+            bf->Search(random);
+
+            stop = std::chrono::high_resolution_clock::now();
+            duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            accu += duration.count();
+        }
+        std::cout << num_insert<< "," << accu << std::endl;
+
+        if (num_insert < 50000) num_insert += 500;
+        else if (num_insert < 1000000) num_insert += 10000;
+        else num_insert += 100000; // else if (num_insert < 3000000)
+    }
+}
+
+
+void BloomFilterProbeCostHit() {
+
+    std::chrono::high_resolution_clock::time_point start;
+    std::chrono::high_resolution_clock::time_point stop;
+    std::chrono::high_resolution_clock::duration duration;
+
+    int num_probes = 1000000;
+
+    int num_insert = 500;
+    while (num_insert <= 3000000) {
+
+        // Save the random numbers we insert into the filter so we know which values to probe
+        // that will always be hits (while still being random)
+        int randoms[num_insert];
+
+        BloomFilter *bf = new BloomFilter(num_insert, 3);
+        for (int i = 0; i < num_insert; i++) {
+            randoms[i] = rand();
+            bf->Insert(randoms[i]);
+        }
+
+        long long accu = 0;
+
+        // Should be all misses + false positives
+        for (int i = 0; i < num_probes; i++) {
+
+            // Isolate random number generation from probing
+            int random = randoms[i%num_insert];
+            start = std::chrono::high_resolution_clock::now();
+
+            bf->Search(random);
+
+            stop = std::chrono::high_resolution_clock::now();
+            duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
+            accu += duration.count();
+        }
+        std::cout << num_insert<< "," << accu << std::endl;
+
+        if (num_insert < 50000) num_insert += 500;
+        else if (num_insert < 1000000) num_insert += 10000;
+        else num_insert += 100000; // else if (num_insert < 3000000)
+    }
+}
+
+
+
+
+
+
+void ProbeTest(const char* alg) {
+
+    if ((std::string) alg == "bloom-hit") {
+        BloomFilterProbeCostHit();
+    }
+    else if ((std::string) alg == "bloom-miss") {
+        BloomFilterProbeCostMiss();
+    }
+    else if ((std::string) alg == "hash-hit") {
+        HashTableProbeCostHit();
+    }
+    else if ((std::string) alg == "hash-miss") {
+        HashTableProbeCostMiss();
+    }
+    else {
+        std::cout << "invalid arguments" << std::endl;
     }
     //CostOfHashTableProbe();
     //CostOfBloomFilterProbe();
