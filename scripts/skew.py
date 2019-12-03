@@ -101,9 +101,6 @@ def date_1_1(batch_num, i, num_batches, debris):
 	elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 
-	
-
-
 def date_2_1(batch_num, i, num_batches, debris):
 
 	
@@ -126,47 +123,100 @@ def date_1_2(batch_num, i, num_batches, debris):
 
 def date_2_2(batch_num, i, num_batches, debris):
 
-	
-
 	if batch_num % 4 < 2:
 		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
 	elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
 
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 
+
+def date_5_5(batch_num, i, num_batches, debris):
+
+	if batch_num % 10 < 5:
+		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
+	elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
+
+		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 	
+def date_10_10(batch_num, i, num_batches, debris):
+
+	if batch_num % 20 < 10:
+		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
+	elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
+
+		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
+
+def date_20_20(batch_num, i, num_batches, debris):
+
+	if batch_num % 40 < 20:
+		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
+	elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
+
+		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 
 
-def cust_1_1(batch_num, i, num_batches, debris):
+def date_50_50(batch_num, i, num_batches, debris):
+
+	if batch_num % 100 < 50:
+		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
+	elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
+
+		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
+
+def date_50_10(batch_num, i, num_batches, debris):
+
+	if batch_num % 60 < 50:
+		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
+	elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
+
+		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
+
+def date_10_50(batch_num, i, num_batches, debris):
+
+	if batch_num % 60 < 10:
+		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
+	elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
+		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
+
+def date_25_25(batch_num, i, num_batches, debris):
+
+	if batch_num % 50 < 25:
+		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
+	elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
+
+		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
+
+
+def cust_10_10(batch_num, i, num_batches, debris):
 	
 
 	field = FIELD["CUST KEY"]
 
-	if batch_num % 2 == 0:
+	if batch_num % 20 == 10:
 		debris[field] = "8450"
 	else:
 		debris[field] = "-1"
 
 	
 
-def part_2_2(batch_num, i, num_batches, debris):
+def part_20_20(batch_num, i, num_batches, debris):
 	
 
 	field = FIELD["PART KEY"]
 
-	if batch_num % 4 < 2:
+	if batch_num % 40 < 20:
 		debris[field] = "1"
 	else:
 		debris[field] = "-1"
 
 	
 
-def supp_1_2(batch_num, i, num_batches, debris):
+def supp_10_20(batch_num, i, num_batches, debris):
 	
 
 	field = FIELD["SUPP KEY"]
 
-	if batch_num % 3 < 1:
+	if batch_num % 30 < 10:
 		debris[field] = "761"
 	else:
 		debris[field] = "-1"
@@ -290,6 +340,27 @@ def GenerateRows(out_filename, batch_size_filename=""):
 				# debris[3] = str(random.randint(1,200000))
 				# debris[4] = str(random.randint(1,2000))
 
+			elif (out_filename == "lineorder-date-5-5.tbl"):
+				date_5_5(batch_num, row, num_batches, debris)
+
+			elif (out_filename == "lineorder-date-10-10.tbl"):
+				date_10_10(batch_num, row, num_batches, debris)
+
+			elif (out_filename == "lineorder-date-20-20.tbl"):
+				date_20_20(batch_num, row, num_batches, debris)
+
+			elif (out_filename == "lineorder-date-50-50.tbl"):
+				date_50_50(batch_num, row, num_batches, debris)
+
+			elif (out_filename == "lineorder-date-10-50.tbl"):
+				date_10_50(batch_num, row, num_batches, debris)
+
+			elif (out_filename == "lineorder-date-50-10.tbl"):
+				date_50_10(batch_num, row, num_batches, debris)
+
+			elif (out_filename == "lineorder-date-25-25.tbl"):
+				date_25_25(batch_num, row, num_batches, debris)
+
 			elif (out_filename == "lineorder-date-linear.tbl"):
 				date_linear(batch_num, row, num_batches, debris)
 				# debris[2] = str(random.randint(1,30000))
@@ -297,24 +368,23 @@ def GenerateRows(out_filename, batch_size_filename=""):
 				# debris[4] = str(random.randint(1,2000))
 
 
-			elif (out_filename == "lineorder-date-linear-part-2-2.tbl"):
+			elif (out_filename == "lineorder-date-linear-part-20-20.tbl"):
 				date_linear(batch_num, row, num_batches, debris)
-				part_2_2(batch_num, row, num_batches, debris)
+				part_20_20(batch_num, row, num_batches, debris)
 				# debris[2] = str(random.randint(1,30000))
 				# debris[4] = str(random.randint(1,2000))
 
-			elif (out_filename =="lineorder-date-linear-part-2-2-cust-1-1.tbl"):
-				date_linear(batch_num, row, num_batches, debris)
-				part_2_2(batch_num, row, num_batches, debris)
-				cust_1_1(batch_num, row, num_batches, debris)
-				# debris[4] = str(random.randint(1,2000))
+			# elif (out_filename =="lineorder-date-linear-part-20-20-cust-10-10.tbl"):
+			# 	date_linear(batch_num, row, num_batches, debris)
+			# 	part_20_20(batch_num, row, num_batches, debris)
+			# 	cust_10_10(batch_num, row, num_batches, debris)
+			#	debris[4] = str(random.randint(1,2000))
 
 
-			elif (out_filename == "lineorder-date-linear-part-2-2-cust-1-1-supp-1-2.tbl"):
+			elif (out_filename == "lineorder-date-linear-part-20-20-supp-10-20.tbl"):
 				date_linear(batch_num, row, num_batches, debris)
-				part_2_2(batch_num, row, num_batches, debris)
-				cust_1_1(batch_num, row, num_batches, debris)
-				supp_1_2(batch_num, row, num_batches, debris)
+				part_20_20(batch_num, row, num_batches, debris)
+				supp_10_20(batch_num, row, num_batches, debris)
 			else:
 				print("invalid filename")
 				break
@@ -339,16 +409,26 @@ It is assumed that the distribution will be updated after every batch.
 
 
 def main():
-	GenerateRows("lineorder-date-part-adversary.tbl","batch-sizes-adversary.txt")
-	GenerateRows("lineorder-date-linear.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-first-half.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-1-1.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-2-1.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-1-2.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-2-2.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-linear-part-2-2.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-linear-part-2-2-cust-1-1.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-linear-part-2-2-cust-1-1-supp-1-2.tbl","batch-sizes-date.txt")
+
+	# GenerateRows("lineorder-date-5-5.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-10-10.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-20-20.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-50-50.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-10-50.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-50-10.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-25-25.tbl","batch-sizes-date.txt")
+
+	# GenerateRows("lineorder-date-part-adversary.tbl","batch-sizes-adversary.txt")
+	# GenerateRows("lineorder-date-linear.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-first-half.tbl","batch-sizes-date.txt")
+
+	# GenerateRows("lineorder-date-1-1.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-2-1.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-1-2.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-2-2.tbl","batch-sizes-date.txt")
+
+	GenerateRows("lineorder-date-linear-part-20-20.tbl","batch-sizes-date.txt")
+	GenerateRows("lineorder-date-linear-part-20-20-supp-10-20.tbl","batch-sizes-date.txt")
 
 if __name__ == "__main__":
 	main()
