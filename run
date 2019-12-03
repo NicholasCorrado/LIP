@@ -8,13 +8,11 @@ fi
 
 echo $query
 
-for i in `seq 1 3`;
+for i in `seq 1 5`;
 do
     echo $i
     echo "hash"
-    ./csv_to_arrow $query time 20 > scripts/data/hash_enum_$i
-    echo "lip"
-    ./csv_to_arrow $query lip 20 > scripts/data/lip_enum_$i
+    ./csv_to_arrow 4.3 lip 100 > scripts/data/hash_enum_$i
 done
 
 python3 ./scripts/plot.py

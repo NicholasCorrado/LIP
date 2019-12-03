@@ -15,11 +15,27 @@
 
 int run(std::string q, std::string alg, std::string SF, bool enum_flag) {
 
-    std::string file_path_customer  = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/customer.tbl";
-    std::string file_path_date      = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/date.tbl";
-    std::string file_path_lineorder = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/lineorder.tbl";
-    std::string file_path_part      = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/part.tbl";
-    std::string file_path_supplier  = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/supplier.tbl";
+    std::string file_path_customer;
+    std::string file_path_date;
+    std::string file_path_lineorder;
+    std::string file_path_part;
+    std::string file_path_supplier;
+
+
+    if (SF.rfind("skew-", 0) == 0) {
+        file_path_lineorder = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-skew/lineorder-" + SF.substr(5) + ".tbl";
+        file_path_customer  = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-skew/customer.tbl";
+        file_path_date      = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-skew/date.tbl";
+        file_path_part      = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-skew/part.tbl";
+        file_path_supplier  = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-skew/supplier.tbl";
+    }
+    else {
+        file_path_customer  = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/customer.tbl";
+        file_path_date      = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/date.tbl";
+        file_path_lineorder = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/lineorder.tbl";
+        file_path_part      = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/part.tbl";
+        file_path_supplier  = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/supplier.tbl";
+    }
 
     std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
                                                    "MKT SEGMENT"};

@@ -232,7 +232,9 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
                 }
             }
         }
+        auto tmp = filters;
         std::sort(filters.begin(), filters.end(), BloomFilterCompare);
+        filters = tmp;
 
         if (DEBUG) {
             for (int filter_index = 0; filter_index < n_dim; filter_index++) {
