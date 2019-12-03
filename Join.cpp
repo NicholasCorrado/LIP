@@ -239,6 +239,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
         if (CR) opt += (index_size) * (n_dim) + ( n_rows - index_size ) * 1;
 
         std::sort(filters.begin(), filters.end(), BloomFilterCompare);
+//        filters = tmp;
 
         if (DEBUG) {
             for (int filter_index = 0; filter_index < n_dim; filter_index++) {
