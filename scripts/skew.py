@@ -407,6 +407,7 @@ increase linearly (while values at all other indices decrease linearly).
 It is assumed that the distribution will be updated after every batch.
 """
 
+# DO NOT SKEW CUST KEY. IT IT CORRELATED WITH LINENUMBER. SPECIAL HANDLING IS REQUIRED.
 
 def main():
 
