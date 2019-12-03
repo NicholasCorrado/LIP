@@ -587,9 +587,10 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
         int index_size = n_rows;
 
 //        for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
-//            std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRateK();
+//            std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRateK() << " ";
 //        }
 //        std::cout << std::endl;
+
         for (int i = 0; i < n_rows; i++) {
             indices[i] = i;
         }

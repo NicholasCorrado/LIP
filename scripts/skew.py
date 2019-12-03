@@ -257,52 +257,57 @@ def GenerateRows(out_filename, batch_size_filename=""):
 			# toPrintLine = adversary(batch_num, row, num_batches, line)
 			if (out_filename == "lineorder-date-part-adversary.tbl"):
 				adversary(batch_num, row, num_batches, debris)
-				debris[2] = str(random.randint(1,30000))
-				debris[4] = str(random.randint(1,2000))
+				#debris[2] = str(random.randint(1,30000))
+				#debris[4] = str(random.randint(1,2000))
+
+			elif (out_filename == "lineorder-date-first-half.tbl"):
+				date_first_half(batch_num, row, num_batches, debris)
+
+
 
 			elif (out_filename == "lineorder-date-1-1.tbl"):
 				date_1_1(batch_num, row, num_batches, debris)
-				debris[2] = str(random.randint(1,30000))
-				debris[3] = str(random.randint(1,200000))
-				debris[4] = str(random.randint(1,2000))
+				# debris[2] = str(random.randint(1,30000))
+				# debris[3] = str(random.randint(1,200000))
+				# debris[4] = str(random.randint(1,2000))
 
 			elif (out_filename == "lineorder-date-2-1.tbl"):
 				date_2_1(batch_num, row, num_batches, debris)
-				debris[2] = str(random.randint(1,30000))
-				debris[3] = str(random.randint(1,200000))
-				debris[4] = str(random.randint(1,2000))
+				# debris[2] = str(random.randint(1,30000))
+				# debris[3] = str(random.randint(1,200000))
+				# debris[4] = str(random.randint(1,2000))
 
 
 			elif (out_filename == "lineorder-date-1-2.tbl"):
 				date_1_2(batch_num, row, num_batches, debris)
-				debris[2] = str(random.randint(1,30000))
-				debris[3] = str(random.randint(1,200000))
-				debris[4] = str(random.randint(1,2000))
+				# debris[2] = str(random.randint(1,30000))
+				# debris[3] = str(random.randint(1,200000))
+				# debris[4] = str(random.randint(1,2000))
 
 			elif (out_filename == "lineorder-date-2-2.tbl"):
 				date_2_2(batch_num, row, num_batches, debris)
-				debris[2] = str(random.randint(1,30000))
-				debris[3] = str(random.randint(1,200000))
-				debris[4] = str(random.randint(1,2000))
+				# debris[2] = str(random.randint(1,30000))
+				# debris[3] = str(random.randint(1,200000))
+				# debris[4] = str(random.randint(1,2000))
 
 			elif (out_filename == "lineorder-date-linear.tbl"):
 				date_linear(batch_num, row, num_batches, debris)
-				debris[2] = str(random.randint(1,30000))
-				debris[3] = str(random.randint(1,200000))
-				debris[4] = str(random.randint(1,2000))
+				# debris[2] = str(random.randint(1,30000))
+				# debris[3] = str(random.randint(1,200000))
+				# debris[4] = str(random.randint(1,2000))
 
 
 			elif (out_filename == "lineorder-date-linear-part-2-2.tbl"):
 				date_linear(batch_num, row, num_batches, debris)
 				part_2_2(batch_num, row, num_batches, debris)
-				debris[2] = str(random.randint(1,30000))
-				debris[4] = str(random.randint(1,2000))
+				# debris[2] = str(random.randint(1,30000))
+				# debris[4] = str(random.randint(1,2000))
 
 			elif (out_filename =="lineorder-date-linear-part-2-2-cust-1-1.tbl"):
 				date_linear(batch_num, row, num_batches, debris)
 				part_2_2(batch_num, row, num_batches, debris)
 				cust_1_1(batch_num, row, num_batches, debris)
-				debris[4] = str(random.randint(1,2000))
+				# debris[4] = str(random.randint(1,2000))
 
 
 			elif (out_filename == "lineorder-date-linear-part-2-2-cust-1-1-supp-1-2.tbl"):
@@ -336,6 +341,7 @@ It is assumed that the distribution will be updated after every batch.
 def main():
 	GenerateRows("lineorder-date-part-adversary.tbl","batch-sizes-adversary.txt")
 	GenerateRows("lineorder-date-linear.tbl","batch-sizes-date.txt")
+	GenerateRows("lineorder-date-first-half.tbl","batch-sizes-date.txt")
 	GenerateRows("lineorder-date-1-1.tbl","batch-sizes-date.txt")
 	GenerateRows("lineorder-date-2-1.tbl","batch-sizes-date.txt")
 	GenerateRows("lineorder-date-1-2.tbl","batch-sizes-date.txt")

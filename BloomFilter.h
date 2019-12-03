@@ -8,7 +8,7 @@
 #include<queue>
 #include <chrono>
 
-#define K_MEMORY 4
+#define K_MEMORY 3
 
 class BloomFilter{
 

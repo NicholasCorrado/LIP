@@ -13,7 +13,7 @@
 #include "select.h"
 #include "util/util.h"
 
-int run(std::string q, std::string alg, std::string SF, bool enum_flag) {
+int run(std::string q, std::string alg, std::string skew, std::string SF, bool enum_flag) {
 
     std::string file_path_customer;
     std::string file_path_date;
@@ -21,13 +21,18 @@ int run(std::string q, std::string alg, std::string SF, bool enum_flag) {
     std::string file_path_part;
     std::string file_path_supplier;
 
+    file_path_customer  = "./benchmarks/benchmark-" + SF + "/customer.tbl";
+    file_path_date      = "./benchmarks/benchmark-" + SF + "/date.tbl";
+    file_path_lineorder = "./benchmarks/benchmark-" + SF + "/lineorder.tbl";
+    file_path_part      = "./benchmarks/benchmark-" + SF + "/part.tbl";
+    file_path_supplier  = "./benchmarks/benchmark-" + SF + "/supplier.tbl";
 
-    if (SF.rfind("skew-", 0) == 0) {
-        file_path_lineorder = "./benchmarks/benchmark-skew/lineorder-" + SF.substr(5) + ".tbl";
-        file_path_customer  = "./benchmarks/benchmark-skew/customer.tbl";
-        file_path_date      = "./benchmarks/benchmark-skew/date.tbl";
-        file_path_part      = "./benchmarks/benchmark-skew/part.tbl";
-        file_path_supplier  = "./benchmarks/benchmark-skew/supplier.tbl";
+    if (skew.rfind("skew-", 0) == 0) {
+        file_path_lineorder = "./benchmarks/benchmark-skew/lineorder-" + skew.substr(5) + ".tbl";
+//        file_path_customer  = "./benchmarks/benchmark-skew/customer.tbl";
+//        file_path_date      = "./benchmarks/benchmark-skew/date.tbl";
+//        file_path_part      = "./benchmarks/benchmark-skew/part.tbl";
+//        file_path_supplier  = "./benchmarks/benchmark-skew/supplier.tbl";
     }
     else {
         file_path_customer  = "./benchmarks/benchmark-" + SF + "/customer.tbl";
@@ -131,6 +136,10 @@ int ui(){
         std::cout << "Choose an algorithm [lip] or [hash]\n>>> ";
         std::cin >> alg;
 
+        std::string skew;
+        std::cout << "skew = ?\n>>> ";
+        std::cin >> skew;
+
         std::string SF;
         std::cout << "SF = ?\n>>> ";
         std::cin >> SF;
@@ -140,7 +149,7 @@ int ui(){
         std::cin >> s_enum_flag;
 
         bool enum_flag = (s_enum_flag == "y" || s_enum_flag == "Y");
-        run(q, alg, SF, enum_flag);
+        run(q, alg, skew, SF, enum_flag);
         
     }
     return 0;
