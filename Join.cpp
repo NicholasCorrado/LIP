@@ -3,6 +3,8 @@
 #include "util/sparsepp/spp.h"
 #include <chrono>
 
+#define DEBUG 0
+
 std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table, std::string left_field, 
                                         std::shared_ptr<arrow::Table> right_table, std::string right_field) {
 
@@ -65,7 +67,7 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
             int res = hash.count(key);
 
             stop = std::chrono::high_resolution_clock::now();
-//            duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+            duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
             accu += duration.count();
             count++;
@@ -100,7 +102,7 @@ std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table,
         out_arrays.clear();
     }
 //    std::cout << "PerHashProbe " << 1.0 * accu / count / 1000 << std::endl;
-//    std::cout << "HashProbe " << accu/1000 << std::endl;
+//    std::cout << "HashProbe " << accu << std::endl;
 
     std::shared_ptr<arrow::Table> result_table;
     status = arrow::Table::FromRecordBatches(out_batches, &result_table);
@@ -167,7 +169,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     status = arrow::RecordBatchBuilder::Make(fact_table->schema(), arrow::default_memory_pool(), &out_batch_builder);
 
     auto* reader = new arrow::TableBatchReader(*fact_table);
-   //reader->set_chunksize(2 << 13);
+//    reader->set_chunksize(2 << 13);
     int* indices;
 
 //     long long accu = 0;
@@ -182,7 +184,12 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
         for(int i = 0; i < n_rows; i++){
             indices[i] = i;
         }
-
+//
+//        for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
+//            std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRate();
+//        }
+//        std::cout << std::endl;
+//    std::cout << in_batch->num_rows() << std::endl;
         for(int filter_index = 0; filter_index < n_dim; filter_index++){
             BloomFilter* bf_j = filters[filter_index];
 
@@ -203,7 +210,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
                 bf_j -> IncrementCount();
 
 //                start = std::chrono::high_resolution_clock::now();
-
+//
 //                stop = std::chrono::high_resolution_clock::now();
 //                //duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 //                duration = (stop - start);
@@ -225,12 +232,14 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
                 }
             }
         }
-
         std::sort(filters.begin(), filters.end(), BloomFilterCompare);
-//        for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
-//            std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRate();
-//        }
-//        std::cout << std::endl;
+
+        if (DEBUG) {
+            for (int filter_index = 0; filter_index < n_dim; filter_index++) {
+                std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRate() << " ";
+            }
+            std::cout << std::endl;
+        }
 
         arrow::Int64Builder indices_builder;
         std::shared_ptr<arrow::Array> indices_array;
@@ -549,7 +558,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
         filters.push_back(bf);
     }
     // long long chunk_size = 2 << 10;
-    std::cout << std::endl;
+
     // prepare to probe each fact
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
@@ -575,7 +584,10 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
         indices = (int *) malloc(n_rows * sizeof(int));
         int index_size = n_rows;
 
-
+//        for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
+//            std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRateK();
+//        }
+//        std::cout << std::endl;
         for (int i = 0; i < n_rows; i++) {
             indices[i] = i;
         }
@@ -614,7 +626,6 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
                     bf_j->IncrementPass();
                 }
             }
-            //std::cout<<bf_j->GetForeignKey() << " pass = " << pass << std::endl;
         }
 
 
@@ -622,10 +633,14 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
             filters[filter_index] -> BatchEndUpdate();
         }
         std::sort(filters.begin(), filters.end(), BloomFilterCompareK);
-//        for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
-//            std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRateK();
-//        }
-//        std::cout << std::endl;
+
+        if (DEBUG) {
+            for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
+                std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRateK();
+            }
+            std::cout << std::endl;
+        }
+
         /*
         for(int p = 0; p < n_dim; p++){
             std::cout << filters[p] -> GetFilterRate() << " ";
@@ -666,9 +681,136 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
 }
 
 
+std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPTime(std::shared_ptr<arrow::Table> fact_table,
+                                                   std::vector<JoinExecutor*> joinExecutors){
 
 
+    int n_dim = joinExecutors.size();
+
+    if (n_dim == 0){
+        return fact_table;
+    }
+
+    std::vector<BloomFilter*> filters;
+
+    for(int i = 0; i < n_dim; i++){
+        BloomFilter* bf = joinExecutors[i] -> ConstructBloomFilter();
+        //bf -> SetMemory(2);
+        filters.push_back(bf);
+    }
+
+    arrow::Status status;
+    std::shared_ptr<arrow::RecordBatch> in_batch;
 
 
+    std::vector<std::shared_ptr<arrow::ArrayData>> out_arrays;
+    std::unique_ptr<arrow::RecordBatchBuilder> out_batch_builder;
+    std::vector<std::shared_ptr<arrow::RecordBatch>> out_batches;
+
+    status = arrow::RecordBatchBuilder::Make(fact_table->schema(), arrow::default_memory_pool(), &out_batch_builder);
+
+    auto* reader = new arrow::TableBatchReader(*fact_table);
+
+    int* indices;
+
+    std::chrono::high_resolution_clock::time_point start;
+    std::chrono::high_resolution_clock::time_point stop;
+    std::chrono::high_resolution_clock::duration duration;
+
+    while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
+        int n_rows = in_batch->num_rows();
+        indices = (int *) malloc(n_rows * sizeof(int));
+        int index_size = n_rows;
+
+//        for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
+//            std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRateK();
+//        }
+//        std::cout << std::endl;
+        for (int i = 0; i < n_rows; i++) {
+            indices[i] = i;
+        }
+
+        for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
+            BloomFilter *bf_j = filters[filter_index];
+
+            std::string foreign_key_j = bf_j->GetForeignKey();
+
+            auto col_j = std::static_pointer_cast<arrow::Int64Array>(
+                    in_batch->GetColumnByName(foreign_key_j)
+            );
 
 
+            int index_i = 0;
+
+            start = std::chrono::high_resolution_clock::now();
+
+            while (index_i < index_size) {
+                int actual_index = indices[index_i];
+
+                long long key_i = col_j->Value(actual_index);
+
+                bf_j->IncrementCount();
+
+                if (!bf_j->Search(key_i)) {
+                    // swap the position at index_i and index_size - 1;
+                    int tmp = indices[index_i];
+                    indices[index_i] = indices[index_size - 1];
+                    indices[index_size - 1] = tmp;
+                    index_size--;
+                } else {
+                    index_i++;
+//                    bf_j->IncrementPass();
+                }
+            }
+
+            bf_j->time += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
+        }
+
+        std::sort(filters.begin(), filters.end(), BloomFilterCompareTime);
+
+        if (DEBUG) {
+            for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
+                if (filters[filter_index]->count > 0)
+                    std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->time/filters[filter_index]->count << " ";
+            }
+            std::cout << std::endl;
+        }
+
+        /*
+        for(int p = 0; p < n_dim; p++){
+            std::cout << filters[p] -> GetFilterRate() << " ";
+        }
+        std::cout << std::endl;
+        */
+        arrow::Int64Builder indices_builder;
+        std::shared_ptr<arrow::Array> indices_array;
+        status = indices_builder.AppendValues(indices, indices + index_size);
+        EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+        status = indices_builder.Finish(&indices_array);
+        EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+
+        // Instantiate things needed for a call to Take()
+        arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
+        arrow::compute::TakeOptions take_options;
+        auto *out = new arrow::compute::Datum();
+
+        for (int k = 0; k < in_batch->schema()->num_fields(); k++) {
+            status = arrow::compute::Take(&function_context, in_batch->column(k), indices_array, take_options, out);
+            EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+            out_arrays.push_back(out->array());
+        }
+
+        auto out_batch = arrow::RecordBatch::Make(in_batch->schema(), out_arrays[0]->length, out_arrays);
+        out_batches.push_back(out_batch);
+
+        out_arrays.clear();
+    }
+
+
+    std::shared_ptr<arrow::Table> result_table;
+    if (out_batches.size() > 0)
+        status = arrow::Table::FromRecordBatches(out_batches, &result_table);
+    EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
+    //return result_table;
+    return EvaluateJoinTree(result_table, joinExecutors);
+}

@@ -33,4 +33,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPResurrection(std::shared_ptr<ar
 std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table> fact_table, 
                                                 std::vector<JoinExecutor*> joinExecutors);
 
+std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPTime(std::shared_ptr<arrow::Table> fact_table,
+                                                   std::vector<JoinExecutor*> joinExecutors);
+
 #endif

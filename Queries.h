@@ -19,6 +19,7 @@ enum ALG{
 	LIP_XIATING, // cut off forever
 	LIP_RESURRECTION,
 	LIP_K, // remember the previous k tuples
+	TIME,
 	UNKNOWN,
 };
 

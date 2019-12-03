@@ -14,8 +14,7 @@ FACT_SCHEMA = ["ORDER KEY", "LINE NUMBER", "CUST KEY", "PART KEY", "SUPP KEY",
 FIELD = {}
 index = 0
 
-NUM_BATCHES = 562 # number of batches in fact table with SF = 1 and default chunksize
-
+#5999938	4	8450	58648	761	19970127	3-MEDIUM	0	1	160664	23230089	5	152630	96398	4	19970306	FOB	
 
 
 # create dictionary mapping column names to column indices
@@ -23,160 +22,307 @@ for field in FACT_SCHEMA:
 	FIELD[field] = index
 	index += 1
 
-
-def loadKeys():
-
-	custKeyList = []
-	partKeyList = []
-	suppKeyList = []
-	dateKeyList = []
-
-	years = [i for i in range(1992, 1998+1)]
-	months = [i for i in range(1, 12+1)]
-	days = [i for i in range(1,31+1)]
+def GetNumberOfBatches(filename):
+	file = open(filename, "r")
+	num_batches = 0
+	while (file.readline()):
+		num_batches += 1
+	return num_batches
 
 
-	i = 0
-	for year in years:
-		for month in months:
-			for day in days:
+dateKeyList = []
 
-				key = str(year)
-
-				if month < 10:
-					key += "0" + str(month)
-				else:
-					key += str(month)
+years = [i for i in range(1992, 1998+1)]
+months = [i for i in range(1, 12+1)]
+days = [i for i in range(1,31+1)]
 
 
-				if day == 31 and month not in [1,3,5,7,8,10,12]:
-					#key += str(day)
-					continue
-				elif year in [1992, 1996] and month == 2 and day == 29:
-					key += str(day)
-				elif month == 2 and day > 28:
-					continue
-				elif day < 10:
-					key += "0" + str(day)
-				else:
-					key += str(day)
+i = 0
+for year in years:
+	for month in months:
+		for day in days:
 
-				dateKeyList.append(key)
+			key = str(year)
 
-	custKeyList = [str(i) for i in range(1, 30000+1)]
-	partKeyList = [str(i) for i in range(1, 200000+1)]
-	suppKeyList = [str(i) for i in range(1, 2000+1)]
+			if month < 10:
+				key += "0" + str(month)
+			else:
+				key += str(month)
 
-	return custKeyList, partKeyList, suppKeyList, dateKeyList
 
-def GenerateRows():
+			if day == 31 and month not in [1,3,5,7,8,10,12]:
+				#key += str(day)
+				continue
+			elif year in [1992, 1996] and month == 2 and day == 29:
+				key += str(day)
+			elif month == 2 and day > 28:
+				continue
+			elif day < 10:
+				key += "0" + str(day)
+			else:
+				key += str(day)
 
-	custKeyList, partKeyList, suppKeyList, dateKeyList = loadKeys()
+			dateKeyList.append(key)
 
-	table_file = input_dir + "lineorder.tbl"
+custKeyList = [str(i) for i in range(1, 30000+1)]
+partKeyList = [str(i) for i in range(1, 200000+1)]
+suppKeyList = [str(i) for i in range(1, 2000+1)]
+
+# for i in range(len(dateKeyList)):
+# 	if dateKeyList[i].startswith("1997"):
+# 		print(i)
+
+# return custKeyList, partKeyList, suppKeyList, dateKeyList
+
+
+
+
+def date_first_half(batch_num, i, num_batches, debris):
+
+	if batch_num < num_batches//2:
+		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
+	elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
+		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
+
+
+def date_linear(batch_num, i, num_batches, debris):
+
+	if (debris[5].startswith("1997") or debris[5].startswith("1998")):
+		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
+	if random.random() < batch_num/num_batches:
+		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
+
+# convention: first digit = low selectivity batch
+def date_1_1(batch_num, i, num_batches, debris):
+
 	
+	if batch_num % 2 == 0:
+		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
+	elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
+		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
+
+	
+
+
+def date_2_1(batch_num, i, num_batches, debris):
+
+	
+
+	if batch_num % 3 < 2:
+		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
+	elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
+		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
+
+	
+
+def date_1_2(batch_num, i, num_batches, debris):
+
+	if batch_num % 3 < 1:
+		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
+	elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
+		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
+
+	
+
+def date_2_2(batch_num, i, num_batches, debris):
+
+	
+
+	if batch_num % 4 < 2:
+		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
+	elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
+
+		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
+
+	
+
+
+def cust_1_1(batch_num, i, num_batches, debris):
+	
+
+	field = FIELD["CUST KEY"]
+
+	if batch_num % 2 == 0:
+		debris[field] = "8450"
+	else:
+		debris[field] = "-1"
+
+	
+
+def part_2_2(batch_num, i, num_batches, debris):
+	
+
+	field = FIELD["PART KEY"]
+
+	if batch_num % 4 < 2:
+		debris[field] = "1"
+	else:
+		debris[field] = "-1"
+
+	
+
+def supp_1_2(batch_num, i, num_batches, debris):
+	
+
+	field = FIELD["SUPP KEY"]
+
+	if batch_num % 3 < 1:
+		debris[field] = "761"
+	else:
+		debris[field] = "-1"
+
+	
+
+def adversary(batch_num, i, num_batches, debris):
+
+
+	if batch_num == 0: 
+		# date selectivity is 2/5 for the first batch
+		if i < 6000000//num_batches*0.4:
+			debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
+			# datepass += 1
+		else:
+			debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
+		# 3/5 of the tuples that pass the date selection should pass the part selection,
+		# but the overall part selectivity for the batch should be less than the date selectivity.
+		if i < 6000000//num_batches*0.4*0.6:
+			debris[3] = "1"
+			# partpass += 1
+		else:
+			debris[3] = "-1"
+
+
+	# date selectivity = 1 on even batches
+	# part selectivity = 0 on even batches
+	else:
+		if batch_num % 2 == 1:
+			debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
+			debris[3] = "-1"
+		# date selectivity = 0 on odd batches (after first batch)
+		else:
+			debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
+			debris[3] = "1"
+
+	debris[2] = "8450"
+	debris[4] = "761"
+
+
+
+def randomCustKLey(line):
+
+	debris = line.split("|")
+
+	field = FIELD["CUST KEY"]
+
+	debris[field] = custKeyList	
+
+
+def GenerateRows(out_filename, batch_size_filename=""):
+
+	# Load valid keys
+	# custKeyList, partKeyList, suppKeyList, dateKeyList = loadKeys()
+
+	# Inout lineorder table from SF = 1 data set
+	table_file = input_dir + "lineorder.tbl"
 	infile = open(table_file, "r")
 
-	output_file = output_dir + "lineorder-1997-1998-20-20.tbl"
+	# output file
+	output_file = output_dir + out_filename
 	outfile = open(output_file, "w")
 
+	# sample line
 	line = infile.readline()[:-1]
 	sampleLine = line.split("|")
 	lineno = 1
 
+	# Get batch size info
+	num_batches = GetNumberOfBatches("./scripts/" + batch_size_filename);
+	batch_size_file = open("./scripts/" + batch_size_filename, "r")
+	batch_size = batch_size_file.readline()[:-1]
 
+	# Where the magic happens
+	batch_num = 0
+	while (batch_size):
 
-	custDist = UniformDistribution(custKeyList)
-	partDist = UniformDistribution(partKeyList)
-	suppDist = UniformDistribution(suppKeyList)
-	dateDist = UniformDistribution(dateKeyList)
+		# if (batch_num%num_batches == 10):
+		print("Writing batch",batch_num,"...")
+		batch_size = int(batch_size)
 
-	print("# Custkey:", len(custKeyList))
-	print("# Partkey:", len(partKeyList))
-	print("# Suppkey:", len(suppKeyList))
-	print("# Datekey:", len(dateKeyList))
+		for row in range(batch_size):
 
-	# dim_file = open(input_dir + "part.tbl")
-	# line = dim_file.readline()[:-1]
-
-	# good_keys = []
-	# line = dim_file.readline()[:-1]
-	# while line != "":
-			
-	# 	debris = line.split("|"	)
-
-	# 	if debris[2] == "MFGR#1" or debris[2] == "MFGR#2":
-	# 		good_keys.append(debris[0])
-
-	# 	line = dim_file.readline()[:-1]
-
-	# dim_file.close()
-
-	# Here, we can control which part of the distribution from which we want to generate tuples
-	# We can even sample from different distributions over time!
-	for batch_num in range(NUM_BATCHES):
-		print("Writing batch", batch_num, "...")
-		for i in range(6000000//NUM_BATCHES):
 			line = infile.readline()[:-1]
 			debris = line.split("|")
+			# Place your function to change the current line here
+			# toPrintLine = date_linear(batch_num, row, num_batches, line)
+			# toPrintLine = adversary(batch_num, row, num_batches, line)
+			if (out_filename == "lineorder-date-part-adversary.tbl"):
+				adversary(batch_num, row, num_batches, debris)
+				debris[2] = str(random.randint(1,30000))
+				debris[4] = str(random.randint(1,2000))
 
-			# odd batches have no 1993 keys
-			# even batcheas have only 1993 keys
-			if batch_num % 20 < 10:
-				debris[5] = "19970101"
-				print("1997")
-			elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
-				debris[5] = "19920101"
-				print("else")
+			elif (out_filename == "lineorder-date-1-1.tbl"):
+				date_1_1(batch_num, row, num_batches, debris)
+				debris[2] = str(random.randint(1,30000))
+				debris[3] = str(random.randint(1,200000))
+				debris[4] = str(random.randint(1,2000))
 
-			# if batch_num < NUM_BATCHES//2:
-			# 	debris[5] = "19970101"
-			# elif (debris[5].startswith("1997") or debris[5].startswith("1998")):
-			# 	debris[5] = "19920101"
-			
+			elif (out_filename == "lineorder-date-2-1.tbl"):
+				date_2_1(batch_num, row, num_batches, debris)
+				debris[2] = str(random.randint(1,30000))
+				debris[3] = str(random.randint(1,200000))
+				debris[4] = str(random.randint(1,2000))
 
-			# if batch_num % 4 != 3 and (debris[3] in good_keys):
-			# 	debris[3] = "-1"
-			# if batch_num % 4 == 3:
-			# 	debris[3] = "1"
 
-			toPrintLine = "|".join(debris)
-			print(toPrintLine, file=outfile)
+			elif (out_filename == "lineorder-date-1-2.tbl"):
+				date_1_2(batch_num, row, num_batches, debris)
+				debris[2] = str(random.randint(1,30000))
+				debris[3] = str(random.randint(1,200000))
+				debris[4] = str(random.randint(1,2000))
+
+			elif (out_filename == "lineorder-date-2-2.tbl"):
+				date_2_2(batch_num, row, num_batches, debris)
+				debris[2] = str(random.randint(1,30000))
+				debris[3] = str(random.randint(1,200000))
+				debris[4] = str(random.randint(1,2000))
+
+			elif (out_filename == "lineorder-date-linear.tbl"):
+				date_linear(batch_num, row, num_batches, debris)
+				debris[2] = str(random.randint(1,30000))
+				debris[3] = str(random.randint(1,200000))
+				debris[4] = str(random.randint(1,2000))
+
+
+			elif (out_filename == "lineorder-date-linear-part-2-2.tbl"):
+				date_linear(batch_num, row, num_batches, debris)
+				part_2_2(batch_num, row, num_batches, debris)
+				debris[2] = str(random.randint(1,30000))
+				debris[4] = str(random.randint(1,2000))
+
+			elif (out_filename =="lineorder-date-linear-part-2-2-cust-1-1.tbl"):
+				date_linear(batch_num, row, num_batches, debris)
+				part_2_2(batch_num, row, num_batches, debris)
+				cust_1_1(batch_num, row, num_batches, debris)
+				debris[4] = str(random.randint(1,2000))
+
+
+			elif (out_filename == "lineorder-date-linear-part-2-2-cust-1-1-supp-1-2.tbl"):
+				date_linear(batch_num, row, num_batches, debris)
+				part_2_2(batch_num, row, num_batches, debris)
+				cust_1_1(batch_num, row, num_batches, debris)
+				supp_1_2(batch_num, row, num_batches, debris)
+			else:
+				print("invalid filename")
+				break
+
+			line = "|".join(debris)
+			print(line, file=outfile)
+
+
+		batch_size = batch_size_file.readline()[:-1]
+		batch_num += 1
 
 	infile.close()
 	outfile.close()
-
-
-	# for k in range(NUM_BATCHES):
-	# 	print("Writing batch ", k, "...")
-	# 	for i in range(6000000//NUM_BATCHES):
-	# 		toPrint = sampleLine
-
-	# 		# toPrint[FIELD["CUST KEY"]] = custDist.sample(i, rows)
-	# 		# toPrint[FIELD["PART KEY"]] = partDist.sample(i, rows)
-	# 		# toPrint[FIELD["SUPP KEY"]] = suppDist.sample(i, rows)
-	# 		# toPrint[FIELD["ORDER DATE"]] = dateDist.sample(i, rows)
-
-	# 		toPrint[FIELD["CUST KEY"]] = custDist.sample()
-	# 		toPrint[FIELD["PART KEY"]] = partDist.sample()
-	# 		toPrint[FIELD["SUPP KEY"]] = suppDist.sample()
-	# 		toPrint[FIELD["ORDER DATE"]] = dateDist.sample()
-
-	# 		toPrintLine = "|".join(toPrint)
-	# 		print(toPrintLine, file=outfile)
-
-	# 	# UPDATE DISTRIBUTIONS HERE
-	# 	for i in range(len(dateDist.dist)):
-	# 		if dateKeyList[i].startswith("1993"):
-
-	# 			if (k % 20 < 10):
-	# 				dateDist.dist[i] += 0.1/365
-	# 			else:
-	# 				dateDist.dist[i] /= 2 
-	# 	dateDist.normalize()
-	# 	dateDist.computeAccu()
-
-	# outfile.close()
 
 
 """
@@ -185,23 +331,18 @@ increase linearly (while values at all other indices decrease linearly).
 
 It is assumed that the distribution will be updated after every batch.
 """
-def updateDistLinear(dist, indices):
-
-	for i in range(len(dist)):
-
-		if i in (i): 
-			dist[i] += 1/NUM_BATCHES/(len(indices))*(len(dist)-len(indices))
-		else:
-			dist[i] -= 1/NUM_BATCHES
-			if dist[i] <= 0: dist[i] = 0
-
-	return dist
 
 
 def main():
-	GenerateRows()
-	
-
+	GenerateRows("lineorder-date-part-adversary.tbl","batch-sizes-adversary.txt")
+	GenerateRows("lineorder-date-linear.tbl","batch-sizes-date.txt")
+	GenerateRows("lineorder-date-1-1.tbl","batch-sizes-date.txt")
+	GenerateRows("lineorder-date-2-1.tbl","batch-sizes-date.txt")
+	GenerateRows("lineorder-date-1-2.tbl","batch-sizes-date.txt")
+	GenerateRows("lineorder-date-2-2.tbl","batch-sizes-date.txt")
+	GenerateRows("lineorder-date-linear-part-2-2.tbl","batch-sizes-date.txt")
+	GenerateRows("lineorder-date-linear-part-2-2-cust-1-1.tbl","batch-sizes-date.txt")
+	GenerateRows("lineorder-date-linear-part-2-2-cust-1-1-supp-1-2.tbl","batch-sizes-date.txt")
 
 if __name__ == "__main__":
 	main()

@@ -6,8 +6,9 @@
 #include<vector>
 #include<string>
 #include<queue>
+#include <chrono>
 
-#define K_MEMORY 3
+#define K_MEMORY 4
 
 class BloomFilter{
 
@@ -18,7 +19,7 @@ private:
 	int* seeds;
 	
 	std::string foreign_key;
-	int count;
+	//int count;
 	int pass;
 
 
@@ -32,6 +33,8 @@ private:
 
 
 public:
+    int count;
+    long long time;
 
 	BloomFilter();
     BloomFilter(int num_insert, int k);
@@ -40,6 +43,7 @@ public:
 
 	double GetFilterRate();
     double GetFilterRateK();
+    double GetFilterRateTime();
 	void IncrementCount();
 	void IncrementPass();
 	void Reset();

@@ -55,6 +55,8 @@ int run(std::string q, std::string alg, std::string SF, bool enum_flag) {
         alg_flag = ALG::LIP_RESURRECTION;
     } else if (alg == "lipk") {
         alg_flag = ALG::LIP_K;
+    } else if (alg == "time") {
+        alg_flag = ALG::TIME;
     } else {
         alg_flag = ALG::UNKNOWN;
     }
@@ -219,6 +221,9 @@ void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<Joi
         case ALG::LIP_K:
             result_table = EvaluateJoinTreeLIPK(lineorder, tree);
             break;
+        case ALG::TIME:
+            result_table = EvaluateJoinTreeLIPTime(lineorder, tree);
+            break;
         default:
             std::cout << "Unknown algorithm" << std::endl;
             break;
@@ -227,6 +232,7 @@ void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<Joi
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     
     int numOfRows = result_table != nullptr ? result_table -> num_rows() : 0;
+//PrintTable(result_table, 0);
     std::cout << "Rows " << numOfRows << std::endl;
     std::cout << "RunningTime " << duration.count() << std::endl;
     //std::cout << duration.count() << std::endl;
@@ -858,7 +864,8 @@ int Query4_2(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "DATE KEY", "ORDER DATE");
     
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe, part_j_exe};
+    //std::vector <JoinExecutor*> tree = {customer_j_exe, date_j_exe, supplier_j_exe, part_j_exe};
+    std::vector <JoinExecutor*> tree = {date_j_exe, part_j_exe, supplier_j_exe, customer_j_exe};
 
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
@@ -917,8 +924,8 @@ int Query4_3(std::shared_ptr <arrow::Table> customer,
     JoinExecutor *date_j_exe = new JoinExecutor(date_s_exe_tree, "DATE KEY", "ORDER DATE");
     
 
-    std::vector <JoinExecutor*> tree = {customer_j_exe, part_j_exe, supplier_j_exe, date_j_exe};
-
+    //std::vector <JoinExecutor*> tree = {customer_j_exe, part_j_exe, supplier_j_exe, date_j_exe};
+    std::vector <JoinExecutor*> tree = {supplier_j_exe, date_j_exe, part_j_exe, customer_j_exe};
     if (enum_flag){
         RunAllPlans(lineorder, tree, alg_flag);
     }

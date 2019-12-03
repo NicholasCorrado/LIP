@@ -288,6 +288,8 @@ BloomFilter::BloomFilter(int num_insert, int k){
     }
 
     memory_k = k;
+    time = 0;
+
     for (int i=0; i<memory_k; i++) {
         pass_queue.push(0);
         count_queue.push(0);
@@ -440,6 +442,14 @@ double BloomFilter::GetFilterRateK() {
         return 1;
 }
 
+double BloomFilter::GetFilterRateTime() {
+    if (count > 0) {
+        return 1.0 * time/count;
+    }
+    else {
+        return 1;
+    }
+}
 
 /*
 	Sample test program to test the false positive rate.
@@ -496,6 +506,13 @@ bool BloomFilterCompareK( BloomFilter *lhs,  BloomFilter *rhs)
 {
     return lhs -> GetFilterRateK() < rhs -> GetFilterRateK();
 }
+
+bool BloomFilterCompareTime( BloomFilter *lhs,  BloomFilter *rhs)
+{
+    return lhs -> GetFilterRateTime() < rhs -> GetFilterRateTime();
+}
+
+
 
 /*
 	Sample test program to test adaptive filters.
