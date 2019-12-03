@@ -4,7 +4,7 @@
 #include <chrono>
 
 #define DEBUG 0
-
+#define CR 1
 std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table, std::string left_field, 
                                         std::shared_ptr<arrow::Table> right_table, std::string right_field) {
 
@@ -171,15 +171,17 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     auto* reader = new arrow::TableBatchReader(*fact_table);
 //    reader->set_chunksize(2 << 13);
     int* indices;
-
 //     long long accu = 0;
 //     long long count = 0;
+
+    int opt = 0;
+    int alg = 0;
+
 
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
         int n_rows = in_batch -> num_rows();
         indices = (int*)malloc(n_rows * sizeof(int));
         int index_size = n_rows;
-
 
         for(int i = 0; i < n_rows; i++){
             indices[i] = i;
@@ -209,6 +211,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
 
                 bf_j -> IncrementCount();
 
+                if(CR) alg++;
 //                start = std::chrono::high_resolution_clock::now();
 //
 //                stop = std::chrono::high_resolution_clock::now();
@@ -224,7 +227,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
                     int tmp = indices[index_i];
                     indices[index_i] = indices[index_size - 1];
                     indices[index_size - 1] = tmp;
-                    index_size--;
+                    index_size--;       
                 }
                 else{
                     index_i++;
@@ -232,6 +235,9 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
                 }
             }
         }
+        
+        if (CR) opt += (index_size) * (n_dim) + ( n_rows - index_size ) * 1;
+
         std::sort(filters.begin(), filters.end(), BloomFilterCompare);
 
         if (DEBUG) {
@@ -266,6 +272,11 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     }
 
     std::shared_ptr<arrow::Table> result_table;
+
+    if(CR){
+        double cr = opt == 0 ? 1 : 1.0 * alg / opt;
+        std::cout << "CR = " << alg << " / " << opt << " = "<<  cr << std::endl;
+    }
     if (out_batches.size() > 0)
         status = arrow::Table::FromRecordBatches(out_batches, &result_table);
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
@@ -310,6 +321,9 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPXiating(std::shared_ptr<arrow::
     // reader->set_chunksize(chunk_size);
     int* indices;
 
+    int opt = 0;
+    int alg = 0;
+
 
     int cutoff = filters.size()-1;
 
@@ -345,7 +359,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPXiating(std::shared_ptr<arrow::
                 long long key_i = col_j->Value(actual_index);
 
                 bf_j->IncrementCount();
-
+                alg ++;
                 if (!bf_j->Search(key_i)) {
                     //AddRowToRecordBatch(i, in_batch, out_batch_builder);
                     // swap the position at index_i and index_size - 1;
@@ -364,6 +378,9 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPXiating(std::shared_ptr<arrow::
                 cutoff = filter_index;
             }
         }
+
+
+        if (CR) opt += (index_size) * (cutoff) + ( n_rows - index_size ) * 1;
 
         std::sort(filters.begin(), filters.end(), BloomFilterCompare);
         /*
@@ -400,6 +417,11 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPXiating(std::shared_ptr<arrow::
     std::shared_ptr<arrow::Table> result_table;
     if (out_batches.size() > 0)
         status = arrow::Table::FromRecordBatches(out_batches, &result_table);
+
+    if(CR){
+        double cr = opt == 0 ? 1 : 1.0 * alg / opt;
+        std::cout << "CR = " << alg << " / " << opt << " = "<<  cr << std::endl;
+    }
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
     //return result_table;
     return EvaluateJoinTree(result_table, joinExecutors);
@@ -441,6 +463,9 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPResurrection(std::shared_ptr<ar
     // reader->set_chunksize(chunk_size);
     int* indices;
 
+    int opt = 0;
+    int alg = 0;
+
 
     int cutoff = filters.size()-1;
 
@@ -449,7 +474,6 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPResurrection(std::shared_ptr<ar
         int n_rows = in_batch->num_rows();
         indices = (int *) malloc(n_rows * sizeof(int));
         int index_size = n_rows;
-
 
         for (int i = 0; i < n_rows; i++) {
             indices[i] = i;
@@ -477,6 +501,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPResurrection(std::shared_ptr<ar
 
                 bf_j->IncrementCount();
 
+                if (CR) alg++;
                 if (!bf_j->Search(key_i)) {
                     //AddRowToRecordBatch(i, in_batch, out_batch_builder);
                     // swap the position at index_i and index_size - 1;
@@ -498,6 +523,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPResurrection(std::shared_ptr<ar
                 cutoff = filters.size() - 1;
             }
         }
+        if (CR) opt += (index_size) * (cutoff) + ( n_rows - index_size ) * 1;
 
         std::sort(filters.begin(), filters.end(), BloomFilterCompare);
         /*
@@ -534,6 +560,11 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPResurrection(std::shared_ptr<ar
     std::shared_ptr<arrow::Table> result_table;
     if (out_batches.size() > 0)
         status = arrow::Table::FromRecordBatches(out_batches, &result_table);
+
+    if(CR){
+        double cr = opt == 0 ? 1 : 1.0 * alg / opt;
+        std::cout << "CR = " << alg << " / " << opt << " = "<<  cr << std::endl;
+    }
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
     //return result_table;
     return EvaluateJoinTree(result_table, joinExecutors);
@@ -577,6 +608,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
 
     int* indices;
 
+    int opt = 0;
+    int alg = 0;
 
 
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
@@ -594,6 +627,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
         double prev_filter_rate = 0;
         //double selectivity = 1;
 
+        
 
         for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
             BloomFilter *bf_j = filters[filter_index];
@@ -615,6 +649,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
 
                 bf_j->IncrementCount();
 
+                if (CR) alg ++;
                 if (!bf_j->Search(key_i)) {
                     // swap the position at index_i and index_size - 1;
                     int tmp = indices[index_i];
@@ -632,6 +667,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
         for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
             filters[filter_index] -> BatchEndUpdate();
         }
+        if (CR) opt += (index_size) * (n_dim) + ( n_rows - index_size ) * 1;
+
         std::sort(filters.begin(), filters.end(), BloomFilterCompareK);
 
         if (DEBUG) {
@@ -675,6 +712,11 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
     std::shared_ptr<arrow::Table> result_table;
     if (out_batches.size() > 0)
         status = arrow::Table::FromRecordBatches(out_batches, &result_table);
+
+    if(CR){
+        double cr = opt == 0 ? 1 : 1.0 * alg / opt;
+        std::cout << "CR = " << alg << " / " << opt << " = "<<  cr << std::endl;
+    }
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
     //return result_table;
     return EvaluateJoinTree(result_table, joinExecutors);

@@ -15,11 +15,11 @@
 
 int run(std::string q, std::string alg, std::string SF, bool enum_flag) {
 
-    std::string file_path_customer  = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/customer.tbl";
-    std::string file_path_date      = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/date.tbl";
-    std::string file_path_lineorder = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/lineorder.tbl";
-    std::string file_path_part      = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/part.tbl";
-    std::string file_path_supplier  = "/Users/corrado/CLionProjects/CS764/benchmarks/benchmark-" + SF + "/supplier.tbl";
+    std::string file_path_customer  = "./benchmarks/benchmark-" + SF + "/customer.tbl";
+    std::string file_path_date      = "./benchmarks/benchmark-" + SF + "/date.tbl";
+    std::string file_path_lineorder = "./benchmarks/benchmark-" + SF + "/lineorder.tbl";
+    std::string file_path_part      = "./benchmarks/benchmark-" + SF + "/part.tbl";
+    std::string file_path_supplier  = "./benchmarks/benchmark-" + SF + "/supplier.tbl";
 
     std::vector<std::string> customer_schema    = {"CUST KEY", "NAME", "ADDRESS", "CITY", "NATION", "REGION", "PHONE",
                                                    "MKT SEGMENT"};
