@@ -80,7 +80,7 @@ initial text=$ $, % sets the text that appears on the start arrow
 \maketitle
 
 
-\abstract{In query optimization on star schemas, lookahead information passing (LIP) is a strategy exploiting the efficiency of probing succinct filters to eliminate almost all facts that do not participate in the final join results. Assuming data independency across all columns in the fact table, it achieves efficient and robust query optimization. This project presents some variants of LIP that can achieve empirically efficient query execution on fact table with correlated data columns, experimented on a skeleton database on top of Apache Arrow.}
+\abstract{In query optimization on star schemas, lookahead information passing (LIP) is a strategy exploiting the efficiency of probing succinct filters to eliminate practically all facts that do not appear in the final join results. Assuming data independency across all columns in the fact table, LIP achieves efficient and robust query optimization. We present some variants of LIP that can achieve empirically efficient query execution on fact table with correlated and even adversarial data columns, experimented on a skeleton database on top of Apache Arrow. We also analyze the performance of each variant of LIP using the notion of competitive ratio in online algorithms.}
 
 
 \section{Introduction}
