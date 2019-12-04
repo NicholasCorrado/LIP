@@ -247,9 +247,7 @@ void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<Joi
             result_table = EvaluateJoinTreeLIPResurrection(lineorder, tree);
             break;
         case ALG::LIP_K:
-            std::cout << "k = " << k << std::endl;
             result_table = EvaluateJoinTreeLIPK(lineorder, tree, k);
-            std::cout << "k = " << k << std::endl;
             break;
         case ALG::TIME:
             result_table = EvaluateJoinTreeLIPTime(lineorder, tree);
