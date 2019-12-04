@@ -8,6 +8,18 @@ fi
 
 echo $query
 
+
+# $dir - the directory for different data set
+# $k   - the memory for lip k
+# $i   - each individual run
+
+
+# $dir/lip_$i
+# $dir/lip-$k_$i
+# $dir/hash_$i  
+
+
+
 for i in `seq 1 5`;
 do
     echo "iteration $i"...
