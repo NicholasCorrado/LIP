@@ -407,12 +407,12 @@ bool BloomFilter::Search(std::string value){
 // Note: We assume that the queues are empty when we call this function.
 void BloomFilter::SetMemory(int _memory){
 
+    memory_k = _memory;
+
     for (int i=0; i<memory_k; i++) {
         pass_queue.push(0);
         count_queue.push(0);
     }
-
-	memory_k = _memory;
 }
 
 
