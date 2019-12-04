@@ -18,54 +18,41 @@ echo $query
 # $dir/lip-$k_$i
 # $dir/hash_$i  
 
+declare -a arr=("date-5-5" "date-10-10" "date-20-20" "date-50-50" "date-10-50" "date-50-10" "date-linear" "date-linear-part-20-20" "date-linear-part-20-20-supp-10-20" "date-part-adversary" "date-first-half")
 
-
-for i in `seq 1 5`;
+for i in `seq 1 1`;
 do
-    echo "iteration $i"...
+    
+    for dir in "${arr[@]}"
+    do
+        alg=hash
+        echo "iteration $i $dir $alg"...
+        ./csv_to_arrow $query $alg $dir 1 > scripts/data/$dir/hash_${i}
+        
+        alg=lip
+        echo "iteration $i $dir $alg"...
+        ./csv_to_arrow $query $alg $dir 1 > scripts/data/$dir/lip_${i}
+        
 
-    echo "lip date-5-5"
-    ./csv_to_arrow all lip skew-date-5-5 1 > scripts/data/date-5-5/lip_enum_$i
-    echo "lipk date-5-5"
-    ./csv_to_arrow all lipk skew-date-5-5 1 > scripts/data/date-5-5/lip3_enum_$i
+        for k in `seq 1 9`;
+        do
+            alg=lip$k
+            echo "iteration $i $dir $alg"...
+            ./csv_to_arrow $query lip$k $dir 1 > scripts/data/$dir/"lip-${k}_${i}"
+        done
 
-    echo "lip date-10-10"
-    ./csv_to_arrow all lip skew-date-10-10 1 > scripts/data/date-10-10/lip_enum_$i
-    echo "lipk date-10-10"
-    ./csv_to_arrow all lipk skew-date-10-10 1 > scripts/data/date-10-10/lip3_enum_$i
+        for k in `seq 10 5 50`;
+        do
+            alg=lip$k
+            echo "iteration $i $dir $alg"...
+            ./csv_to_arrow $query lip$k $dir 1 > scripts/data/$dir/lip-${k}_${i}
+        done 
 
-    echo "lip date-20-20"
-    ./csv_to_arrow all lip skew-date-20-20 1 > scripts/data/date-20-20/lip_enum_$i
-    echo "lipk date-20-20"
-    ./csv_to_arrow all lipk skew-date-20-20 1 > scripts/data/date-20-20/lip3_enum_$i
-
-    echo "lip date-50-50"
-    ./csv_to_arrow all lip skew-date-50-50 1 > scripts/data/date-50-50/lip_enum_$i
-    echo "lipk date-50-50"
-    ./csv_to_arrow all lipk skew-date-50-50 1 > scripts/data/date-50-50/lip3_enum_$i
-
-    echo "lip date-10-50"
-    ./csv_to_arrow all lip skew-date-10-50 1 > scripts/data/date-10-50/lip_enum_$i
-    echo "lipk date-10-50"
-    ./csv_to_arrow all lipk skew-date-10-50 1 > scripts/data/date-10-50/lip3_enum_$i
-
-    echo "lip date-50-10"
-    ./csv_to_arrow all lip skew-date-50-10 1 > scripts/data/date-50-10/lip_enum_$i
-    echo "lipk date-50-10"
-    ./csv_to_arrow all lipk skew-date-50-10 1 > scripts/data/date-50-10/lip3_enum_$i
-
-    echo "lip date-linear"
-    ./csv_to_arrow all lip skew-date-linear 1 > scripts/data/date-linear/lip_enum_$i
-    echo "lipk date-linear"
-    ./csv_to_arrow all lipk skew-date-linear 1 > scripts/data/date-linear/lip3_enum_$i
-
-    echo "lip date-linear-part-20-20"
-    ./csv_to_arrow all lip skew-date-linear-part-20-20 1 > scripts/data/date-linear-part-20-20/lip_enum_$i
-    echo "lipk date-linear-part-20-20"
-    ./csv_to_arrow all lipk skew-date-linear-part-20-20 1 > scripts/data/date-linear-part-20-20/lip3_enum_$i
-
-    echo "lip date-linear-part-20-20-supp-10-20"
-    ./csv_to_arrow all lip skew-date-linear-part-20-20-supp-10-20 1 > scripts/data/date-linear-part-20-20-supp-10-20/lip_enum_$i
-    echo "lipk date-linear-part-20-20-supp-10-20"
-    ./csv_to_arrow all lipk skew-date-linear-part-20-20-supp-10-20 1 > scripts/data/date-linear-part-20-20-supp-10-20/lip3_enum_$i
+        for k in `seq 60 10 100`;
+        do
+            alg=lip$k
+            echo "iteration $i $dir $alg"...
+            ./csv_to_arrow $query lip$k $dir 1 > scripts/data/$dir/lip-${k}_${i}
+        done 
+    done
 done
