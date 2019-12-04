@@ -273,7 +273,7 @@ BloomFilter::BloomFilter(){
 
 	The user can pass in a how many inserts will be performed.
 */
-BloomFilter::BloomFilter(int num_insert, int k){
+BloomFilter::BloomFilter(int num_insert){
     Reset();
     int n = num_insert;
     //numberOfHashes = int ( - log(FALSE_POSITIVE_RATE) / log(2));
@@ -286,14 +286,7 @@ BloomFilter::BloomFilter(int num_insert, int k){
     for(int i = 0; i < numberOfHashes; ++i){
         seeds[i] = rand() % MAX_SEED;
     }
-
-    memory_k = k;
     time = 0;
-
-    for (int i=0; i<memory_k; i++) {
-        pass_queue.push(0);
-        count_queue.push(0);
-    }
 }
 
 
@@ -411,7 +404,14 @@ bool BloomFilter::Search(std::string value){
 }
 
 
+// Note: We assume that the queues are empty when we call this function.
 void BloomFilter::SetMemory(int _memory){
+
+    for (int i=0; i<memory_k; i++) {
+        pass_queue.push(0);
+        count_queue.push(0);
+    }
+
 	memory_k = _memory;
 }
 

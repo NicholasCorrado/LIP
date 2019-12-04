@@ -573,7 +573,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPResurrection(std::shared_ptr<ar
 
 
 std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table> fact_table, 
-                                                std::vector<JoinExecutor*> joinExecutors){
+                                                std::vector<JoinExecutor*> joinExecutors, int k){
 
 
     int n_dim = joinExecutors.size();
@@ -586,7 +586,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
 
     for(int i = 0; i < n_dim; i++){
         BloomFilter* bf = joinExecutors[i] -> ConstructBloomFilter();
-        //bf -> SetMemory(2);
+        bf -> SetMemory(k);
         filters.push_back(bf);
     }
     // long long chunk_size = 2 << 10;
@@ -698,8 +698,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
         arrow::compute::TakeOptions take_options;
         auto *out = new arrow::compute::Datum();
 
-        for (int k = 0; k < in_batch->schema()->num_fields(); k++) {
-            status = arrow::compute::Take(&function_context, in_batch->column(k), indices_array, take_options, out);
+        for (int j = 0; j < in_batch->schema()->num_fields(); j++) {
+            status = arrow::compute::Take(&function_context, in_batch->column(j), indices_array, take_options, out);
             EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
             out_arrays.push_back(out->array());
         }

@@ -13,6 +13,8 @@
 #include "select.h"
 #include "util/util.h"
 
+int k = -1;
+
 int run(std::string q, std::string alg, std::string skew, std::string SF, bool enum_flag) {
 
 
@@ -64,7 +66,6 @@ int run(std::string q, std::string alg, std::string skew, std::string SF, bool e
     std::shared_ptr<arrow::Table> part        = build_table(file_path_part,      pool, part_schema);
     std::shared_ptr<arrow::Table> supplier    = build_table(file_path_supplier,  pool, supplier_schema);
 
-
     int alg_flag;
 
     if (alg == "lip") {
@@ -75,7 +76,8 @@ int run(std::string q, std::string alg, std::string skew, std::string SF, bool e
         alg_flag = ALG::LIP_XIATING;
     } else if (alg == "resur") {
         alg_flag = ALG::LIP_RESURRECTION;
-    } else if (alg == "lipk") {
+    } else if (alg.rfind("lip",0) == 0) {
+        k = std::stoi(alg.substr(3));
         alg_flag = ALG::LIP_K;
     } else if (alg == "time") {
         alg_flag = ALG::TIME;
@@ -245,7 +247,9 @@ void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<Joi
             result_table = EvaluateJoinTreeLIPResurrection(lineorder, tree);
             break;
         case ALG::LIP_K:
-            result_table = EvaluateJoinTreeLIPK(lineorder, tree);
+            std::cout << "k = " << k << std::endl;
+            result_table = EvaluateJoinTreeLIPK(lineorder, tree, k);
+            std::cout << "k = " << k << std::endl;
             break;
         case ALG::TIME:
             result_table = EvaluateJoinTreeLIPTime(lineorder, tree);

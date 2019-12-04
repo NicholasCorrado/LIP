@@ -14,7 +14,7 @@ void TestTrueNegative() {
 
     for (int num_cells=1000; num_cells<1000000; num_cells = num_cells + 1000) {
         //for (int num_insert = 100; num_insert< 2*num_cells; num_insert = num_insert + 100) {
-        BloomFilter *bf = new BloomFilter(num_insert, num_cells);
+        BloomFilter *bf = new BloomFilter(num_insert);
 
         for (int i = 0; i < num_insert; i++) {
             bf->Insert(rand() % 1000000);
@@ -57,7 +57,7 @@ void CostOFBloomFilterBuild() {
 
         start = std::chrono::high_resolution_clock::now();
 
-        BloomFilter *bf = new BloomFilter(num_insert, 3);
+        BloomFilter *bf = new BloomFilter(num_insert);
         for (int i = 0; i < num_insert; i++) {
             bf->Insert(rand());
         }
@@ -315,7 +315,7 @@ void BloomFilterProbeCostMiss() {
     int num_insert = 500;
     while (num_insert <= 3000000) {
 
-        BloomFilter *bf = new BloomFilter(num_insert, 3);
+        BloomFilter *bf = new BloomFilter(num_insert);
         for (int i = 0; i < num_insert; i++) {
             bf->Insert(rand() % (INT_MAX/2));
         }
@@ -360,7 +360,7 @@ void BloomFilterProbeCostHit() {
         // that will always be hits (while still being random)
         int randoms[num_insert];
 
-        BloomFilter *bf = new BloomFilter(num_insert, 3);
+        BloomFilter *bf = new BloomFilter(num_insert);
         for (int i = 0; i < num_insert; i++) {
             randoms[i] = rand();
             bf->Insert(randoms[i]);
