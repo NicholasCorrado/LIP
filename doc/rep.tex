@@ -1,6 +1,6 @@
         % % Title and author(s)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{Accelerating Joins with Filters}
+\title{Accelerating Joins with Filters: Keeping a Limited Memory}
 \author{Nicholas Corrado \and Xiating Ouyang}
 \date{}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,7 +80,7 @@ initial text=$ $, % sets the text that appears on the start arrow
 \maketitle
 
 
-\abstract{In query optimization on star schemas, lookahead information passing (LIP) is a strategy exploiting the efficiency of probing succinct filters to eliminate practically all facts that do not appear in the final join results before performing the actual join. Assuming data independency across all columns in the fact table, LIP achieves efficient and robust query optimization. We present some variants of LIP that can achieve empirically efficient query execution on fact table with correlated and even adversarial data columns, experimented on a skeleton database on top of Apache Arrow. We also analyze the performance of each variant of LIP using the notion of competitive ratio in online algorithms.}
+\abstract{In query optimization on star schemas, lookahead information passing (LIP) is a strategy exploiting the efficiency of probing succinct filters to eliminate practically all facts that do not appear in the final join results before performing the actual join. Assuming data independency across all columns in the fact table, LIP achieves efficient and robust query optimization. We present LIP-$k$, a variant of LIP that only remembers the hit/miss statistics for the previous $k$ batches, achieving empirically efficient query execution on fact table with correlated and even adversarial data columns. We implemented LIP and LIP-$k$ on a skeleton database on top of Apache Arrow and analyze the performance of each variant of LIP using the notion of competitive ratio in online algorithms.}
 
 
 \section{Introduction}
@@ -88,7 +88,7 @@ initial text=$ $, % sets the text that appears on the start arrow
 Performing join operations in database management systems using Star Schemas is a fundamental and prevalent task in the modern data industry. Continuous efforts have been spent on building a reliable query optimizer over the last few decades. However, the current optimizers may still produce disastrously inefficient query plans which involves processing unnecessarily gigantic intermediate tables \cite{leis2015good,rabl2013variations}. The \textit{lookahead Information Passing (LIP)} strategy aggressively uses Bloom Filters to filter the fact tables to effectively reduce the sizes of the intermediate tables, provably as efficient and robust as computing the join using the optimal query plan \cite{zhu2017looking}. The key idea behind LIP is to estimate the filter selectivity of each dimension table and adaptively reorder the sequence of applying the filters to the fact table. 
 
 
-The LIP strategy can also be modeled using an online algorithm setting. Suppose we fix $n$ filters, and the tuples in the fact table arrives in an online fashion. Upon arrival of each tuple, one has to decide a sequence of filters to probe the tuple, with an objective of minimizing the number of probes needed to decide whether to accept the tuple and forward it to the hash join phase, or to eliminate it. A mechanism deciding the sequence of applying the filters is thus crucial to the success of LIP. If a tuple passes all filters, \textit{all} mechanisms have to probe the tuple to all filters to confirm its passage; and if a tuple is eliminated by the filters, the \textit{optimal} mechanism would apply any filter that rejects the tuple in the first place, using only one probe. Thus given any fact table $F$, the number of probes that an optimal mechanism requires to process all tuples in the fact table can be readily computed: 
+The filtering process can be modeled as the \textsc{LIP} problem in an online setting: Suppose we fix $n$ filters, and the tuples in the fact table arrives in an online fashion. Upon arrival of each tuple, one has to decide a sequence of filters to probe the tuple, with an objective of minimizing the number of probes needed to decide whether to accept the tuple and forward it to the hash join phase, or to eliminate it. A mechanism deciding the sequence of applying the filters is thus crucial to the success of LIP. If a tuple passes all filters, \textit{all} mechanisms have to probe the tuple to all filters to confirm its passage; and if a tuple is eliminated by the filters, the \textit{optimal} mechanism would apply any filter that rejects the tuple in the first place, using only one probe. Thus given any fact table $F$, the number of probes that an optimal mechanism requires to process all tuples in the fact table can be readily computed: 
 \[
 	\textsc{OPT}(F) = n|F_{\text{pass}}| + |F_{\text{reject}}|,
 \]
@@ -99,10 +99,10 @@ where $|F_{\text{pass}}|$ and $|F_{\text{reject}}|$ are the number of tuples in 
 called the \textit{competitive ratio} of $\mathcal{M}$. The competitive ratio is always at least 1 by definition, and in this problem the competitive ratio is at most $n$, the number of filters, since one mechanism can probe each tuple to at most $n$ filters.
 
 
-In the practical perspective however, one wishes to minimize the total running time of LIP, which is effectively the sum of the running time of the mechanism and the running time of building the filters and performing the probes. A trade-off between having a near optimal mechanism that consumes much time and allowing many failed probes to eliminate each non-participating tuple is therefore of much interest. This project tries to balance the two levels by designing a good mechanism 
+In the practical perspective however, one wishes to minimize the total running time of LIP, which is effectively the sum of the running time of the mechanism and the running time of building the filters and performing the probes. A trade-off between having a near optimal mechanism that consumes much time and allowing many failed probes to eliminate each non-participating tuple is therefore of much interest. 
 
 
-This project aims at designing efficient LIP mechanisms and measure their performance in terms of their competitive ratio and their overall running time. We will build a skeleton database system on top of Apache Arrow supporting LIP and hash-joins to conduct our experiments and test the performance of our LIP mechanisms against the hash-join.
+This project aims at designing efficient LIP mechanisms and measure their performance in terms of their competitive ratio and their overall running time. We will build a skeleton database system on top of Apache Arrow supporting LIP and hash-joins to conduct our experiments and test the performance of our variant LIP mechanisms against the hash-join and the orignal LIP.
 
 
 %Experimental results show that as LIP uses more filters, the increase in performance improvement diminishes, displaying a concave curve. One reason is that if the cache cannot hold all filters, then evicting the filters causes significant overhead in the performance. Moreover, when probing each fact tuple against all filters, the more selective filters are inserted to cache first. When the cache is full, the cache manager has to evict a more selective filter so that a less selective filter can be inserted to cache. Once LIP switches to probing the next fact tuple, the more selective filter is inserted into the cache again, while one could have skipped probing against certain inselective filters to reduce the replacement overhead.
@@ -164,9 +164,10 @@ The partition in \cite{zhu2017looking} satisfies that $|F_{t+1}| = 2|F_{t}|$ at 
 	\label{fig:lip}
 \end{figure*}
 
+The LIP strategy is \textit{deterministic} in Figure \ref{fig:lip}, i.e.\ multiple executions of LIP over the same fact table should all produce the same result. Experimental results show almost optimal performance compared to the performance of hash join in the optimal sequence \cite{zhu2017looking}. However, it can be shown that deterministic mechanism in the worst case can never achieve a competitive ratio less than $n$.
 
 \begin{theorem}
-	Let $n$ be the number of filters in the LIP problem. There is no deterministic mechanism $\mathcal{M}$ achieving a competitive ratio less than $n$ for the LIP problem.
+	Let $n$ be the number of filters in the LIP problem. There is no deterministic mechanism $\mathcal{M}$ achieving a competitive ratio less than $n$ for the \textsc{LIP} problem.
 \end{theorem}
 
 \begin{proof}
@@ -177,110 +178,104 @@ The partition in \cite{zhu2017looking} satisfies that $|F_{t+1}| = 2|F_{t}|$ at 
 
 
 
-\section{Variant LIP Mechanisms}
+\section{LIP-$k$}
 
-In this section, we introduce 3 variants of LIP: LIP-CUT-OFF, LIP-CUT-OFF-RESUR and LIP-K. \xiating{Fill this.}
+% \subsection{LIP with Cut-Off}
+% The current LIP strategy builds the hash table on each dimension table in stage (1) and probes each fact tuple to each hash table to eliminate false positives in stage (2). It is somewhat equivalent to performing a hash join of (i) the filtered fact table with false positives and (ii) all the other dimension tables. The slight difference is that the hash join algorithm would inherently choose a joining sequence to perform the join, whereas the LIP strategy may probe each fact tuple to eliminate false positives in any order that the programmer wishes. There is no query optimizer in our constructed system, and thus no optimization overhead if we choose to use hash join to help us probing.
 
+% \begin{figure*}[h!]
+% 	\centering
+% 	\tikz\path (0,0) node[draw, text width=.8\textwidth, rectangle, inner xsep=20pt, inner ysep=10pt]{
+% 		\begin{minipage}[t!]{\textwidth}
+% 			{\sc Procedure}: \texttt{LIP-Cut-Off}
+% 			\\
+% 			{\sc Input}: a fact table $F$ and a set of $n$ Bloom filters $f_i$ for each $D_i$ with $1 \leq i \leq n$
+%  			\\
+% 			{\sc Output}: Indices of tuples in $F$ that pass the filtering
+% 			\begin{tabbing}
+% 				Aaa\=aaA\=Aaa\=Aaa\=Aaa\=AAAAAAAAAAAAAAAAAAAAAAAAA\=A \kill
+% 				1.\> Initialize $I = \emptyset$
+% 				\\
+% 				2.\> {\bf foreach } filter $f$ {\bf do}
+% 				\\
+% 				3.\>\> $count[f] \leftarrow 0$
+% 				\\
+% 				4.\>\> $pass[f] \leftarrow 0$ 
+% 				\\
+% 				5.\> Partition $F = \bigcup_{1 \leq t \leq T}F_t$. 
+% 				\\
+% 				6.\> {\bf foreach } fact block $F_t$ {\bf do} 
+% 				\\
+% 				7.\>\> {\bf foreach } filter $f$ in order {\bf do}
+% 				\\
+% 				8.\>\>\> {\bf foreach} index $j \in F_t$ {\bf do}
+% 				\\
+% 				9.\>\>\>\> $count[f] \leftarrow count[f] + 1$
+% 				\\
+% 				10.\>\>\>\> {\bf if }$f$ contains $F_t[j]$ 
+% 				\\
+% 				11.\>\>\>\>\> $I \leftarrow I \cup \{j\}$ 
+% 				\\
+% 				12.\>\>\>\>\> $pass[f] \leftarrow pass[f] + 1$
+% 				\\
+% 				13.\>\> {\bf sort} filters $f$ in nondesending order of $pass[f]/count[f]$
+% 				\\
+% 				14.\> {\bf return } $I$
+% 			\end{tabbing}  
+% 		\end{minipage}
+% 	};
+% 	\caption{The LIP algorithm for computing the joins.}
+% 	\label{fig:lip-cut}
+% \end{figure*}
 
-\subsection{LIP with Cut-Off}
-The current LIP strategy builds the hash table on each dimension table in stage (1) and probes each fact tuple to each hash table to eliminate false positives in stage (2). It is somewhat equivalent to performing a hash join of (i) the filtered fact table with false positives and (ii) all the other dimension tables. The slight difference is that the hash join algorithm would inherently choose a joining sequence to perform the join, whereas the LIP strategy may probe each fact tuple to eliminate false positives in any order that the programmer wishes. There is no query optimizer in our constructed system, and thus no optimization overhead if we choose to use hash join to help us probing.
+% \subsection{LIP with Cut-Off and Resurrection}
 
-\begin{figure*}[h!]
-	\centering
-	\tikz\path (0,0) node[draw, text width=.8\textwidth, rectangle, inner xsep=20pt, inner ysep=10pt]{
-		\begin{minipage}[t!]{\textwidth}
-			{\sc Procedure}: \texttt{LIP-Cut-Off}
-			\\
-			{\sc Input}: a fact table $F$ and a set of $n$ Bloom filters $f_i$ for each $D_i$ with $1 \leq i \leq n$
- 			\\
-			{\sc Output}: Indices of tuples in $F$ that pass the filtering
-			\begin{tabbing}
-				Aaa\=aaA\=Aaa\=Aaa\=Aaa\=AAAAAAAAAAAAAAAAAAAAAAAAA\=A \kill
-				1.\> Initialize $I = \emptyset$
-				\\
-				2.\> {\bf foreach } filter $f$ {\bf do}
-				\\
-				3.\>\> $count[f] \leftarrow 0$
-				\\
-				4.\>\> $pass[f] \leftarrow 0$ 
-				\\
-				5.\> Partition $F = \bigcup_{1 \leq t \leq T}F_t$. 
-				\\
-				6.\> {\bf foreach } fact block $F_t$ {\bf do} 
-				\\
-				7.\>\> {\bf foreach } filter $f$ in order {\bf do}
-				\\
-				8.\>\>\> {\bf foreach} index $j \in F_t$ {\bf do}
-				\\
-				9.\>\>\>\> $count[f] \leftarrow count[f] + 1$
-				\\
-				10.\>\>\>\> {\bf if }$f$ contains $F_t[j]$ 
-				\\
-				11.\>\>\>\>\> $I \leftarrow I \cup \{j\}$ 
-				\\
-				12.\>\>\>\>\> $pass[f] \leftarrow pass[f] + 1$
-				\\
-				13.\>\> {\bf sort} filters $f$ in nondesending order of $pass[f]/count[f]$
-				\\
-				14.\> {\bf return } $I$
-			\end{tabbing}  
-		\end{minipage}
-	};
-	\caption{The LIP algorithm for computing the joins.}
-	\label{fig:lip-cut}
-\end{figure*}
+% \begin{figure*}[h!]
+% 	\centering
+% 	\tikz\path (0,0) node[draw, text width=.8\textwidth, rectangle, inner xsep=20pt, inner ysep=10pt]{
+% 		\begin{minipage}[t!]{\textwidth}
+% 			{\sc Procedure}: \texttt{LIP-Cut-Off-with-Resurrection}
+% 			\\
+% 			{\sc Input}: a fact table $F$ and a set of $n$ Bloom filters $f_i$ for each $D_i$ with $1 \leq i \leq n$
+%  			\\
+% 			{\sc Output}: Indices of tuples in $F$ that pass the filtering
+% 			\begin{tabbing}
+% 				Aaa\=aaA\=Aaa\=Aaa\=Aaa\=AAAAAAAAAAAAAAAAAAAAAAAAA\=A \kill
+% 				1.\> Initialize $I = \emptyset$
+% 				\\
+% 				2.\> {\bf foreach } filter $f$ {\bf do}
+% 				\\
+% 				3.\>\> $count[f] \leftarrow 0$
+% 				\\
+% 				4.\>\> $pass[f] \leftarrow 0$ 
+% 				\\
+% 				5.\> Partition $F = \bigcup_{1 \leq t \leq T}F_t$. 
+% 				\\
+% 				6.\> {\bf foreach } fact block $F_t$ {\bf do} 
+% 				\\
+% 				7.\>\> {\bf foreach } filter $f$ in order {\bf do}
+% 				\\
+% 				8.\>\>\> {\bf foreach} index $j \in F_t$ {\bf do}
+% 				\\
+% 				9.\>\>\>\> $count[f] \leftarrow count[f] + 1$
+% 				\\
+% 				10.\>\>\>\> {\bf if }$f$ contains $F_t[j]$ 
+% 				\\
+% 				11.\>\>\>\>\> $I \leftarrow I \cup \{j\}$ 
+% 				\\
+% 				12.\>\>\>\>\> $pass[f] \leftarrow pass[f] + 1$
+% 				\\
+% 				13.\>\> {\bf sort} filters $f$ in nondesending order of $pass[f]/count[f]$
+% 				\\
+% 				14.\> {\bf return } $I$
+% 			\end{tabbing}  
+% 		\end{minipage}
+% 	};
+% 	\caption{The LIP algorithm for computing the joins.}
+% 	\label{fig:lip-resur}
+% \end{figure*}
 
-\subsection{LIP with Cut-Off and Resurrection}
-
-\begin{figure*}[h!]
-	\centering
-	\tikz\path (0,0) node[draw, text width=.8\textwidth, rectangle, inner xsep=20pt, inner ysep=10pt]{
-		\begin{minipage}[t!]{\textwidth}
-			{\sc Procedure}: \texttt{LIP-Cut-Off-with-Resurrection}
-			\\
-			{\sc Input}: a fact table $F$ and a set of $n$ Bloom filters $f_i$ for each $D_i$ with $1 \leq i \leq n$
- 			\\
-			{\sc Output}: Indices of tuples in $F$ that pass the filtering
-			\begin{tabbing}
-				Aaa\=aaA\=Aaa\=Aaa\=Aaa\=AAAAAAAAAAAAAAAAAAAAAAAAA\=A \kill
-				1.\> Initialize $I = \emptyset$
-				\\
-				2.\> {\bf foreach } filter $f$ {\bf do}
-				\\
-				3.\>\> $count[f] \leftarrow 0$
-				\\
-				4.\>\> $pass[f] \leftarrow 0$ 
-				\\
-				5.\> Partition $F = \bigcup_{1 \leq t \leq T}F_t$. 
-				\\
-				6.\> {\bf foreach } fact block $F_t$ {\bf do} 
-				\\
-				7.\>\> {\bf foreach } filter $f$ in order {\bf do}
-				\\
-				8.\>\>\> {\bf foreach} index $j \in F_t$ {\bf do}
-				\\
-				9.\>\>\>\> $count[f] \leftarrow count[f] + 1$
-				\\
-				10.\>\>\>\> {\bf if }$f$ contains $F_t[j]$ 
-				\\
-				11.\>\>\>\>\> $I \leftarrow I \cup \{j\}$ 
-				\\
-				12.\>\>\>\>\> $pass[f] \leftarrow pass[f] + 1$
-				\\
-				13.\>\> {\bf sort} filters $f$ in nondesending order of $pass[f]/count[f]$
-				\\
-				14.\> {\bf return } $I$
-			\end{tabbing}  
-		\end{minipage}
-	};
-	\caption{The LIP algorithm for computing the joins.}
-	\label{fig:lip-resur}
-\end{figure*}
-
-\subsection{LIP with $k$ memory}
-
-
-LIP algorithm in Figure \ref{fig:lip} estimates the selectivity of each filter using statistics from the very beginning, which is inefficient for certain distribution and physical layout of data. Consider some filter $f$ that is very selective for the first $t_0$ iterations at line 6 and not selective for the remaining iterations. (For example, a filter $f$ filtering for \texttt{year} $\geq 2017$ and the \texttt{Date} table is sorted in \texttt{year}.) In this case, LIP would obtain a good estimate of the selectivity of $f$ during the first $t_0$ iterations, and thus tend to apply $f$ early in the remaining iterations. However, it is in fact more efficient to postpone applying $f$ in the remaining iterations, despite $f$ has good selectivity in the first $t_0$ iterations. One remedy to this is to only ``remember" the hit/miss statistics of each filter over the previous $t^*$ iterations.
+LIP strategy in Figure \ref{fig:lip} estimates the selectivity of each filter using statistics from the very beginning, which is inefficient for certain distribution and physical layout of data. Consider some filter $f$ that is very selective for the first $t_0$ iterations at line 6 and not selective for the remaining iterations. (For example, a filter $f$ filtering for \texttt{year} $\geq 2017$ and the \texttt{Date} table is sorted in \texttt{year}.) In this case, LIP would obtain a good estimate of the selectivity of $f$ during the first $t_0$ iterations, and thus tend to apply $f$ early in the remaining iterations. However, it is in fact more efficient to postpone applying $f$ in the remaining iterations, despite $f$ has good selectivity in the first $t_0$ iterations. One remedy to this is to only ``remember" the hit/miss statistics of each filter over the previous $k$ iterations.
 
 \begin{figure*}[h!]
 	\centering
@@ -333,7 +328,7 @@ LIP algorithm in Figure \ref{fig:lip} estimates the selectivity of each filter u
 	\label{fig:lip-k}
 \end{figure*}
 
-
+We remark that LIP-$k$ is also deterministic, therefore prone to the worst case competitive ratio of $n$. However, empirical data shows that for the orignal SSB dataset and certain queries, LIP-$k$ is as fast as LIP, and for certain datasets and queries LIP-$k$ is faster than LIP. Detailed empirical data are presented and analyzed in Section \ref{sec:experiment}.
 
 \section{Database Implementation}
 
@@ -350,7 +345,8 @@ The succinct filter structure we choose is the Bloom filters. The default false-
 Our code is available at \url{https://github.com/NicholasCorrado/CS764}.
 
 
-\section{Empirical Results}
+
+\section{Empirical Results}\label{sec:experiment}
 
 
 The dataset for testing is obtained from the Star Schema Benchmark \cite{o2009star}. We will hard-code each queries in \cite{o2009star} to measure the join processing time.
@@ -372,28 +368,31 @@ The dataset for testing is obtained from the Star Schema Benchmark \cite{o2009st
 % \section{Experiments}
 
 
-\begin{comment}
+
 \section{Deploying lookahead filters in distributed systems}
 
-In this section we discuss a method to deploy the LIP filters in distributed systems. This method incorporates LIP and the \textsc{hypercube} algorithm \cite{zhu2017looking,}.
+In this section we discuss a method to deploy the LIP filters in distributed systems. This method incorporates LIP and the \textsc{hypercube} algorithm \cite{zhu2017looking}.
 
 
 Let $p$ be the number of machines available. Let $k_i$ be the primary key of $D_i$, and each tuple in the fact table $F$ possesses a foreign key to each $D_i$. Suppose $p = \prod_{1 \leq i \leq n} p_i$,  and then we label each of the $p$ machines with a coordinate $(x_1, x_2, \dots, x_n)$ where each $1 \leq x_i \leq p_i$.
 
-We first pick $n$ hash functions $h_i$ such that the range of each $h_i$ is $\{1, 2, \dots, p_i\}$. Then for each dimension table $D_i$ and for each primary key $k_i$ in $D_i$, we send $k_i$ to all machines with $i$-th component being $h_i(k_i)$. 
-
-\end{comment}
+We first pick $n$ hash functions $h_i$ such that the range of each $h_i$ is $\{1, 2, \dots, p_i\}$. Then for each dimension table $D_i$ and for each primary key $k_i$ in $D_i$, we send $k_i$ to all machines with $i$-th component being $h_i(k_i)$. Hence 
 
 
-% \section{Concluding remarks}
 
-\section{Future works}
+\section{Concluding remarks}
+
+% concluding remarks below
+
+
+
+% Future work below
 
 In this work, all variants have an adversarial fact table that would force the algorithm to achieve a competitive ratio of $n$. However, reasonable applications of some existing random online algorithm mechanisms may yield a competitive ratio of $O(\log n)$ using the weighted majority algorithm \cite{littlestone1994weighted}. However, multiplicative updates on the weights may change the weighted average filter to use, but will not change the sequence of all filters if only comparing them based on their weights. More work is required here to either provide a mechanism to achieve a better competitive ratio, or provide a lower bound reduction showing that the competitive ratio of $n$ is tight even for random mechanisms.
 
 
 \section*{Acknowledgement}
-The authors wish to thank Prof.\ Jignesh Patel for constant feedbacks on this project and Kevin Gaffney for helping us with Apache Arrow specifics.
+The authors wish to thank Prof.\ Jignesh Patel for constant feedbacks on this project and Kevin Gaffney for helping us with Apache Arrow specifics. The second author wishes to thank Prof.\ Paris Koutris for the suggestion of working on a practical project when the production of lemmas is jammed. It works.
 
 
 \bibliography{rep}{}
