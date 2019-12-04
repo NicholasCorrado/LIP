@@ -69,7 +69,7 @@ partKeyList = [str(i) for i in range(1, 200000+1)]
 suppKeyList = [str(i) for i in range(1, 2000+1)]
 
 # for i in range(len(dateKeyList)):
-# 	if dateKeyList[i].startswith("1997"):
+# 	if dateKeyList[i].startswith("1998"):
 # 		print(i)
 
 # return custKeyList, partKeyList, suppKeyList, dateKeyList
@@ -92,6 +92,13 @@ def date_linear(batch_num, i, num_batches, debris):
 	if random.random() < batch_num/num_batches:
 		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
 
+def date_linear_1998(batch_num, i, num_batches, debris):
+
+	if (debris[5].startswith("1998")):
+		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
+	if random.random() < 1-batch_num/num_batches:
+		debris[5] = str(dateKeyList[random.randint(2192, 2257-1)])
+
 # convention: first digit = low selectivity batch
 def date_1_1(batch_num, i, num_batches, debris):
 
@@ -102,8 +109,6 @@ def date_1_1(batch_num, i, num_batches, debris):
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 
 def date_2_1(batch_num, i, num_batches, debris):
-
-	
 
 	if batch_num % 3 < 2:
 		debris[5] = str(dateKeyList[random.randint(1827, 2257-1)])
@@ -363,6 +368,9 @@ def GenerateRows(out_filename, batch_size_filename=""):
 
 			elif (out_filename == "lineorder-date-linear.tbl"):
 				date_linear(batch_num, row, num_batches, debris)
+
+			elif (out_filename == "lineorder-date-linear-1998.tbl"):
+				date_linear_1998(batch_num, row, num_batches, debris)
 				# debris[2] = str(random.randint(1,30000))
 				# debris[3] = str(random.randint(1,200000))
 				# debris[4] = str(random.randint(1,2000))
@@ -411,6 +419,7 @@ It is assumed that the distribution will be updated after every batch.
 
 def main():
 
+	GenerateRows("lineorder-date-linear-1998.tbl", "batch-sizes-date.txt")
 	# GenerateRows("lineorder-date-5-5.tbl","batch-sizes-date.txt")
 	# GenerateRows("lineorder-date-10-10.tbl","batch-sizes-date.txt")
 	# GenerateRows("lineorder-date-20-20.tbl","batch-sizes-date.txt")
@@ -428,8 +437,8 @@ def main():
 	# GenerateRows("lineorder-date-1-2.tbl","batch-sizes-date.txt")
 	# GenerateRows("lineorder-date-2-2.tbl","batch-sizes-date.txt")
 
-	GenerateRows("lineorder-date-linear-part-20-20.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-linear-part-20-20-supp-10-20.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-linear-part-20-20.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-linear-part-20-20-supp-10-20.tbl","batch-sizes-date.txt")
 
 if __name__ == "__main__":
 	main()

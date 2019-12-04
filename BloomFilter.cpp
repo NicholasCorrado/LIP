@@ -430,6 +430,7 @@ void BloomFilter::BatchEndUpdate(){
 	pass_queue_sum += pass;
 	count_queue_sum += count;
 
+
     pass = 0;
 	count = 0;
 }

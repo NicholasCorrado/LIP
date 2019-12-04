@@ -50,32 +50,56 @@ def produce_plot(hash_file_base, start, end):
 	return hash_time	
 
 def plot(start, end):
-	lip_plot  = produce_plot("./scripts/data/date-1-1/lip_enum_", start, end)
-	lipk_plot = produce_plot("./scripts/data/date-1-1/lipk_enum_", start, end)
+	# lip_plot  = produce_plot("./scripts/data/date-5-5/lip_enum_", start, end)
+	# lipk_plot = produce_plot("./scripts/data/date-5-5/lipk_enum_", start, end)
 
-	plt.gca().legend(('LIP', 'LIPk'))
-	plt.show()
+	# plt.gca().legend(('LIP', 'LIPk'))
+	# plt.show()
 
-	lip_plot  = produce_plot("./scripts/data/date-1-2/lip_enum_", start, end)
-	lipk_plot = produce_plot("./scripts/data/date-1-2/lipk_enum_", start, end)
+	# lip_plot  = produce_plot("./scripts/data/date-10-10/lip_enum_", start, end)
+	# lipk_plot = produce_plot("./scripts/data/date-10-10/lipk_enum_", start, end)
 
-	plt.gca().legend(('LIP', 'LIPk'))
-	plt.show()	
+	# plt.gca().legend(('LIP', 'LIPk'))
+	# plt.show()	
 
-	lip_plot  = produce_plot("./scripts/data/date-2-1/lip_enum_", start, end)
-	lipk_plot = produce_plot("./scripts/data/date-2-1/lipk_enum_", start, end)
+	# lip_plot  = produce_plot("./scripts/data/date-20-20/lip_enum_", start, end)
+	# lipk_plot = produce_plot("./scripts/data/date-20-20/lipk_enum_", start, end)
 
-	plt.gca().legend(('LIP', 'LIPk'))
-	plt.show()	
+	# plt.gca().legend(('LIP', 'LIPk'))
+	# plt.show()	
 
-	lip_plot  = produce_plot("./scripts/data/date-2-2/lip_enum_", start, end)
-	lipk_plot = produce_plot("./scripts/data/date-2-2/lipk_enum_", start, end)
+	# lip_plot  = produce_plot("./scripts/data/date-50-50/lip_enum_", start, end)
+	# lipk_plot = produce_plot("./scripts/data/date-50-50/lipk_enum_", start, end)
 
-	plt.gca().legend(('LIP', 'LIPk'))
-	plt.show()	
+	# plt.gca().legend(('LIP', 'LIPk'))
+	# plt.show()	
 
-	lip_plot  = produce_plot("./scripts/data/date-linear/lip_enum_", start, end)
-	lipk_plot = produce_plot("./scripts/data/date-linear/lipk_enum_", start, end)
+	# lip_plot  = produce_plot("./scripts/data/date-10-50/lip_enum_", start, end)
+	# lipk_plot = produce_plot("./scripts/data/date-10-50/lipk_enum_", start, end)
+
+	# plt.gca().legend(('LIP', 'LIPk'))
+	# plt.show()	
+
+	# lip_plot  = produce_plot("./scripts/data/date-50-10/lip_enum_", start, end)
+	# lipk_plot = produce_plot("./scripts/data/date-50-10/lipk_enum_", start, end)
+
+	# plt.gca().legend(('LIP', 'LIPk'))
+	# plt.show()	
+
+	# lip_plot  = produce_plot("./scripts/data/date-linear/lip_enum_", start, end)
+	# lipk_plot = produce_plot("./scripts/data/date-linear/lipk_enum_", start, end)
+
+	# plt.gca().legend(('LIP', 'LIPk'))
+	# plt.show()
+
+	# lip_plot  = produce_plot("./scripts/data/date-linear-part-20-20/lip_enum_", start, end)
+	# lipk_plot = produce_plot("./scripts/data/date-linear-part-20-20/lipk_enum_", start, end)
+
+	# plt.gca().legend(('LIP', 'LIPk'))
+	# plt.show()
+
+	lip_plot  = produce_plot("./scripts/data/date-linear-part-20-20-supp-10-20/lip_enum_", start, end)
+	lipk_plot = produce_plot("./scripts/data/date-linear-part-20-20-supp-10-20/lipk_enum_", start, end)
 
 	plt.gca().legend(('LIP', 'LIPk'))
 	plt.show()
