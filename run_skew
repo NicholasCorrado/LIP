@@ -1,0 +1,74 @@
+make
+
+query=$1
+
+if [ "$#" -ne 1 ]; then
+    query=all
+fi
+
+echo $query
+
+for i in `seq 1 5`;
+do
+    echo "iteration $i"...
+
+    echo "lip date-1-1"
+    ./csv_to_arrow all lip skew-date-1-1 1 > scripts/data/date-1-1/lip_enum_$i
+    echo "lipk date-1-1"
+    ./csv_to_arrow all lipk skew-date-1-1 1 > scripts/data/date-1-1/lip3_enum_$i
+
+    echo "lip date-2-2"
+    ./csv_to_arrow all lip skew-date-2-2 1 > scripts/data/date-2-2/lip_enum_$i
+    echo "lipk date-2-2"
+    ./csv_to_arrow all lipk skew-date-2-2 1 > scripts/data/date-2-2/lip3_enum_$i
+
+    echo "lip date-5-5"
+    ./csv_to_arrow all lip skew-date-5-5 1 > scripts/data/date-5-5/lip_enum_$i
+    echo "lipk date-5-5"
+    ./csv_to_arrow all lipk skew-date-5-5 1 > scripts/data/date-5-5/lip3_enum_$i
+
+    echo "lip date-10-10"
+    ./csv_to_arrow all lip skew-date-10-10 1 > scripts/data/date-10-10/lip_enum_$i
+    echo "lipk date-10-10"
+    ./csv_to_arrow all lipk skew-date-10-10 1 > scripts/data/date-10-10/lip3_enum_$i
+
+    echo "lip date-20-20"
+    ./csv_to_arrow all lip skew-date-20-20 1 > scripts/data/date-20-20/lip_enum_$i
+    echo "lipk date-20-20"
+    ./csv_to_arrow all lipk skew-date-20-20 1 > scripts/data/date-20-20/lip3_enum_$i
+
+    echo "lip date-50-50"
+    ./csv_to_arrow all lip skew-date-50-50 1 > scripts/data/date-50-50/lip_enum_$i
+    echo "lipk date-50-50"
+    ./csv_to_arrow all lipk skew-date-50-50 1 > scripts/data/date-50-50/lip3_enum_$i
+
+    echo "lip date-10-50"
+    ./csv_to_arrow all lip skew-date-10-50 1 > scripts/data/date-10-50/lip_enum_$i
+    echo "lipk date-10-50"
+    ./csv_to_arrow all lipk skew-date-10-50 1 > scripts/data/date-10-50/lip3_enum_$i
+
+    echo "lip date-50-10"
+    ./csv_to_arrow all lip skew-date-50-10 1 > scripts/data/date-50-10/lip_enum_$i
+    echo "lipk date-50-10"
+    ./csv_to_arrow all lipk skew-date-50-10 1 > scripts/data/date-50-10/lip3_enum_$i
+
+    echo "lip date-25-25"
+    ./csv_to_arrow all lip skew-date-25-25 1 > scripts/data/date-25-25/lip_enum_$i
+    echo "lipk date-25-25"
+    ./csv_to_arrow all lipk skew-date-25-25 1 > scripts/data/date-25-25/lip3_enum_$i
+
+    echo "lip date-linear"
+    ./csv_to_arrow all lip skew-date-linear 1 > scripts/data/date-linear/lip_enum_$i
+    echo "lipk date-linear"
+    ./csv_to_arrow all lipk skew-date-linear 1 > scripts/data/date-linear/lip3_enum_$i
+
+    echo "lip date-linear-part-20-20"
+    ./csv_to_arrow all lip skew-date-linear-part-20-20 1 > scripts/data/date-linear-part-20-20/lip_enum_$i
+    echo "lipk date-linear-part-20-20"
+    ./csv_to_arrow all lipk skew-date-linear-part-20-20 1 > scripts/data/date-linear-part-20-20/lip3_enum_$i
+
+    echo "lip date-linear-part-20-20-supp-10-20"
+    ./csv_to_arrow all lip skew-date-linear-part-20-20-supp-10-20 1 > scripts/data/date-linear-part-20-20-supp-10-20/lip_enum_$i
+    echo "lipk date-linear-part-20-20-supp-10-20"
+    ./csv_to_arrow all lipk skew-date-linear-part-20-20-supp-10-20 1 > scripts/data/date-linear-part-20-20-supp-10-20/lip3_enum_$i
+done
