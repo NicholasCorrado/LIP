@@ -165,6 +165,18 @@ The partition in \cite{zhu2017looking} satisfies that $|F_{t+1}| = 2|F_{t}|$ at 
 \end{figure*}
 
 
+\begin{theorem}
+	Let $n$ be the number of filters in the LIP problem. There is no deterministic mechanism $\mathcal{M}$ achieving a competitive ratio less than $n$ for the LIP problem.
+\end{theorem}
+
+\begin{proof}
+	We present an adversary to the mechanism $\mathcal{M}$ such that $\mathcal{M}$ only achieves a competitive ratio of $n$ in the worst case. Let the $n$ filters be $f_1, f_2, \dots, f_n$ and consider $n$ tuples $t_1, t_2, \dots, t_n$, where $t_i \notin f_i$ but $t_i \in f_j$ for any $i \neq j$.
+
+	The adversary proceeds as follows: It first observes the sequence of filters $\sigma_t$ at any step $t$ set by the mechanism $\mathcal{M}$, and produce the input $f_{\sigma_t(n)}$ to the mechanism $\mathcal{M}$. Thus the mechanism $\mathcal{M}$ would require $n$ filter probes to eliminate $f_{\sigma_t(n)}$ at each step $t$, whereas the optimal sequence is to apply $\sigma_t(n)$ at the first place. Thus it yields a competitive ratio of $n$.
+\end{proof}
+
+
+
 \section{Variant LIP Mechanisms}
 
 In this section, we introduce 3 variants of LIP: LIP-CUT-OFF, LIP-CUT-OFF-RESUR and LIP-K. \xiating{Fill this.}
@@ -377,7 +389,7 @@ We first pick $n$ hash functions $h_i$ such that the range of each $h_i$ is $\{1
 
 \section{Future works}
 
-In this work, all variants have an adversarial fact table that would force the algorithm to achieve a competitive ratio of $n$. However, reasonable applications of some existing online algorithm mechanisms may yield a competitive ratio of $O(\log n)$ using the weighted majority algorithm \cite{littlestone1994weighted}.
+In this work, all variants have an adversarial fact table that would force the algorithm to achieve a competitive ratio of $n$. However, reasonable applications of some existing random online algorithm mechanisms may yield a competitive ratio of $O(\log n)$ using the weighted majority algorithm \cite{littlestone1994weighted}. However, multiplicative updates on the weights may change the weighted average filter to use, but will not change the sequence of all filters if only comparing them based on their weights. More work is required here to either provide a mechanism to achieve a better competitive ratio, or provide a lower bound reduction showing that the competitive ratio of $n$ is tight even for random mechanisms.
 
 
 \section*{Acknowledgement}
