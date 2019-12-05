@@ -4,7 +4,7 @@
 #include <chrono>
 
 #define DEBUG 0
-#define CR 0
+#define CR 1
 std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table, std::string left_field, 
                                         std::shared_ptr<arrow::Table> right_table, std::string right_field) {
 
@@ -276,7 +276,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
 
     if(CR){
         double cr = opt == 0 ? 1 : 1.0 * alg / opt;
-        std::cout << "CR = " << alg << " / " << opt << " = "<<  cr << std::endl;
+        std::cout << "CR " <<  cr << std::endl;
     }
     if (out_batches.size() > 0)
         status = arrow::Table::FromRecordBatches(out_batches, &result_table);
@@ -421,7 +421,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPXiating(std::shared_ptr<arrow::
 
     if(CR){
         double cr = opt == 0 ? 1 : 1.0 * alg / opt;
-        std::cout << "CR = " << alg << " / " << opt << " = "<<  cr << std::endl;
+        std::cout << "CR " <<  cr << std::endl;
     }
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
     //return result_table;
@@ -564,7 +564,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPResurrection(std::shared_ptr<ar
 
     if(CR){
         double cr = opt == 0 ? 1 : 1.0 * alg / opt;
-        std::cout << "CR = " << alg << " / " << opt << " = "<<  cr << std::endl;
+        std::cout << "CR " <<  cr << std::endl;
     }
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
     //return result_table;
@@ -717,7 +717,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
 
     if(CR){
         double cr = opt == 0 ? 1 : 1.0 * alg / opt;
-        std::cout << "CR = " << alg << " / " << opt << " = "<<  cr << std::endl;
+        std::cout << "CR " <<  cr << std::endl;
     }
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
     //return result_table;
