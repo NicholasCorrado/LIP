@@ -27,32 +27,32 @@ do
     do
         alg=hash
         echo "iteration $i $dir $alg"...
-        ./csv_to_arrow $query $alg $dir 1 > scripts/data/$dir/hash_${i}
+        ./csv_to_arrow $query $alg "skew-$dir" 1 > scripts/data/$dir/hash_${i}
         
         alg=lip
         echo "iteration $i $dir $alg"...
-        ./csv_to_arrow $query $alg $dir 1 > scripts/data/$dir/lip_${i}
+        ./csv_to_arrow $query $alg "skew-$dir" 1 > scripts/data/$dir/lip_${i}
         
 
         for k in `seq 1 9`;
         do
             alg=lip$k
             echo "iteration $i $dir $alg"...
-            ./csv_to_arrow $query lip$k $dir 1 > scripts/data/$dir/"lip-${k}_${i}"
+            ./csv_to_arrow $query lip$k "skew-$dir" 1 > scripts/data/$dir/"lip-${k}_${i}"
         done
 
         for k in `seq 10 5 50`;
         do
             alg=lip$k
             echo "iteration $i $dir $alg"...
-            ./csv_to_arrow $query lip$k $dir 1 > scripts/data/$dir/lip-${k}_${i}
+            ./csv_to_arrow $query lip$k "skew-$dir" 1 > scripts/data/$dir/lip-${k}_${i}
         done 
 
         for k in `seq 60 10 100`;
         do
             alg=lip$k
             echo "iteration $i $dir $alg"...
-            ./csv_to_arrow $query lip$k $dir 1 > scripts/data/$dir/lip-${k}_${i}
+            ./csv_to_arrow $query lip$k "skew-$dir" 1 > scripts/data/$dir/lip-${k}_${i}
         done 
     done
 done
