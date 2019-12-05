@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
+
+MSEC_TO_SEC = 1000000
+
 def GetQueryName(line):
 	return line.split()[2]
 		
@@ -60,7 +63,7 @@ def produce_time_plot(hash_file_base, start, end):
 	hash_time = []
 	
 	for q in hash_dict:
-		hash_time.append(min(hash_dict[q]))
+		hash_time.append(min(hash_dict[q]) / MSEC_TO_SEC)
 	
 	index = [i for i in range(1, len(hash_time)+1)]
 
@@ -108,9 +111,11 @@ def plot_time(start, end):
 		legend_label_list = ['Hash', 'LIP']
 		for i in lipK:
 			legend_label_list.append('LIP-' + str(i))
-		plt.gca().legend(tuple(legend_label_list))
-		# plt.show()
 
+		plt.gca().legend(tuple(legend_label_list))
+		plt.xlabel("Query #")
+		plt.ylabel("Running time (s)")
+		plt.show()
 
 
 def plot_cr(start, end):
@@ -134,25 +139,29 @@ def plot_cr(start, end):
 	lipK = lipK1 + lipK2 + lipK3 
 	
 	overall_cr = {}
-	overall_cr["lip"] = 1
 	for i in lipK:
 		alg_name = "lip" + str(i) 
 		overall_cr[alg_name] = 1
-
+	overall_cr["lip"] = 1
+	
 
 	for directory in directories:
 		dir_base = "./scripts/data/" + directory + "/"
 
-		cr_lip  = compute_competitive_ratio(dir_base + "lip_", start, end)
-		
-		overall_cr["lip"] = max(overall_cr["lip"], cr_lip)
 		
 		for i in lipK:
 			lip_i_cr = compute_competitive_ratio(dir_base + "lip-" + str(i) + "_", start, end)
 			alg_name = "lip" + str(i)
 			overall_cr[alg_name] = max(overall_cr[alg_name], lip_i_cr)
+		
+		cr_lip  = compute_competitive_ratio(dir_base + "lip_", start, end)
+		
+		overall_cr["lip"] = max(overall_cr["lip"], cr_lip)
 	
-	plt.plot([0] + lipK, list(overall_cr.values()), '-o')
+	plt.plot(lipK + [2*max(lipK)], list(overall_cr.values()), '-o')
+	plt.xlabel("k")
+	plt.ylabel("Comp. ratio ( = ALG #probes/ OPT #probes)")
+		
 	plt.show()
 
 
@@ -162,7 +171,7 @@ def main():
 	# 	plot(1, 2)
 	# else:
 	# 	plot(int(sys.argv[1]), int(sys.argv[2]))
-	# plot_time(1, 3)
+	plot_time(1, 3)
 	plot_cr(1, 3)
 	#ret, cr = GetDictionary(["./scripts/data/date-5-5/lip_1"])
 	#print(ret, cr)
