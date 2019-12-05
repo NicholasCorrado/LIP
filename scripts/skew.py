@@ -81,20 +81,20 @@ def date_first_half(batch_num, i, num_batches, debris):
 
 	if batch_num < num_batches//2:
 		debris[5] = str(dateKeyList[random.randint(2192, 2257-1)])
-	elif debris[5].startswith("1998"):
+	elif debris[5].startswith("1997") or debris[5].startswith("1998"):
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 
 
 def date_linear(batch_num, i, num_batches, debris):
 
-	if debris[5].startswith("1998"):
+	if debris[5].startswith("1998") or debris[5].startswith("1998"):
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 	if random.random() < batch_num/num_batches:
 		debris[5] = str(dateKeyList[random.randint(2192, 2257-1)])
 
 def date_linear_1998(batch_num, i, num_batches, debris):
 
-	if (debris[5].startswith("1998")):
+	if (debris[5].startswith("1998") or debris[5].startswith("1998")):
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 	if random.random() < 1-batch_num/num_batches:
 		debris[5] = str(dateKeyList[random.randint(2192, 2257-1)])
@@ -105,14 +105,14 @@ def date_1_1(batch_num, i, num_batches, debris):
 	
 	if batch_num % 2 == 0:
 		debris[5] = str(dateKeyList[random.randint(2192, 2257-1)])
-	elif debris[5].startswith("1998"):
+	debris[5].startswith("1997") or debris[5].startswith("1998"):
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 
 def date_2_1(batch_num, i, num_batches, debris):
 
 	if batch_num % 3 < 2:
 		debris[5] = str(dateKeyList[random.randint(2192, 2257-1)])
-	elif debris[5].startswith("1998"):
+	debris[5].startswith("1997") or debris[5].startswith("1998"):
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 
 	
@@ -121,7 +121,7 @@ def date_1_2(batch_num, i, num_batches, debris):
 
 	if batch_num % 3 < 1:
 		debris[5] = str(dateKeyList[random.randint(2192, 2257-1)])
-	elif debris[5].startswith("1998"):
+	debris[5].startswith("1997") or debris[5].startswith("1998"):
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 
 	
@@ -130,7 +130,7 @@ def date_2_2(batch_num, i, num_batches, debris):
 
 	if batch_num % 4 < 2:
 		debris[5] = str(dateKeyList[random.randint(2192, 2257-1)])
-	elif debris[5].startswith("1998"):
+	debris[5].startswith("1997") or debris[5].startswith("1998"):
 
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 
@@ -139,7 +139,7 @@ def date_5_5(batch_num, i, num_batches, debris):
 
 	if batch_num % 10 < 5:
 		debris[5] = str(dateKeyList[random.randint(2192, 2257-1)])
-	elif debris[5].startswith("1998"):
+	debris[5].startswith("1997") or debris[5].startswith("1998"):
 
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 	
@@ -147,7 +147,7 @@ def date_10_10(batch_num, i, num_batches, debris):
 
 	if batch_num % 20 < 10:
 		debris[5] = str(dateKeyList[random.randint(2192, 2257-1)])
-	elif debris[5].startswith("1998"):
+	debris[5].startswith("1997") or debris[5].startswith("1998"):
 
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 
@@ -155,7 +155,7 @@ def date_20_20(batch_num, i, num_batches, debris):
 
 	if batch_num % 40 < 20:
 		debris[5] = str(dateKeyList[random.randint(2192, 2257-1)])
-	elif debris[5].startswith("1998"):
+	debris[5].startswith("1997") or debris[5].startswith("1998"):
 
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 
@@ -164,7 +164,7 @@ def date_50_50(batch_num, i, num_batches, debris):
 
 	if batch_num % 100 < 50:
 		debris[5] = str(dateKeyList[random.randint(2192, 2257-1)])
-	elif debris[5].startswith("1998"):
+	debris[5].startswith("1997") or debris[5].startswith("1998"):
 
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 
@@ -172,7 +172,7 @@ def date_50_10(batch_num, i, num_batches, debris):
 
 	if batch_num % 60 < 50:
 		debris[5] = str(dateKeyList[random.randint(2192, 2257-1)])
-	elif debris[5].startswith("1998"):
+	debris[5].startswith("1997") or debris[5].startswith("1998"):
 
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 
@@ -180,14 +180,14 @@ def date_10_50(batch_num, i, num_batches, debris):
 
 	if batch_num % 60 < 10:
 		debris[5] = str(dateKeyList[random.randint(2192, 2257-1)])
-	elif debris[5].startswith("1998"):
+	debris[5].startswith("1997") or debris[5].startswith("1998"):
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 
 def date_25_25(batch_num, i, num_batches, debris):
 
 	if batch_num % 50 < 25:
 		debris[5] = str(dateKeyList[random.randint(2192, 2257-1)])
-	elif debris[5].startswith("1998"):
+	debris[5].startswith("1997") or debris[5].startswith("1998"):
 
 		debris[5] = str(dateKeyList[random.randint(0, 1827-1)])
 
