@@ -246,7 +246,8 @@ std::string BloomFilter::GetForeignKey(){
 }
 	
 
-
+//long long pq[3] = {0,0,0};
+//long long cq[3] = {0,0,0};
 
 
 /*
@@ -283,9 +284,15 @@ BloomFilter::BloomFilter(int num_insert){
     cells = std::vector<bool>(numberOfCells, false);
 
     seeds = (int*)malloc(numberOfHashes * sizeof(int));
-    for(int i = 0; i < numberOfHashes; ++i){
+    for(int i = 0; i < numberOfHashes; ++i) {
         seeds[i] = rand() % MAX_SEED;
     }
+
+    pass = 0;
+    count = 0;
+    pass_queue_sum = 0;
+    count_queue_sum = 0;
+
     time = 0;
 }
 
@@ -408,28 +415,31 @@ bool BloomFilter::Search(std::string value){
 void BloomFilter::SetMemory(int _memory){
 
     memory_k = _memory;
+    pass_queue = new int[memory_k];
+    count_queue = new int[memory_k];
 
-    for (int i=0; i<memory_k; i++) {
-        pass_queue.push(0);
-        count_queue.push(0);
-    }
+//    pass_queue = (long *) malloc(memory_k*sizeof(long));
+//    count_queue = (long *) malloc(memory_k*sizeof(long));
+//    pass_queue = std::make_unique<long *>(malloc(memory_k*sizeof(long)));
+//    count_queue = std::make_unique<long *>(malloc(memory_k*sizeof(long)));
+    queue_index = memory_k-1;
+
 }
 
 
 void BloomFilter::BatchEndUpdate(){
 
-    pass_queue_sum  -= pass_queue.front();
-    count_queue_sum -= count_queue.front();
+    pass_queue_sum  -= pass_queue[queue_index];
+    count_queue_sum -= pass_queue[queue_index];
 
-    pass_queue.pop();
-    count_queue.pop();
+    pass_queue[queue_index] = pass;
+    count_queue[queue_index] = count;
 
-	pass_queue.push(pass);
-    count_queue.push(count);
+    queue_index--;
+    if(queue_index < 0) queue_index = memory_k-1;
 
 	pass_queue_sum += pass;
 	count_queue_sum += count;
-
 
     pass = 0;
 	count = 0;

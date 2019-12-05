@@ -367,7 +367,7 @@ std::shared_ptr<arrow::Table> JoinExecutor::join(std::shared_ptr<arrow::Table> f
 
 BloomFilter* JoinExecutor::ConstructBloomFilter(){
     BloomFilter* bf = select_tree_exe -> ConstructBloomFilterNoFK(dim_primary_key);
-	
+
     bf -> SetForeignKey(fact_foreign_key);
 	return bf;
 }

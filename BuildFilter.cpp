@@ -21,7 +21,7 @@ BuildFilter(std::shared_ptr<arrow::Table> table,
                 std::string select_field,
                 std::shared_ptr<arrow::Scalar> value,
                 arrow::compute::CompareOperator op,
-                std::string key_field) {
+                std::string key_field, int k) {
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
@@ -30,7 +30,7 @@ BuildFilter(std::shared_ptr<arrow::Table> table,
 
     // We were using the default constructor, which uses the default filter size of 500000!!!
     //BloomFilter* bf = new BloomFilter();
-    BloomFilter* bf = new BloomFilter(table->num_rows());
+    BloomFilter* bf = new BloomFilter(table->num_rows()/2);
 
     // Instantiate things needed for a call to Compare()
     arrow::compute::FunctionContext function_context(arrow::default_memory_pool());
@@ -74,7 +74,7 @@ BuildFilter(std::shared_ptr<arrow::Table> table,
         A Bloomfilter bf of all the attributes passing the selection
 */
 
-BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, arrow::compute::CompareOperator op, std::string key_field) {
+BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::string value, arrow::compute::CompareOperator op, std::string key_field, int k) {
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
@@ -118,7 +118,7 @@ BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, std::string select
         A Bloomfilter bf of all the attributes passing the selection
 */
 
-BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::string lo, std::string hi, std::string key_field) {
+BloomFilter* BuildFilter(std::shared_ptr<arrow::Table> table, std::string select_field, std::string lo, std::string hi, std::string key_field, int k) {
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
@@ -170,7 +170,7 @@ BuildFilter(std::shared_ptr<arrow::Table> table,
                 std::string select_field, 
                 std::shared_ptr<arrow::Scalar> lo_value,
                 std::shared_ptr<arrow::Scalar> hi_value, 
-                std::string key_field) {
+                std::string key_field, int k) {
 
     arrow::Status status;
     std::shared_ptr<arrow::RecordBatch> in_batch;
