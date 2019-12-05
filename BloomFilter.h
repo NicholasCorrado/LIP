@@ -21,14 +21,20 @@ private:
 	int pass;
 
 
-	int pass_queue_sum;
-	int count_queue_sum;
+
+	long long pass_queue_sum;
+	long long count_queue_sum;
 
 	int memory_k;
-	std::queue<int> pass_queue;
-	std::queue<int> count_queue;
+//	std::queue<int> pass_queue;
+//	std::queue<int> count_queue;
 
+    int* pass_queue;
+    int* count_queue;
 
+//    std::unique_ptr<long*> pass_queue;
+//    std::unique_ptr<long*> count_queue;
+    int queue_index;
 
 public:
     int count;

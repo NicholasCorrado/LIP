@@ -4,7 +4,7 @@
 #include <chrono>
 
 #define DEBUG 0
-#define CR 0
+#define CR 1
 std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table, std::string left_field, 
                                         std::shared_ptr<arrow::Table> right_table, std::string right_field) {
 
@@ -177,7 +177,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     int opt = 0;
     int alg = 0;
 
-
+    long long accu = 0;
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
         int n_rows = in_batch -> num_rows();
         indices = (int*)malloc(n_rows * sizeof(int));
@@ -203,6 +203,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
 
 
             int index_i = 0;
+
 
             while (index_i < index_size){
                 int actual_index = indices[index_i];
@@ -232,14 +233,16 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
                 else{
                     index_i++;
                     bf_j -> IncrementPass();
+//                    std::cout<< line_num+actual_index << " " <<key_i << " " << bf_j->GetForeignKey() << std::endl;
                 }
             }
         }
         
         if (CR) opt += (index_size) * (n_dim) + ( n_rows - index_size ) * 1;
-
+//        auto start = std::chrono::high_resolution_clock::now();
         std::sort(filters.begin(), filters.end(), BloomFilterCompare);
-//        filters = tmp;
+//        auto stop = std::chrono::high_resolution_clock::now();
+//        accu += std::chrono::high_resolution_clock::duration(stop-start).count();
 
         if (DEBUG) {
             for (int filter_index = 0; filter_index < n_dim; filter_index++) {
@@ -271,7 +274,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
 
         out_arrays.clear();
     }
-
+//    std::cout<<"accu = " << accu << std::endl;
     std::shared_ptr<arrow::Table> result_table;
 
     if(CR){
@@ -612,16 +615,11 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
     int opt = 0;
     int alg = 0;
 
-
+    long long accu = 0;
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
         int n_rows = in_batch->num_rows();
         indices = (int *) malloc(n_rows * sizeof(int));
         int index_size = n_rows;
-
-//        for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
-//            std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRateK() << " ";
-//        }
-//        std::cout << std::endl;
 
         for (int i = 0; i < n_rows; i++) {
             indices[i] = i;
@@ -665,14 +663,20 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
             }
         }
 
-
+//        auto start = std::chrono::high_resolution_clock::now();
         for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
             filters[filter_index] -> BatchEndUpdate();
         }
-        if (CR) opt += (index_size) * (n_dim) + ( n_rows - index_size ) * 1;
+//        auto stop = std::chrono::high_resolution_clock::now();
+//        accu += std::chrono::high_resolution_clock::duration(stop-start).count();
+
 
         std::sort(filters.begin(), filters.end(), BloomFilterCompareK);
 
+
+        if (CR) opt += (index_size) * (n_dim) + ( n_rows - index_size ) * 1;
+
+//        accu += std::chrono::high_resolution_clock::duration(stop-start).count();
         if (DEBUG) {
             for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
                 std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRateK();
@@ -680,12 +684,6 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
             std::cout << std::endl;
         }
 
-        /*
-        for(int p = 0; p < n_dim; p++){
-            std::cout << filters[p] -> GetFilterRate() << " ";
-        }
-        std::cout << std::endl;
-        */
         arrow::Int64Builder indices_builder;
         std::shared_ptr<arrow::Array> indices_array;
         status = indices_builder.AppendValues(indices, indices + index_size);
@@ -709,7 +707,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
 
         out_arrays.clear();
     }
-
+//    std::cout<<"accu = " << accu << std::endl;
 
     std::shared_ptr<arrow::Table> result_table;
     if (out_batches.size() > 0)
