@@ -20,7 +20,7 @@ echo $query
 
 declare -a arr=("date-5-5" "date-10-10" "date-20-20" "date-50-50" "date-10-50" "date-50-10" "date-linear" "date-linear-part-20-20" "date-linear-part-20-20-supp-10-20" "date-part-adversary" "date-first-half")
 
-for i in `seq 1 1`;
+for i in `seq 1 5`;
 do
     
     for dir in "${arr[@]}"
