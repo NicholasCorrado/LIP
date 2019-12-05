@@ -3,7 +3,7 @@
 #include "util/sparsepp/spp.h"
 #include <chrono>
 
-#define DEBUG 0
+#define DEBUG 1
 #define CR 1
 std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table, std::string left_field, 
                                         std::shared_ptr<arrow::Table> right_table, std::string right_field) {
