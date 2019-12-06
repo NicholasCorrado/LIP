@@ -83,6 +83,7 @@
 \usepackage{xcolor}
 \usepackage{fancyvrb}
 \usepackage{float}
+\usepackage{pgffor}% http://ctan.org/pkg/pgffor
 \usepackage{pdfpages}
 \usepackage{pifont}% http://ctan.org/pkg/pifont
 \usepackage{subfig}
@@ -158,11 +159,31 @@ University of Wisconsin-Madison \\ % Your institution for the title page
 
 % lip slides here
 
-{
-\setbeamercolor{background canvas}{bg=}
-\includepdf[pages={1-}]{lip-animation.pdf}
+
+
+\foreach \n in {1,...,25} {%
+  \begin{frame}[noframenumbering]
+  \frametitle{Lookahead Information Passing (LIP)}
+  \begin{figure}
+    \centering
+    \includegraphics[page={\n},height=0.7\textheight,keepaspectratio]{lip-animation}
+    \end{figure}
+  \end{frame}
 }
 
+
+\begin{frame}[noframenumbering]
+  \frametitle{Lookahead Information Passing (LIP)}
+  \begin{figure}
+    \centering
+    \includegraphics[page={26},height=0.7\textheight,keepaspectratio]{lip-animation}
+  \end{figure}
+  \pause
+  \begin{itemize}
+    \item Using statistics from all previous batches
+    \item Just the previous $k$ \pause --- LIP-$k$
+  \end{itemize}
+\end{frame}
 % lip slides above
 
 \begin{frame}
@@ -186,11 +207,10 @@ University of Wisconsin-Madison \\ % Your institution for the title page
 
 \begin{frame}
 \frametitle{LIP is solving an online problem}
-\pause
 \begin{itemize}
-  \item Tuples arrive one at a time
-  \item Upon arrival, fix a sequence of filters
-  \item Minimize the total probes \pause
+  \item Tuples arriving one at a time
+  \item Upon arrival, decide a sequence of filters
+  \item Minimize the total probes
   \item Deterministic! \pause
 \end{itemize}
 
@@ -206,11 +226,23 @@ University of Wisconsin-Madison \\ % Your institution for the title page
 
 \end{frame}
 
+
+
 \begin{frame}
-  \frametitle{Competitive ratio vs.\ $k$}
+  \frametitle{Competitive ratio vs.\ $k$ on Uniform}
   \begin{figure}
     \centering
-    %\includegraphics[height=0.7\textheight,keepaspectratio]{ratio-k}
+    \includegraphics[height=0.7\textheight,keepaspectratio]{cr-k-uniform}
+  \end{figure}
+\end{frame}
+
+
+
+\begin{frame}
+  \frametitle{Competitive ratio vs.\ $k$ on skewed}
+  \begin{figure}
+    \centering
+    \includegraphics[height=0.7\textheight,keepaspectratio]{cr-k-skewed}
   \end{figure}
 \end{frame}
 

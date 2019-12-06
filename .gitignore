@@ -7,6 +7,9 @@
 !/doc/*.tex
 !/doc/*.bib
 !/doc/*.sty
+!/doc/*.pdf
+!/doc/pics/
+!/doc/pics/*
 !.gitignore
 !CMakeLists.txt
 !/scripts/

@@ -158,7 +158,11 @@ def plot_cr(start, end):
 		
 		overall_cr["lip"] = max(overall_cr["lip"], cr_lip)
 	
-	plt.plot(lipK + [2*max(lipK)], list(overall_cr.values()), '-o')
+	X = lipK + [2*max(lipK)]
+	Y = list(overall_cr.values())
+	print(X)
+	print(Y)
+	plt.plot(X, Y, '-o')
 	plt.xlabel("k")
 	plt.ylabel("Comp. ratio ( = ALG #probes/ OPT #probes)")
 		
@@ -171,8 +175,8 @@ def main():
 	# 	plot(1, 2)
 	# else:
 	# 	plot(int(sys.argv[1]), int(sys.argv[2]))
-	plot_time(1, 3)
-	plot_cr(1, 3)
+	plot_time(1000, 1001)
+	plot_cr(1000, 1001)
 	#ret, cr = GetDictionary(["./scripts/data/date-5-5/lip_1"])
 	#print(ret, cr)
 	
