@@ -158,7 +158,11 @@ def plot_cr(start, end):
 		
 		overall_cr["lip"] = max(overall_cr["lip"], cr_lip)
 	
-	plt.plot(lipK + [2*max(lipK)], list(overall_cr.values()), '-o')
+	X = lipK + [2*max(lipK)]
+	Y = list(overall_cr.values())
+	print(X)
+	print(Y)
+	plt.plot(X, Y, '-o')
 	plt.xlabel("k")
 	plt.ylabel("Comp. ratio ( = ALG #probes/ OPT #probes)")
 		
