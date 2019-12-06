@@ -418,17 +418,17 @@ It is assumed that the distribution will be updated after every batch.
 
 def main():
 
-	GenerateRows("lineorder-date-5-5.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-10-10.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-20-20.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-50-50.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-10-50.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-50-10.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-25-25.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-5-5.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-10-10.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-20-20.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-50-50.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-10-50.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-50-10.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-25-25.tbl","batch-sizes-date.txt")
 
-	GenerateRows("lineorder-date-part-adversary.tbl","batch-sizes-adversary.txt")
+	# GenerateRows("lineorder-date-part-adversary.tbl","batch-sizes-adversary.txt")
 	GenerateRows("lineorder-date-linear.tbl","batch-sizes-date.txt")
-	GenerateRows("lineorder-date-first-half.tbl","batch-sizes-date.txt")
+	# GenerateRows("lineorder-date-first-half.tbl","batch-sizes-date.txt")
 
 	# GenerateRows("lineorder-date-1-1.tbl","batch-sizes-date.txt")
 	# GenerateRows("lineorder-date-2-1.tbl","batch-sizes-date.txt")

@@ -96,19 +96,19 @@ def plot_time(start, end):
 	lipK2 = [i for i in range(10, 50, 5)]
 	lipK3 = [i for i in range(50, 110, 10)]
 
-	lipK = lipK1 + lipK2 + lipK3 
+	lipK = [1,5,10,20,40,60,80,100]#lipK1 + lipK2 + lipK3 
 		
 
 	for directory in directories:
 		dir_base = "./scripts/data/" + directory + "/"
 
-		hash_plot = produce_time_plot(dir_base + "hash_", start, end)
+		# hash_plot = produce_time_plot(dir_base + "hash_", start, end)
 		lip_plot  = produce_time_plot(dir_base + "lip_", start, end)
 		
 		for i in lipK:
 			lip_plot = produce_time_plot(dir_base + "lip-" + str(i) + "_", start, end)
 		
-		legend_label_list = ['Hash', 'LIP']
+		legend_label_list = ['LIP']
 		for i in lipK:
 			legend_label_list.append('LIP-' + str(i))
 
@@ -175,8 +175,8 @@ def main():
 	# 	plot(1, 2)
 	# else:
 	# 	plot(int(sys.argv[1]), int(sys.argv[2]))
-	plot_time(1000, 1001)
-	plot_cr(1000, 1001)
+	plot_time(1, 5)
+	# plot_cr(1, 2)
 	#ret, cr = GetDictionary(["./scripts/data/date-5-5/lip_1"])
 	#print(ret, cr)
 	

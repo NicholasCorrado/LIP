@@ -647,8 +647,13 @@ int Query3_2(std::shared_ptr <arrow::Table> customer,
     SelectExecutorTree *customer_s_exe_tree = new SelectExecutorTree(customer, customer_s_exe);
     // WHERE CUSTOMER.NATION = UNITED STATES
 
+    //@TODO: HERE. THIS SHOULD BE "NATION" == "UNITED STATES"
+//    SelectExecutor *supplier_s_exe      = new SelectExecutorStr(
+//                                            "REGION", "ASIA", arrow::compute::CompareOperator::EQUAL);
+
     SelectExecutor *supplier_s_exe      = new SelectExecutorStr(
-                                            "REGION", "ASIA", arrow::compute::CompareOperator::EQUAL);
+            "NATION", "UNITED STATES", arrow::compute::CompareOperator::EQUAL);
+
     SelectExecutorTree *supplier_s_exe_tree = new SelectExecutorTree(supplier, supplier_s_exe);
     // WHERE SUPPLIER REGION = ASIA
 

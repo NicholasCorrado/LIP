@@ -179,6 +179,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
 
     long long accu = 0;
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
+//        std::cout << "batchsize = " << in_batch->num_rows()<< std::endl;
         int n_rows = in_batch -> num_rows();
         indices = (int*)malloc(n_rows * sizeof(int));
         int index_size = n_rows;
@@ -237,7 +238,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
                 }
             }
         }
-        
+        // cost of probing all passing tuples + cost of immediately rejecting all not passing tuples
         if (CR) opt += (index_size) * (n_dim) + ( n_rows - index_size ) * 1;
 //        auto start = std::chrono::high_resolution_clock::now();
         std::sort(filters.begin(), filters.end(), BloomFilterCompare);
@@ -280,6 +281,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     if(CR){
         double cr = opt == 0 ? 1 : 1.0 * alg / opt;
         std::cout << "CR " <<  cr << std::endl;
+        std::cout << "alg " << alg << std::endl;
+        std::cout << "opt " << opt << std::endl;
     }
     if (out_batches.size() > 0)
         status = arrow::Table::FromRecordBatches(out_batches, &result_table);
@@ -716,6 +719,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
     if(CR){
         double cr = opt == 0 ? 1 : 1.0 * alg / opt;
         std::cout << "CR " <<  cr << std::endl;
+        std::cout << "alg " << alg << std::endl;
+        std::cout << "opt " << opt << std::endl;
     }
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
     //return result_table;
