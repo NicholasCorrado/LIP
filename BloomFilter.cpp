@@ -476,7 +476,7 @@ double BloomFilter::GetFilterRateK() {
 
 double BloomFilter::GetFilterRateTime() {
     if (count > 0) {
-        return 1.0 * time/count;
+        return time/count;
     }
     else {
         return 1;

@@ -3,8 +3,12 @@
 #include "util/sparsepp/spp.h"
 #include <chrono>
 
-#define DEBUG 0
+
+#define DEBUG 1
 #define CR 1
+
+
+
 std::shared_ptr<arrow::Table> HashJoin(std::shared_ptr<arrow::Table> left_table, std::string left_field, 
                                         std::shared_ptr<arrow::Table> right_table, std::string right_field) {
 
@@ -187,6 +191,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
         for(int i = 0; i < n_rows; i++){
             indices[i] = i;
         }
+
+        int prev_alg = alg;
 //
 //        for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
 //            std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRate();
@@ -252,6 +258,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
             std::cout << std::endl;
         }
 
+//        if (DEBUG) std::cout << "misses = " << alg-prev_alg << std::endl;
         arrow::Int64Builder indices_builder;
         std::shared_ptr<arrow::Array> indices_array;
         status = indices_builder.AppendValues(indices,indices+index_size);
@@ -619,6 +626,9 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
     int alg = 0;
 
     long long accu = 0;
+
+
+
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
         int n_rows = in_batch->num_rows();
         indices = (int *) malloc(n_rows * sizeof(int));
@@ -630,7 +640,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
         double prev_filter_rate = 0;
         //double selectivity = 1;
 
-        
+        int prev_alg = alg;
 
         for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
             BloomFilter *bf_j = filters[filter_index];
@@ -685,6 +695,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
                 std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->GetFilterRateK();
             }
             std::cout << std::endl;
+
+           std::cout << "misses = " << alg-prev_alg << std::endl;
         }
 
         arrow::Int64Builder indices_builder;
@@ -728,6 +740,22 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
 }
 
 
+
+
+
+
+static inline unsigned long long getticks(void)
+{
+    unsigned int lo, hi;
+
+    // RDTSC copies contents of 64-bit TSC into EDX:EAX
+    asm volatile("rdtsc" : "=a" (lo), "=d" (hi));
+    return (unsigned long long)hi << 32u | lo;
+}
+
+
+
+
 std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPTime(std::shared_ptr<arrow::Table> fact_table,
                                                    std::vector<JoinExecutor*> joinExecutors){
 
@@ -760,9 +788,13 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPTime(std::shared_ptr<arrow::Tab
 
     int* indices;
 
-    std::chrono::high_resolution_clock::time_point start;
-    std::chrono::high_resolution_clock::time_point stop;
-    std::chrono::high_resolution_clock::duration duration;
+//    std::chrono::high_resolution_clock::time_point start;
+//    std::chrono::high_resolution_clock::time_point stop;
+//    std::chrono::high_resolution_clock::duration duration;
+    unsigned long long start = 0;
+    unsigned long long stop = 0;
+    int opt = 0;
+    int alg = 0;
 
     while (reader->ReadNext(&in_batch).ok() && in_batch != nullptr) {
         int n_rows = in_batch->num_rows();
@@ -777,6 +809,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPTime(std::shared_ptr<arrow::Tab
             indices[i] = i;
         }
 
+        start = getticks();
+
         for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
             BloomFilter *bf_j = filters[filter_index];
 
@@ -789,7 +823,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPTime(std::shared_ptr<arrow::Tab
 
             int index_i = 0;
 
-            start = std::chrono::high_resolution_clock::now();
+//            start = std::chrono::high_resolution_clock::now();
 
             while (index_i < index_size) {
                 int actual_index = indices[index_i];
@@ -797,7 +831,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPTime(std::shared_ptr<arrow::Tab
                 long long key_i = col_j->Value(actual_index);
 
                 bf_j->IncrementCount();
-
+                if (CR) alg++;
                 if (!bf_j->Search(key_i)) {
                     // swap the position at index_i and index_size - 1;
                     int tmp = indices[index_i];
@@ -810,18 +844,23 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPTime(std::shared_ptr<arrow::Tab
                 }
             }
 
-            bf_j->time += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
+//            bf_j->time += std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count();
+            stop = getticks();
+            bf_j->time += stop - start;
+
         }
 
+        if (CR) opt += (index_size) * (n_dim) + ( n_rows - index_size ) * 1;
         std::sort(filters.begin(), filters.end(), BloomFilterCompareTime);
 
         if (DEBUG) {
             for (int filter_index = 0; filter_index < n_dim ; filter_index++) {
-                if (filters[filter_index]->count > 0)
-                    std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->time/filters[filter_index]->count << " ";
+//                if (filters[filter_index]->count > 0)
+                    std::cout << filters[filter_index]->GetForeignKey() << " " << filters[filter_index]->time << " ";
             }
             std::cout << std::endl;
         }
+
 
         /*
         for(int p = 0; p < n_dim; p++){
@@ -847,13 +886,17 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPTime(std::shared_ptr<arrow::Tab
             out_arrays.push_back(out->array());
         }
 
+
         auto out_batch = arrow::RecordBatch::Make(in_batch->schema(), out_arrays[0]->length, out_arrays);
         out_batches.push_back(out_batch);
 
         out_arrays.clear();
     }
 
-
+    if(CR) {
+        double cr = opt == 0 ? 1 : 1.0 * alg / opt;
+        std::cout<< "CR " << cr <<std::endl;
+    }
     std::shared_ptr<arrow::Table> result_table;
     if (out_batches.size() > 0)
         status = arrow::Table::FromRecordBatches(out_batches, &result_table);

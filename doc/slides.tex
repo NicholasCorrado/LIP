@@ -12,7 +12,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %----------------------------------------------------------------------------------------
-%	PACKAGES AND THEMES
+% PACKAGES AND THEMES
 %----------------------------------------------------------------------------------------
 
 \documentclass{beamer}
@@ -77,6 +77,7 @@
 }
 \usepackage{amsthm,amsmath,amssymb,upgreek,marvosym,mathtools}
 \usepackage{graphicx}
+\usepackage{multirow,bigdelim}
 \graphicspath{ {./pics/} }
 
 \usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
@@ -121,7 +122,7 @@ initial text=$ $, % sets the text that appears on the start arrow
 \newcommand{\coNP}{$\mathbf{coNP}$}
 \newcommand{\und}[1]{\underline{#1}}
 \newcommand{\nl}{$\mathbf{NL}$}
-
+\newcommand{\sel}[1]{\sigma_{\text{#1}}}
 
 \title[LIP with limited memory]{Accelerating Joins with Filters: Keeping a Limited Memory is Robust} % The short title appears at the bottom of every slide, the full title is only on the title page
 
@@ -152,8 +153,8 @@ University of Wisconsin-Madison \\ % Your institution for the title page
 \end{figure}
 
 \begin{itemize}
-  \item Gigantic intermediate tables
-  \item Filtering ahead of time before join
+  \item If the query optimizer chooses a poor join order, intermediate join results may be unnecessarily large.
+  \item Solution: try to filter out extraneous tuples before performing joins
 \end{itemize}
 \end{frame}
 
@@ -180,8 +181,11 @@ University of Wisconsin-Madison \\ % Your institution for the title page
   \end{figure}
   \pause
   \begin{itemize}
-    \item Using statistics from all previous batches
-    \item Just the previous $k$ \pause --- LIP-$k$
+    \item LIP uses statistics from all previous batches to compute $\sigma$
+    \begin{itemize}
+        \item Slow response to local changes in key distributions
+    \end{itemize}
+    \item \textbf{LIP-k}: Only use the previous $k$ batches to compute $\sigma$
   \end{itemize}
 \end{frame}
 % lip slides above
@@ -195,12 +199,42 @@ University of Wisconsin-Madison \\ % Your institution for the title page
 \end{frame}
 
 
+
 \begin{frame}
-  \frametitle{Experiments}
+  \frametitle{An Example Experiment}
+    \begin{tabular}{|c|l} 
+    \cline{1-1}
+    \textbf{Skewed Key} & \\
+    \cline{1-1}
+    $\sigma = 1$ & \rdelim\}{3.5}{3mm}[50 batches] \\ 
+    \cline{1-1}
+    $\vdots$ & \\ 
+    \cline{1-1}
+    $\sigma = 1$  & \\
+    \cline{1-1}
+    $\sigma = 0$  & \rdelim\}{3.5}{3mm}[50 batches] \\ 
+    \cline{1-1}
+    $\vdots$ &\\
+    \cline{1-1}
+    $\sigma = 0$ &\\
+    \cline{1-1}
+    $\sigma = 1$ & \rdelim\}{3.5}{3mm}[50 batches] \\ 
+    \cline{1-1} 
+    $\vdots$ &\\
+    \cline{1-1}
+    $\sigma = 1$ & \\
+    \cline{1-1}
+    $\vdots$ & \\
+    \cline{1-1}
+    \end{tabular}
   \begin{figure}
     \centering
     %\includegraphics[height=0.7\textheight,keepaspectratio]{time-graph}
   \end{figure}
+  \begin{itemize}
+      \item LIP-k perform performs better than LIP on some queries...
+      \item ...but LIP performs better on others... 
+  \end{itemize}
 \end{frame}
 
 
@@ -229,7 +263,7 @@ University of Wisconsin-Madison \\ % Your institution for the title page
 
 
 \begin{frame}
-  \frametitle{Competitive ratio vs.\ $k$ on Uniform}
+  \frametitle{Competitive Ratio vs.\ $k$ on Uniform Data}
   \begin{figure}
     \centering
     \includegraphics[height=0.7\textheight,keepaspectratio]{cr-k-uniform}
@@ -239,7 +273,10 @@ University of Wisconsin-Madison \\ % Your institution for the title page
 
 
 \begin{frame}
-  \frametitle{Competitive ratio vs.\ $k$ on skewed}
+  \frametitle{Competitive Ratio vs.\ $k$ on Adversarial Data}
+  \begin{itemize}
+      \item Adversarial dataset constructed such that LIP-$k$ has worst case performance for odd $k$
+  \end{itemize}
   \begin{figure}
     \centering
     \includegraphics[height=0.7\textheight,keepaspectratio]{cr-k-skewed}
