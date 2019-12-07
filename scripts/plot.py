@@ -64,10 +64,10 @@ def produce_time_plot(hash_file_base, start, end):
 	
 	for q in hash_dict:
 		hash_time.append(min(hash_dict[q]) / MSEC_TO_SEC)
-	
-	index = [i for i in range(1, len(hash_time)+1)]
 
-	hash_plot = plt.plot(index, hash_time, '-o')
+
+	query = ['Q1.1', 'Q1.2', 'Q1.3', 'Q2.1', 'Q2.2', 'Q2.3', 'Q3.1', 'Q3.2', 'Q3.3', 'Q3.4', 'Q4.1', 'Q4.2', 'Q4.3']
+	hash_plot = plt.plot(query, hash_time, '-o')
 
 	return cr	
 
@@ -96,7 +96,8 @@ def plot_time(start, end):
 	lipK2 = [i for i in range(10, 50, 5)]
 	lipK3 = [i for i in range(50, 110, 10)]
 
-	lipK = [1,5,10,20,40,60,80,100]#lipK1 + lipK2 + lipK3 
+	lipK = lipK2 + lipK3 
+	#lipK = [1,10,20,80,100]#lipK1 + lipK2 + lipK3 
 		
 
 	for directory in directories:

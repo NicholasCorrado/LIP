@@ -38,7 +38,7 @@ private:
 
 public:
     int count;
-    long long time;
+    unsigned long long time;
 
 	BloomFilter();
     BloomFilter(int num_insert);
