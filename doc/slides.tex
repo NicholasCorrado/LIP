@@ -220,21 +220,21 @@ University of Wisconsin-Madison \\ % Your institution for the title page
     \begin{column}{0.25\textwidth}
         \small
         \begin{tabular}{c c}
-         \texttt{Credit Score} \\
+         \texttt{ID} \\
          \hline
-         720 & \rdelim \} {4}{3mm}[50 batches] \\
-         750 & \\
-         720 & \\
+         \textcolor{green}{1} & \rdelim \} {4}{3mm}[50 batches] \\
+         \textcolor{green}{2} & \\
+         \textcolor{green}{3} & \\
          $\dots$ \\
          \hline
-         400 & \rdelim \} {4}{3mm}[50 batches]\\
-         400 & \\
-         400 & \\
+         \textcolor{red}{4} & \rdelim \} {4}{3mm}[50 batches]\\
+         \textcolor{red}{5} & \\
+         \textcolor{red}{6} & \\
          $\dots$ \\
          \hline
-         770 & \rdelim \} {4}{3mm}[50 batches]\\
-         810 & \\
-         800 & \\
+         \textcolor{green}{7} & \rdelim \} {4}{3mm}[50 batches]\\
+         \textcolor{green}{8} & \\
+         \textcolor{green}{9} & \\
          $\dots$  
         \end{tabular}
 
@@ -269,16 +269,16 @@ University of Wisconsin-Madison \\ % Your institution for the title page
   \end{itemize}
   \item 
   
-    \visible<5->{$$\texttt{Competitive ratio of } \mathcal{M} =} \visible<4->{\frac{\# \text{probes by } \mathcal{M}}{\# \text{probes by OPT}} \leq n.$$}
+    \visible<6->{$$\texttt{Competitive ratio of } \mathcal{M} =} \visible<5->{\max_{I}}\visible<4->{\frac{\# \text{probes by } \mathcal{M} \text{ on } I}{\# \text{probes by OPT} \text{ on } I} \leq n.$$}
 \end{itemize}
 
-\visible<6->{
+\visible<7->{
 \begin{theorem}
   There is no \textbf{deterministic} mechanism $\mathcal{M}$ for \textsc{LIP} achieving a competitive ratio less than $N$, where $N$ is the number of filters used in \textsc{LIP}.
 \end{theorem}
 }
 
-\visible<7->{
+\visible<8->{
 \begin{itemize}
   \item Randomness?
 \end{itemize}
