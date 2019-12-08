@@ -182,16 +182,24 @@ University of Wisconsin-Madison \\ % Your institution for the title page
     \centering
     \includegraphics[page={26},height=0.7\textheight,keepaspectratio]{lip-animation}
   \end{figure}
-  \pause
+  
+\end{frame}
+% lip slides above
+
+\begin{frame}
+  \frametitle{LIP-$k$}
+
   \begin{itemize}
     \item LIP uses statistics from all previous batches to compute $\sigma$
     \begin{itemize}
-        \item Slow response to local changes in key distributions
+        \item Slow response to local changes in key distributions in fact table
+        \item e.g.\ $(11/28/2019, \text{Turkey})$
     \end{itemize}
     \item \textbf{LIP-k}: Only use the previous $k$ batches to compute $\sigma$
   \end{itemize}
+
 \end{frame}
-% lip slides above
+
 
 \begin{frame}
   \frametitle{Implementation and benchmarking}
