@@ -80,24 +80,25 @@ def compute_competitive_ratio(hash_file_base, start, end):
 
 
 def plot_time(start, end):
-	directories = [	"date-5-5",
-				 	"date-10-10",
-				 	"date-20-20", 
-				 	"date-50-50",
-				 	"date-10-50",
-			  		"date-50-10",
-				   	"date-linear",
-				    "date-linear-part-20-20",
-					"date-linear-part-20-20-supp-10-20",
-					"date-part-adversary",
-					"date-first-half"
-					]
+	# directories = [	"date-5-5",
+	# 			 	"date-10-10",
+	# 			 	"date-20-20", 
+	# 			 	"date-50-50",
+	# 			 	"date-10-50",
+	# 		  		"date-50-10",
+	# 			   	"date-linear",
+	# 			    "date-linear-part-20-20",
+	# 				"date-linear-part-20-20-supp-10-20",
+	# 				"date-part-adversary",
+	# 				"date-first-half"
+	# 				]
+	directories = ["date-50-50"]
 	lipK1 = [i for i in range(1, 10)]
 	lipK2 = [i for i in range(10, 50, 5)]
 	lipK3 = [i for i in range(50, 110, 10)]
 
-	lipK = lipK2 + lipK3 
-	#lipK = [1,10,20,80,100]#lipK1 + lipK2 + lipK3 
+	# lipK = lipK2 + lipK3 
+	lipK = [1,10,20,80,100]#lipK1 + lipK2 + lipK3 
 		
 
 	for directory in directories:

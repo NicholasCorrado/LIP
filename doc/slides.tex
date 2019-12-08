@@ -95,6 +95,7 @@
 \newtheorem{scolium}{Scolium}   %% And a not so common one.
 %\newtheorem{definition}{Definition}
 \newtheorem{construction}{Construction}
+\usepackage[export]{adjustbox}
 
 \usepackage{tkz-graph}
 \usepackage{arydshln}
@@ -198,42 +199,21 @@ University of Wisconsin-Madison \\ % Your institution for the title page
   \end{figure}
 \end{frame}
 
-
-
 \begin{frame}
   \frametitle{An Example Experiment}
-    \begin{tabular}{|c|l} 
-    \cline{1-1}
-    \textbf{Skewed Key} & \\
-    \cline{1-1}
-    $\sigma = 1$ & \rdelim\}{3.5}{3mm}[50 batches] \\ 
-    \cline{1-1}
-    $\vdots$ & \\ 
-    \cline{1-1}
-    $\sigma = 1$  & \\
-    \cline{1-1}
-    $\sigma = 0$  & \rdelim\}{3.5}{3mm}[50 batches] \\ 
-    \cline{1-1}
-    $\vdots$ &\\
-    \cline{1-1}
-    $\sigma = 0$ &\\
-    \cline{1-1}
-    $\sigma = 1$ & \rdelim\}{3.5}{3mm}[50 batches] \\ 
-    \cline{1-1} 
-    $\vdots$ &\\
-    \cline{1-1}
-    $\sigma = 1$ & \\
-    \cline{1-1}
-    $\vdots$ & \\
-    \cline{1-1}
-    \end{tabular}
-  \begin{figure}
-    \centering
-    %\includegraphics[height=0.7\textheight,keepaspectratio]{time-graph}
-  \end{figure}
+  \begin{tikzpicture}
+  \centering
+    \node<1> (img1) {\includegraphics[height=0.7\textheight,keepaspectratio]{skew-table.png}};
+    \node<2> (img2) {\includegraphics[height=0.7\textheight,keepaspectratio]{time-graph-lip-hash.png}};
+    \node<3-> (img3) {\includegraphics[height=0.7\textheight,keepaspectratio]{time-graph-lip-lipk.png}};
+  \end{tikzpicture}
   \begin{itemize}
+  \pause
+  \pause
+  \pause
       \item LIP-k perform performs better than LIP on some queries...
-      \item ...but LIP performs better on others... 
+      \pause
+      \item ...but LIP performs better on others 
   \end{itemize}
 \end{frame}
 
@@ -249,7 +229,7 @@ University of Wisconsin-Madison \\ % Your institution for the title page
 \end{itemize}
 
 \begin{theorem}
-  Let $n$ be the number of filters in the LIP problem. There is no deterministic mechanism $\mathcal{M}$ achieving a competitive ratio less than $n$ for the \textsc{LIP} problem.
+  There is no deterministic mechanism $\mathcal{M}$ for \textsc{LIP} achieving a competitive ratio less than $N$, where $N$ is the number of filters used in \textsc{LIP}.
 \end{theorem}
 
 \pause
@@ -275,7 +255,8 @@ University of Wisconsin-Madison \\ % Your institution for the title page
 \begin{frame}
   \frametitle{Competitive Ratio vs.\ $k$ on Adversarial Data}
   \begin{itemize}
-      \item Adversarial dataset constructed such that LIP-$k$ has worst case performance for odd $k$
+      \item Adversarial data set constructed such that LIP-$k$ has worst case performance for odd $k$
+      \item Run on query with $N = 2$ joins
   \end{itemize}
   \begin{figure}
     \centering
@@ -290,8 +271,8 @@ University of Wisconsin-Madison \\ % Your institution for the title page
 
   \begin{itemize}
     \item Implemented LIP and its variant LIP-$k$
-    \item LIP-$k$ is better than LIP in the adversarial/skewed settings
-    \item Randomness to achieve better robustness guarantee
+    \item Relative performance of LIP and LIP-k depends on the query 
+    \item Can we use randomness to achieve a better robustness guarantee?
   \end{itemize}
 \end{frame}
 
