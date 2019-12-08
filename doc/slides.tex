@@ -96,6 +96,7 @@
 %\newtheorem{definition}{Definition}
 \newtheorem{construction}{Construction}
 \usepackage[export]{adjustbox}
+\usepackage{appendixnumberbeamer}
 
 \usepackage{tkz-graph}
 \usepackage{arydshln}
@@ -249,96 +250,32 @@ University of Wisconsin-Madison \\ % Your institution for the title page
   \end{itemize}
 \end{frame}
 
-\begin{comment}
-\begin{frame}
-  \frametitle{An Example Experiment}
-  \begin{itemize}
-    \item Select where \texttt{Credit Score }$\geq 700$
-  \end{itemize}
-
-  \begin{columns}[t]
-    \begin{column}{0.4\textwidth}
-      
-        \begin{tabular}{c c}
-         \texttt{Credit Score} \\
-         \hline
-         720 & \rdelim \} {4}{3mm}[50 batches] \\
-         750 & \\
-         720 & \\
-         $\dots$ \\
-         \hline
-         400 & \rdelim \} {4}{3mm}[50 batches]\\
-         400 & \\
-         400 & \\
-         $\dots$ \\
-         \hline
-         770 & \rdelim \} {4}{3mm}[50 batches]\\
-         810 & \\
-         800 & \\
-         $\dots$  
-        \end{tabular}
-
-    \end{column}
-
-    \begin{column}{0.6\textwidth}
-        \begin{figure}
-          \centering
-          \includegraphics[width=0.8\textwidth,keepaspectratio]{time-graph-no-hash}
-        \end{figure}
-    \end{column}
-    \pause
-  \end{columns}
-  
-\end{frame}
-\end{comment}
-
 
 \begin{frame}
 \frametitle{LIP is solving an online problem}
 \begin{itemize}
-  \item Tuples arriving one at a time
-  \item Upon arrival, decide a sequence of filters
-  \item Minimize the total probes
-  \item Deterministic! \pause
+  \visible<1->{\item Given any tuple $t$, a mechanism $\mathcal{M}$ decides a sequence of applying the filters to \textit{minimize} the number of probes.}
+  \begin{itemize}
+    \visible<2->{\item if $t$ passes \textbf{all} filters: $n$ probes necessary}
+    \visible<3->{\item if not, at least one filter rejects it: 1 probe best / $n$ probes worst}
+  \end{itemize}
+  \item 
+  
+    \visible<5->{$$\texttt{Competitive ratio of } \mathcal{M} =} \visible<4->{\frac{\# \text{probes by } \mathcal{M}}{\# \text{probes by OPT}} \leq n.$$}
 \end{itemize}
 
+\visible<6->{
 \begin{theorem}
-  There is no deterministic mechanism $\mathcal{M}$ for \textsc{LIP} achieving a competitive ratio less than $N$, where $N$ is the number of filters used in \textsc{LIP}.
+  There is no \textbf{deterministic} mechanism $\mathcal{M}$ for \textsc{LIP} achieving a competitive ratio less than $N$, where $N$ is the number of filters used in \textsc{LIP}.
 \end{theorem}
+}
 
-\pause
+\visible<7->{
 \begin{itemize}
-  \item Not observed in practice, but a theoretical lower bound
   \item Randomness?
 \end{itemize}
-
+}
 \end{frame}
-
-
-
-\begin{frame}
-  \frametitle{Competitive Ratio vs.\ $k$ on Uniform Data}
-  \begin{figure}
-    \centering
-    \includegraphics[height=0.7\textheight,keepaspectratio]{cr-k-uniform}
-  \end{figure}
-\end{frame}
-
-
-
-\begin{frame}
-
-  \frametitle{Competitive Ratio vs.\ $k$ on Adversarial Data}
-  \begin{itemize}
-      \item Adversarial data set constructed such that LIP-$k$ has worst case performance for odd $k$
-      \item Run on query with $N = 2$ joins
-  \end{itemize}
-  \begin{figure}
-    \centering
-    \includegraphics[height=0.7\textheight,keepaspectratio]{cr-k-skewed}
-  \end{figure}
-\end{frame}
-
 
 
 \begin{frame}
@@ -356,9 +293,37 @@ University of Wisconsin-Madison \\ % Your institution for the title page
 \Huge{Thank you!}
 \end{frame}
 
-\begin{frame}
-\Huge{Questions?}
-\end{frame}
 %----------------------------------------------------------------------------------------
+
+
+
+
+
+\begin{frame}[noframenumbering]
+  \frametitle{Competitive Ratio vs.\ $k$ on Uniform Data}
+  \begin{figure}
+    \centering
+    \includegraphics[height=0.7\textheight,keepaspectratio]{cr-k-uniform}
+  \end{figure}
+\end{frame}
+
+
+
+
+\begin{frame}[noframenumbering]
+
+  \frametitle{Competitive Ratio vs.\ $k$ on Adversarial Data}
+  \begin{itemize}
+      \item Adversarial data set constructed such that LIP-$k$ has worst case performance for odd $k$
+      \item Run on query with $N = 2$ joins
+  \end{itemize}
+  \begin{figure}
+    \centering
+    \includegraphics[height=0.7\textheight,keepaspectratio]{cr-k-skewed}
+  \end{figure}
+\end{frame}
+
+
+
 
 \end{document}
