@@ -1,0 +1,25 @@
+
+\section{Introduction}
+
+Performing join operations in database management systems using Star Schemas is a fundamental and prevalent task in the modern data industry. Continuous efforts have been spent on building a reliable query optimizer over the last few decades. However, the current optimizers may still produce disastrously inefficient query plans which involves processing unnecessarily gigantic intermediate tables \cite{leis2015good,rabl2013variations}. The \textit{lookahead Information Passing (LIP)} strategy aggressively uses Bloom Filters to filter the fact tables to effectively reduce the sizes of the intermediate tables, provably as efficient and robust as computing the join using the optimal query plan \cite{zhu2017looking}. The key idea behind LIP is to estimate the filter selectivity of each dimension table and adaptively reorder the sequence of applying the filters to the fact table. 
+
+
+The filtering process can be modeled as the \textsc{LIP} problem in an online setting: Suppose we fix $n$ filters, and the tuples in the fact table arrives in an online fashion. Upon arrival of each tuple, one has to decide a sequence of filters to probe the tuple, with an objective of minimizing the number of probes needed to decide whether to accept the tuple and forward it to the hash join phase, or to eliminate it. A mechanism deciding the sequence of applying the filters is thus crucial to the success of LIP. If a tuple passes all filters, \textit{all} mechanisms have to probe the tuple to all filters to confirm its passage; and if a tuple is eliminated by the filters, the \textit{optimal} mechanism would apply any filter that rejects the tuple in the first place, using only one probe. Thus given any fact table $F$, the number of probes that an optimal mechanism requires to process all tuples in the fact table can be readily computed: 
+\[
+	\textsc{OPT}(F) = n|F_{\text{pass}}| + |F_{\text{reject}}|,
+\]
+where $|F_{\text{pass}}|$ and $|F_{\text{reject}}|$ are the number of tuples in $F$ that pass all filters and are rejected in $F$ respectively. For any mechanism $\mathcal{M}$, denoted by \textsc{ALG}$_{\mathcal{M}}(F)$ the number of probes that $\mathcal{M}$ performed to process all tuples in the fact table.  The performance of any mechanism $\mathcal{M}$ can thus be measured by 
+\[
+	\max_{F}\frac{\textsc{ALG}_{\mathcal{M}}(F)}{\textsc{OPT}(F)},
+\]
+called the \textit{competitive ratio} of $\mathcal{M}$. The competitive ratio is always at least 1 by definition, and in this problem the competitive ratio is at most $n$, the number of filters, since one mechanism can probe each tuple to at most $n$ filters.
+
+
+This project aims at designing efficient LIP mechanisms and measure their performance in terms of their overall running time and competitive ratio. We will build a skeleton database system on top of Apache Arrow supporting LIP and hash-joins to conduct our experiments and test the performance of our variant LIP mechanisms against the hash-join and the orignal LIP. We also present a theoretical result showing that no deterministic mechanism can have a competitive ratio better than $n$, and discuss possible extensions of LIP to use randomness to design a better mechanism.
+
+
+%Experimental results show that as LIP uses more filters, the increase in performance improvement diminishes, displaying a concave curve. One reason is that if the cache cannot hold all filters, then evicting the filters causes significant overhead in the performance. Moreover, when probing each fact tuple against all filters, the more selective filters are inserted to cache first. When the cache is full, the cache manager has to evict a more selective filter so that a less selective filter can be inserted to cache. Once LIP switches to probing the next fact tuple, the more selective filter is inserted into the cache again, while one could have skipped probing against certain inselective filters to reduce the replacement overhead.
+
+
+%This project aims at investigating the effect of skipping certain LIP filter on improving the performance of LIP, and if possible, derive a theoretical guarantee on the performance of LIP against the optimal joining sequence. We will build a skeleton database system on top of Apache Arrow supporting LIP and hash-joins to conduct our experiments and test the performance of our revised LIP strategy against the hash-join.
+

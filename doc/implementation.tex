@@ -1,0 +1,17 @@
+
+
+\section{Database Implementation}
+
+We have developed a prototype database system supporting basic join/select operations on star schemas sufficient to benchmark the performance of LIP and its variants on top of Apache Arrow. We assume that the fact table schema contains foreignkeys to all dimension tables, and each dimension table is single-key. Given a star schema fact table $F$ and dimension tables $D_i$ for $1 \leq i \leq n$, a join query in our system specifies selectors $\sigma_F$ for $F$ and $\sigma_i$ for each $D_i$, and executing that query will return $\sigma_F(F) \JOIN \sigma_1(D_1) \JOIN \dots \JOIN \sigma_n(D_n)$, projected on the schema of $F$. 
+
+The supported premitive selectors are comparison with integer/string values ($=, \leq, \geq, <, >$) and between, where the semantic of \texttt{BETWEEN} ($\ell$, $h$) is to select all $x$ with $\ell \leq x \leq h$. The selectors for each dimension can be either a premitive selector, or a composition (logical AND and OR) of multiple primitive/composite selectors. This is implemented using the Composite design pattern.
+
+
+The hash join algorithm first produces a hash table $T_i$ for each $\sigma_i(D_i)$, projected on the $k_i$, and then probe each tuple in the fact table against all $T_i$. We used Sparseepp (accessible at \url{https://github.com/greg7mdp/sparsepp}) as our implementation of the hash table, in which the sparsehash by Google (accessible at \url{https://github.com/sparsehash/sparsehash}) is used as the underlying hash function. All primary keys are regarded as 64-bit integers.
+
+The succinct filter structure we choose is the Bloom filters. The default false-positive rate is set to 0.001 and the default number of inserts to the filter is set to 50,000. The hash function for the Bloom Filter is Knuth's Multiplicative hash function, extended to accept a 64-bit integer as a seed. 
+
+
+Our code is available at \url{https://github.com/NicholasCorrado/CS764}.
+
+
