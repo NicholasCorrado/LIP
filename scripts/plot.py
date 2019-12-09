@@ -58,6 +58,25 @@ def GetDictionary(data_directories):
 
 
 
+def get_var(arr):
+	mean = sum(arr) * 1.0 / len(arr)
+
+	var = 0
+
+	for i in arr:
+		var += (i - mean)**2
+
+	return 1.0 * var / len(arr)
+
+def get_variance(hash_file_base, start, end):
+	hash_dict, cr = GetDictionary([hash_file_base + str(i) for i in range(start, end)])
+	
+	for q in hash_dict:
+		print(q, get_var(hash_dict[q]))
+	return None
+
+
+
 def produce_time_plot(hash_file_base, start, end):
 	hash_dict, cr = GetDictionary([hash_file_base + str(i) for i in range(start, end)])
 	hash_time = []
