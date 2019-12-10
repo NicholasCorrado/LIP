@@ -53,6 +53,7 @@ initial text=$ $, % sets the text that appears on the start arrow
 \newenvironment{keywords}{}{}
 \DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 \newcommand{\todo}{(TO BE CONTINUED...)}
+\graphicspath{ {./pics/} }
 
 \newcommand{\paris}[1]{{\color{blue} Paris: [{#1}]}}
 
@@ -96,6 +97,7 @@ initial text=$ $, % sets the text that appears on the start arrow
 
 % concluding remarks below
 
+The contributions of this project come in two-folds: We implemented Hash-join and LIP on top of Apache Arrow and thus provided an interface for future integration of Hustle on Apache Arrow; and we proposed LIP-$k$, a variant of LIP, which opens up an area for improving the performance LIP. It would also be interesting to study the problem of LIP in the online algorithmic setting to design an efficient mechanism utilizing randomness with better worst case guarantees. 
 
 
 % Future work below
@@ -103,7 +105,7 @@ initial text=$ $, % sets the text that appears on the start arrow
 % In this work, there exists an adversarial fact table for all variants of LIP have that would force the algorithm to achieve a competitive ratio of $n$. However, reasonable applications of some existing random online algorithm mechanisms may yield a competitive ratio of $O(\log n)$ using the weighted majority algorithm \cite{littlestone1994weighted}. However, multiplicative updates on the weights may change the weighted average filter to use, but will not change the sequence of all filters if only comparing them based on their weights. More work is required here to either provide a mechanism to achieve a better competitive ratio, or provide a lower bound reduction showing that the competitive ratio of $n$ is tight even for random mechanisms.
 
 
-\section*{Acknowledgement}
+\section*{Acknowledgements}
 
 The authors wish to thank Prof.\ Jignesh Patel for constant feedbacks on this project and Kevin Gaffney for helping us with Apache Arrow specifics. The second author wishes to thank Prof.\ Paris Koutris for the suggestion of working on a practical project when the lemma production pipe is jammed. It works.
 
