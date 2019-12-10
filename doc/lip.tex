@@ -96,9 +96,9 @@ LIP strategy in Figure \ref{fig:lip} estimates the selectivity of each filter us
 				\\
 				12.\>\>\>\>\> $pass[f] \leftarrow pass[f] + 1$
 				\\
-				13.\>\>\> Dequeue one element from both $count\_queue[f]$ and $pass\_queue[f]$
+				13.\>\>\> $count\_queue[f].dequeue()$ and $pass\_queue[f].dequeue()$
 				\\
-				14.\>\>\> Enqueue $count[f]$ and $pass[f]$ to $count\_queue[f]$ and $pass\_queue[f]$ respectively
+				14.\>\>\> $count\_queue[f].enqueue(count[f])$ and $pass\_queue[f].enqueue(pass[f])$
 				\\
 				15.\>\>\> Reset $count[f] \leftarrow 0$, $pass[f] \leftarrow 0$ 
 				\\
