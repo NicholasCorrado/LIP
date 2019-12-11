@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <arrow/api.h>
-#include "../select.h"
+#include "select.h"
 #include "JoinExecutor.h"
 #include <map>
 

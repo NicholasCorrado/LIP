@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "select.h"
-#include "util/util.h"
+#include "../util/util.h"
 
 
 arrow::compute::Datum* GetSelectFilter(std::shared_ptr<arrow::RecordBatch> in_batch,

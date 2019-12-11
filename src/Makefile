@@ -69,8 +69,8 @@ rebuild_cache/fast: rebuild_cache
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/local/Cellar/cmake/3.15.4/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -245,6 +245,21 @@ main.s:
 	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/main.s
 .PHONY : main.s
 
+# target to build an object file
+select.o:
+	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/select.o
+.PHONY : select.o
+
+# target to preprocess a source file
+select.i:
+	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/select.i
+.PHONY : select.i
+
+# target to generate assembly for a file
+select.s:
+	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/select.s
+.PHONY : select.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -278,6 +293,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... select.o"
+	@echo "... select.i"
+	@echo "... select.s"
 .PHONY : help
 
 
