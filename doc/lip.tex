@@ -121,8 +121,9 @@ Empirical data shows that for the orignal SSB dataset and certain queries, LIP-$
 The LIP strategy and its variant LIP-$k$ depicted in Figure \ref{fig:lip} and \ref{fig:lip-k} are \textit{deterministic}, i.e.\ multiple executions over the same fact table would produce the same result. Experimental results show that LIP performs almost optimally compared to the performance of hash join in the optimal sequence \cite{zhu2017looking} on the benchmark dataset, in which the keys are distributed almost uniformly. However, it can be shown that deterministic mechanism in the worst case can never achieve a competitive ratio less than $n$, when played against an adversary producing an adversarial dataset.
 
 
-\begin{theorem}
+\begin{theorem}\label{thm:det-n}
 	Let $n$ be the number of filters in the LIP problem. There is no deterministic mechanism $\mathcal{M}$ achieving a competitive ratio less than $n$ for the \textsc{LIP} problem.
+
 \end{theorem}
 
 \begin{proof}
