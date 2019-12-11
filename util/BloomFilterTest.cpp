@@ -4,7 +4,7 @@
 
 #include "BloomFilterTest.h"
 #include <iostream>
-#include "./../BloomFilter.h"
+#include "../src/BloomFilter.h"
 #include "sparsepp/spp.h"
 
 void TestTrueNegative() {

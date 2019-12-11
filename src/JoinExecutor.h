@@ -6,7 +6,7 @@
 #include<vector>
 #include<string>
 #include <arrow/api.h>
-#include "select.h"
+#include "../select.h"
 #include "BuildFilter.h"
 #include <map>
 
