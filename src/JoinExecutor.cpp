@@ -1,8 +1,8 @@
 #include "JoinExecutor.h"
-#include "select.h"
+#include "../select.h"
 #include "Join.h"
 #include "BuildFilter.h"
-#include "util/util.h"
+#include "../util/util.h"
 
 
 std::shared_ptr<arrow::RecordBatch>
