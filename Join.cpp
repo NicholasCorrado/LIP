@@ -1,6 +1,6 @@
 #include "Join.h"
-#include "../util/util.h"
-#include "../util/sparsepp/spp.h"
+#include "util/util.h"
+#include "util/sparsepp/spp.h"
 #include <chrono>
 
 

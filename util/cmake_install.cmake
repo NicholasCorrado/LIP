@@ -1,4 +1,4 @@
-# Install script for directory: /Users/corrado/CLionProjects/CS764/src
+# Install script for directory: /Users/corrado/CLionProjects/CS764/util
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

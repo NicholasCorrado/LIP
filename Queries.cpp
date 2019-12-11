@@ -10,8 +10,8 @@
 #include <arrow/stl.h>
 #include <chrono>
 #include "Queries.h"
-#include "../select.h"
-#include "../util/util.h"
+#include "select.h"
+#include "util/util.h"
 
 int k = -1;
 
