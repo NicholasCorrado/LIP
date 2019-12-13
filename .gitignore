@@ -11,10 +11,10 @@
 !/doc/pics/
 !/doc/pics/*
 !.gitignore
-!CMakeLists.txt
 !/scripts/
 /scripts/*
 !/scripts/*.py
 !run
-!/util/
-!/util/*
+!/src/CMakeFiles/
+!/apps/CMakeFiles/
+!/util/CMakeFiles/
