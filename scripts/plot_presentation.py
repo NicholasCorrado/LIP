@@ -56,6 +56,7 @@ def GetDictionary(data_directories):
 
 	return ret, cr
 
+<<<<<<< HEAD
 def get_stdev(hash_file_base, start, end):
 	hash_dict, cr = GetDictionary([hash_file_base + str(i) for i in range(start, end)])
 	hash_time = []
@@ -96,20 +97,23 @@ def produce_time_plot(hash_file_base, start, end):
 	# plt.legend()
 	# plt.show()
 
-
-
 	hash_dict, cr = GetDictionary([hash_file_base + str(i) for i in range(start, end)])
 	hash_time = []
-	
+	hash_time_all = []
 	for q in hash_dict:
 		hash_time.append(min(hash_dict[q]) / MSEC_TO_SEC)
+		hash_time_all.append([time / MSEC_TO_SEC for time in hash_dict[q]])
+		print(q)
+		if (q == "2.1"):
+			print(hash_time_all[-1])
 
-
+	error = np.std(hash_time_all, axis=1)
+	# print(error)
 
 	query = ['Q2.1', 'Q3.2', 'Q4.2']
 	hash_time = [hash_time[j] for j in range(6,len(hash_time))]
 
-	return hash_time
+	return hash_time, [error[3], error[7], error[11]]
 
 	# hash_plot = plt.plot(query, hash_time, '-o')
 
@@ -124,7 +128,6 @@ def plot_time(start, end):
 
 	PLOT_HASH = False
 
-	PLOT_HASH = False
 
 	directories = [	"date-50-50",
 				   	"date-linear",
@@ -134,10 +137,9 @@ def plot_time(start, end):
 
 	lipK = [1,10,20,50,80,100]
 
-
 	for directory in directories:
 		dir_base = "./scripts/data/" + directory + "/"
-
+		
 		hash_time = produce_time_plot(dir_base + "hash_", start, end)
 		lip_time  = produce_time_plot(dir_base + "lip_", start, end)
 		lip1_time = produce_time_plot(dir_base + "lip-1" + "_", start, end)
