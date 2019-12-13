@@ -288,8 +288,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIP(std::shared_ptr<arrow::Table> 
     if(CR){
         double cr = opt == 0 ? 1 : 1.0 * alg / opt;
         std::cout << "CR " <<  cr << std::endl;
-        std::cout << "alg " << alg << std::endl;
-        std::cout << "opt " << opt << std::endl;
+//        std::cout << "alg " << alg << std::endl;
+//        std::cout << "opt " << opt << std::endl;
     }
     if (out_batches.size() > 0)
         status = arrow::Table::FromRecordBatches(out_batches, &result_table);

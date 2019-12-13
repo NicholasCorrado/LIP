@@ -231,21 +231,6 @@ __/util/util.s:
 .PHONY : __/util/util.s
 
 # target to build an object file
-main.o:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/main.o
-.PHONY : main.o
-
-# target to preprocess a source file
-main.i:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/main.i
-.PHONY : main.i
-
-# target to generate assembly for a file
-main.s:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/main.s
-.PHONY : main.s
-
-# target to build an object file
 select.o:
 	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/select.o
 .PHONY : select.o
@@ -290,9 +275,6 @@ help:
 	@echo "... __/util/util.o"
 	@echo "... __/util/util.i"
 	@echo "... __/util/util.s"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
 	@echo "... select.o"
 	@echo "... select.i"
 	@echo "... select.s"
