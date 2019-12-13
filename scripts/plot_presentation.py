@@ -56,6 +56,44 @@ def GetDictionary(data_directories):
 
 	return ret, cr
 
+def get_stdev():
+	ret = {}
+	cr = 1
+
+	isCR = False
+	init = False
+	for data_directory in data_directories:
+		print(data_directory)
+		try:
+			file = open(data_directory, "r")
+		except FileNotFoundError:
+			continue
+		line = file.readline()[:-1]
+		while line != "":
+			query_name = GetQueryName(line)
+			line = file.readline()[:-1]
+			if not init:
+				if line.split()[0] == 'CR':
+					isCR = True
+			
+			if isCR:
+				cratio = GetCompetitiveRatio(line)
+				cr = max(cr, cratio)
+				line = file.readline()[:-1]
+		
+			while True:
+				line = file.readline()[:-1]
+				running_time = GetRunningTime(line)
+				if query_name not in ret:
+					ret[query_name] = [1.0 * running_time]
+				else:
+					ret[query_name].append(1.0 * running_time)
+				line = file.readline()[:-1]
+				if line == "" or line.split()[0] == "Running":
+					break
+		file.close()
+
+	return ret, cr
 
 
 def produce_time_plot(hash_file_base, start, end):
@@ -87,20 +125,23 @@ def produce_time_plot(hash_file_base, start, end):
 	# plt.legend()
 	# plt.show()
 
-
-
 	hash_dict, cr = GetDictionary([hash_file_base + str(i) for i in range(start, end)])
 	hash_time = []
-	
+	hash_time_all = []
 	for q in hash_dict:
 		hash_time.append(min(hash_dict[q]) / MSEC_TO_SEC)
+		hash_time_all.append([time / MSEC_TO_SEC for time in hash_dict[q]])
+		print(q)
+		if (q == "2.1"):
+			print(hash_time_all[-1])
 
-
+	error = np.std(hash_time_all, axis=1)
+	# print(error)
 
 	query = ['Q2.1', 'Q3.2', 'Q4.2']
 	hash_time = [hash_time[3], hash_time[7], hash_time[11]]
 
-	return hash_time
+	return hash_time, [error[3], error[7], error[11]]
 
 	# hash_plot = plt.plot(query, hash_time, '-o')
 
@@ -119,14 +160,14 @@ def plot_time(start, end):
 	lipK = [1,10,20,50,80,100]
 	dir_base = "./scripts/data/date-50-50/"
 
-	hash_time = produce_time_plot(dir_base + "hash_", start, end)
-	lip_time  = produce_time_plot(dir_base + "lip_", start, end)
-	lip1_time = produce_time_plot(dir_base + "lip-1" + "_", start, end)
-	lip10_time = produce_time_plot(dir_base + "lip-10" + "_", start, end)
-	lip20_time = produce_time_plot(dir_base + "lip-20" + "_", start, end)
-	lip50_time = produce_time_plot(dir_base + "lip-50" + "_", start, end)
-	lip80_time = produce_time_plot(dir_base + "lip-80" + "_", start, end)
-	lip100_time = produce_time_plot(dir_base + "lip-100"  + "_", start, end)
+	hash_time, 		hash_errors 	= produce_time_plot(dir_base + "hash_", start, end)
+	lip_time, 		lip_errors 		= produce_time_plot(dir_base + "lip_", start, end)
+	lip1_time, 		lip1_errors 	= produce_time_plot(dir_base + "lip-1" + "_", start, end)
+	lip10_time, 	lip10_errors 	= produce_time_plot(dir_base + "lip-10" + "_", start, end)
+	lip20_time, 	lip20_errors 	= produce_time_plot(dir_base + "lip-20" + "_", start, end)
+	lip50_time, 	lip50_errors 	= produce_time_plot(dir_base + "lip-50" + "_", start, end)
+	lip80_time, 	lip80_errors 	= produce_time_plot(dir_base + "lip-80" + "_", start, end)
+	lip100_time, 	lip100_errors 	= produce_time_plot(dir_base + "lip-100"  + "_", start, end)
 
 	
 	legend_label_list = []
@@ -135,6 +176,7 @@ def plot_time(start, end):
 	legend_label_list.append('LIP')
 
 	times = [ lip1_time, lip10_time, lip20_time, lip50_time, lip80_time, lip100_time, lip_time]
+
 	if (PLOT_HASH):
 		times.append(hash_time)
 		legend_label_list.append('Hash')
@@ -144,7 +186,6 @@ def plot_time(start, end):
 
 	# set width of bar
 	barWidth = 0.1
-	print(times)
 
 	# Set position of bar on X axis
 	# rh = np.arange(len(lip_time))
@@ -171,15 +212,15 @@ def plot_time(start, end):
 	# Make the plot
 	plt.figure(num=1, figsize=(8, 7))
 
-	plt.bar(r1, lip1_time,  color='tab:red', width=barWidth, edgecolor='white')
-	plt.bar(r10, lip10_time,  color='tab:orange', width=barWidth, edgecolor='white')
-	plt.bar(r20, lip10_time, color='gold',width=barWidth, edgecolor='white')
-	plt.bar(r50, lip20_time, color='tab:green', width=barWidth, edgecolor='white')
-	plt.bar(r80, lip50_time, color='tab:blue', width=barWidth, edgecolor='white')
-	plt.bar(r100, lip80_time, color='indigo', width=barWidth, edgecolor='white')
-	plt.bar(rl, lip_time, color='tab:purple', width=barWidth, edgecolor='white')
+	plt.bar(r1, lip1_time, 		yerr=lip1_errors, color='tab:red', width=barWidth)
+	plt.bar(r10, lip10_time, 	yerr=lip10_errors, color='tab:orange', width=barWidth)
+	plt.bar(r20, lip20_time, 	yerr=lip20_errors,color='gold',width=barWidth)
+	plt.bar(r50, lip50_time, 	yerr=lip50_errors,color='tab:green', width=barWidth)
+	plt.bar(r80, lip80_time, 	yerr=lip80_errors,color='tab:blue', width=barWidth)
+	plt.bar(r100, lip100_time, 	yerr=lip100_errors,color='indigo', width=barWidth)
+	plt.bar(rl, lip_time, 		yerr=lip_errors,color='tab:purple', width=barWidth)
 	if (PLOT_HASH): 
-		plt.bar(rh, hash_time,  color='grey', width=barWidth, edgecolor='white')
+		plt.bar(rh, hash_time,  yerr=hash_errors, color='grey', width=barWidth)
 	# plt.bar(r1, bars1, color='#7f6d5f', width=barWidth, edgecolor='white', label='var1')
 	# plt.bar(r2, bars2, color='#557f2d', width=barWidth, edgecolor='white', label='var2')
 	# plt.bar(r3, bars3, color='#2d7f5e', width=barWidth, edgecolor='white', label='var3')
