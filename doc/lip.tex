@@ -1,13 +1,11 @@
 
 \section{Lookahead Information Passing (LIP)}
-In this section, we first present the LIP strategy in \cite{zhu2017looking}, and then discuss our variant LIP-$k$, designed to respond to local skewness more quickly than LIP. Finally, we discuss the competitive ratios of all deterministic mechanisms and provide proof on its lower bound. Some possible extensions of LIP using randomness is also discussed.
-
-
+In this section, we first present the LIP strategy in \cite{zhu2017looking}. We then discuss our variant LIP-$k$, designed to respond to local skewness more quickly than LIP. Finally, we discuss the competitive ratios of all deterministic mechanisms and provide proof on its lower bound. Possible extensions of LIP using randomness is also discussed.
 
 \subsection{LIP}
-The LIP strategy has three stages: (1) Building a hash table and a filter for each dimension table, (2) probe each fact tuple on the filters, producing a set of fact tuples with false positives, and (3) probe the hash table of each dimension table to eliminate the false positives. In what follows we mainly discuss stage (2) since stages (1) and (3) are readily implemented by either the database engine or the filter constructors.
+The LIP strategy has three stages: (1) Build a hash table and a filter for each dimension table, (2) probe each fact tuple on the filters, producing a set of fact tuples with false positives, and (3) probe the hash table of each dimension table to eliminate the false positives. In what follows, we mainly discuss stage (2), since stages (1) and (3) are readily implemented by the filter constructors and database engine, respectively.
 
-Let $F$ be the fact table and $D_i$ the dimension tables for $1 \leq i \leq n$. We denote the number of facts in $F$ and each $D_i$ as $|F|$ and $|D_i|$. A LIP filter on $D_i$ is implemented using a Bloom filter, with false positive rate $\varepsilon$. The true selectivity $\sigma_i$ of $D_i$ on fact table $F$ is given by $\sigma_i = |D_i \JOIN_{pk_i = fk_i} F| / |F|,$ where $pk_i$ is the primary key of $D_i$ and $fk_i$ is the foreign key of $D_i$ in $F$. The \texttt{LIP-join} algorithm, depicted in Figure \ref{fig:lip}, computes the indices of tuples in $F$ that pass the filtering of each Bloom filter of $D_i$. Note that there is an innate false positive rate $\varepsilon$ associated with each Bloom Filter, and thus the set of indices is a superset of the true set of indices of tuples appearing in the final join result.
+Let $F$ be the fact table and $D_i$ the dimension tables for $1 \leq i \leq n$. We denote the number of facts in $F$ and each $D_i$ as $|F|$ and $|D_i|$. Each LIP filter on $D_i$ is a Bloom filter with false positive rate $\varepsilon$. The true selectivity $\sigma_i$ of $D_i$ on fact table $F$ is given by $\sigma_i = |D_i \JOIN_{pk_i = fk_i} F| / |F|,$ where $pk_i$ is the primary key of $D_i$ and $fk_i$ is the foreign key of $D_i$ in $F$. The \texttt{LIP-join} algorithm, depicted in Figure \ref{fig:lip}, computes the indices of tuples in $F$ that pass all LIP filters. Note that because of the false positive rate $\varepsilon$ associated with each filter, the set of indices is a superset of the true set of indices of tuples appearing in the final join result.
 
 The partition in \cite{zhu2017looking} satisfies that $|F_{t+1}| = 2|F_{t}|$ at line 5, and the algorithm approximates the true selectiveness $\sigma_i$ of each dimension $D_i$ using $pass[i]/count[i]$, the aggregated selectiveness since the beginning.
 
@@ -59,7 +57,10 @@ The partition in \cite{zhu2017looking} satisfies that $|F_{t+1}| = 2|F_{t}|$ at 
 
 \subsection{LIP-$k$}
 
-LIP strategy in Figure \ref{fig:lip} estimates the selectivity of each filter using statistics from the beginning batch, which is inefficient for certain distribution or physical layout of data. Consider some filter $f$ that is very selective for the first $t_0$ iterations at line 6 and not selective for the remaining iterations. (For example, a filter $f$ filtering for \texttt{year} $\geq 2017$ and the \texttt{Date} table is sorted in \texttt{year}.) In this case, LIP would obtain a good estimate of the selectivity of $f$ during the first $t_0$ iterations, and thus tend to apply $f$ early in the remaining iterations. However, it is more efficient to postpone applying $f$ in the remaining iterations, despite $f$ has good selectivity in the first $t_0$ iterations. One remedy to this is to only ``remember" the hit/miss statistics of each filter over the previous $k$ batches.
+The LIP strategy in Figure \ref{fig:lip} estimates the selectivity of each filter using statistics from all previous batches, 
+which can be inefficient for certain foreign key distributions in the fact table. 
+Consider the case where some filter $f$ is very selective for the first $T$ batches and not selective for the remaining batches. 
+(For example, a filter $f$ filtering for \texttt{year} $\geq 2017$ and the \texttt{Date} table is sorted in \texttt{year}.) In this case, LIP would obtain a good estimate of the selectivity of $f$ during the first $T$ iterations, and thus tend to apply $f$ early in the remaining iterations. However, it is more efficient to postpone applying $f$ in the remaining iterations, despite $f$ has good selectivity in the first $T$ iterations. One remedy to this is to only ``remember" the hit/miss statistics of each filter over the previous $k$ batches.
 
 \begin{figure*}[h!]
 	\centering
@@ -118,7 +119,7 @@ Empirical data shows that for the orignal SSB dataset and certain queries, LIP-$
 
 \subsection{Competitive Ratio Analysis}
 
-The LIP strategy and its variant LIP-$k$ depicted in Figure \ref{fig:lip} and \ref{fig:lip-k} are \textit{deterministic}, i.e.\ multiple executions over the same fact table would produce the same result. Experimental results show that LIP performs almost optimally compared to the performance of hash join in the optimal sequence \cite{zhu2017looking} on the benchmark dataset, in which the keys are distributed almost uniformly. However, it can be shown that deterministic mechanism in the worst case can never achieve a competitive ratio less than $n$, when played against an adversary producing an adversarial dataset.
+The LIP strategy and its variant LIP-$k$ depicted in Figures \ref{fig:lip} and \ref{fig:lip-k} are \textit{deterministic}, i.e.\ multiple executions over the same fact table would produce the same result. Experimental results show that LIP has faster execution time compared to hash join in the optimal sequence \cite{zhu2017looking} on the benchmark dataset, in which the keys are distributed almost uniformly. However, it can be shown that any deterministic mechanism in the worst case can never achieve a competitive ratio less than $n$ when played against an adversary producing an adversarial dataset.
 
 
 \begin{theorem}\label{thm:det-n}
@@ -127,14 +128,14 @@ The LIP strategy and its variant LIP-$k$ depicted in Figure \ref{fig:lip} and \r
 \end{theorem}
 
 \begin{proof}
-	We present an adversary to the mechanism $\mathcal{M}$ such that $\mathcal{M}$ only achieves a competitive ratio of $n$ in the worst case. Let the $n$ filters be $f_1, f_2, \dots, f_n$ and consider $n$ tuples $t_1, t_2, \dots, t_n$, where $t_i \notin f_i$ but $t_i \in f_j$ for any $i \neq j$.
-
-	The adversary proceeds as follows: It first observes the sequence of filters $\sigma_t$ at any step $t$ set by the mechanism $\mathcal{M}$, and produce the input $f_{\sigma_t(n)}$ to the mechanism $\mathcal{M}$. Thus the mechanism $\mathcal{M}$ would require $n$ filter probes to eliminate $f_{\sigma_t(n)}$ at each step $t$, whereas the optimal sequence is to apply $\sigma_t(n)$ at the first place. Thus it yields a competitive ratio of $n$.
+	We present an adversary to the arbitrary mechanism $\mathcal{M}$ such that $\mathcal{M}$ only achieves a competitive ratio of $n$ in the worst case. 
+	Let the $n$ filters be $f_1, f_2, \dots, f_n$, 
+	and let $S_k$ denote the filter sequence that will be used to filter batch $k$. 
+	Let each batch contain $m$ tuples.
+	At each iteration $k$, prior to LIP's probe phase, the adversary observes $S_k$ and produces a batch of tuples $\{t_1, t_2, \dots, t_m\}$, where $t_i \in f_n$ but $t_i \notin f_j$ for any $j < n$. The adversary then feeds this batch into mechanism $\mathcal{M}$. Thus, $\mathcal{M}$ performs $n$ filter probes to eliminate each tuple, whereas the optimal sequence is to apply $f_n$ first. Thus, $\mathcal{M}$ has a competitive ratio of $n$.
 \end{proof}
 
+It might be possible to design a randomized mechanism that can achieve a better competitive ratio than $n$. The randomized mechanism would, at the end of each batch, select a sequence of applying the filters from a distribution of all filter permutations, based on the estimated selectivities. However, we have not obtained any algorithmic upper bound on the competitive ratio. Furthermore, a randomized approach creates a new concern of being too computationally heavy.
 
-It might be possible to design a randomized mechanism $\mathcal{M_p}$ that can achieve a better competitive ratio than $n$. The randomized mechanism would, at the end of each batch, select a sequence of applying the filters from a distribution of all filter permutations, based on the estimated selectivities. However, we have not obtained any algorithmic upper bound on the competitive ratio.  
-
-
-In the practical perspective however, one wishes to minimize the total running time of the mechanism $\mathcal{M}$, which is effectively the sum of the running time of the mechanism and the running time of building the filters and performing the probes. A trade-off between having a near optimal mechanism that consumes much time and allowing many failed probes to eliminate each non-participating tuple is therefore of much interest. 
+In the practical perspective however, one wishes to minimize the total running time of the mechanism, which is effectively the sum of the running time of the mechanism and the running time of building the filters and performing the probes. A trade-off between having a near optimal mechanism that consumes much time and allowing many failed probes to eliminate each non-participating tuple is therefore of much interest. 
 
