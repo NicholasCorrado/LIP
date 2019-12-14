@@ -189,8 +189,8 @@ def plot_time(start, end):
 
 		 
 		# Add xticks on the middle of the group bars
-		# plt.xticks([r + barWidth*3 for r in range(len(lip_time))], ['Q3.1','Q3.2','Q3.3','Q3.4','Q4.1','Q4.2','Q4.3'])
-		plt.xticks([r + barWidth*3 for r in range(len(lip_time))], ['Q1.1','Q1.2','Q1.3','Q2.1','Q2.2','Q2.3'])
+		plt.xticks([r + barWidth*3 for r in range(len(lip_time))], ['Q3.1','Q3.2','Q3.3','Q3.4','Q4.1','Q4.2','Q4.3'])
+		# plt.xticks([r + barWidth*3 for r in range(len(lip_time))], ['Q1.1','Q1.2','Q1.3','Q2.1','Q2.2','Q2.3'])
 		 
 		# Create legend & Show graphic
 		plt.gca().legend(tuple(legend_label_list), prop={'size': 12})
