@@ -63,38 +63,13 @@ def get_stdev(hash_file_base, start, end):
 	for q in hash_dict:
 		hash_time.append(np.std(hash_dict[q]) / MSEC_TO_SEC)
 
-	hash_time = [hash_time[j] for j in range(6,len(hash_time))]
+	# hash_time = [hash_time[j] for j in range(6,len(hash_time))]
+	hash_time = [hash_time[j] for j in range(6)]
 
 	return hash_time
 
 def produce_time_plot(hash_file_base, start, end):
 
-
-	# # set width of bar
-	# barWidth = 0.25
-	 
-	# # set height of bar
-	# bars1 = [12, 30, 1, 8, 22]
-	# bars2 = [28, 6, 16, 5, 10]
-	# bars3 = [29, 3, 24, 25, 17]
-
-	# # Set position of bar on X axis
-	# r1 = np.arange(len(bars1))
-	# r2 = [x + barWidth for x in r1]
-	# r3 = [x + barWidth for x in r2]
-	 
-	# # Make the plot
-	# plt.bar(r1, bars1, color='#7f6d5f', width=barWidth, edgecolor='white', label='var1')
-	# plt.bar(r2, bars2, color='#557f2d', width=barWidth, edgecolor='white', label='var2')
-	# plt.bar(r3, bars3, color='#2d7f5e', width=barWidth, edgecolor='white', label='var3')
-	 
-	# # Add xticks on the middle of the group bars
-	# plt.xlabel('group', fontweight='bold')
-	# plt.xticks([r + barWidth for r in range(len(bars1))], ['A', 'B', 'C', 'D', 'E'])
-	 
-	# # Create legend & Show graphic
-	# plt.legend()
-	# plt.show()
 
 	hash_dict, cr = GetDictionary([hash_file_base + str(i) for i in range(start, end)])
 	hash_time = []
@@ -106,11 +81,10 @@ def produce_time_plot(hash_file_base, start, end):
 	error = np.std(hash_time_all, axis=1)
 
 	query = ['Q2.1', 'Q3.2', 'Q4.2']
-	hash_time = [hash_time[j] for j in range(6,len(hash_time))]
+	#hash_time = [hash_time[j] for j in range(6,len(hash_time))]
+	hash_time = [hash_time[j] for j in range(6)]
 
 	return hash_time
-
-	# hash_plot = plt.plot(query, hash_time, '-o')
 
 
 
@@ -131,7 +105,7 @@ def plot_time(start, end):
 					]
 
 
-	titles = ["DATE-50-50", "DATE-LINEAR", "DATE-PART-ADVERSARY", "DATE-FIRST-HALF",]
+	titles = ["DATE-50-50", "DATE-LINEAR", "DATE-PART-ADVERSARY", "DATE-FIRST-HALF"]
 	lipK = [1,10,20,50,80,100]
 
 	j = 0
@@ -215,7 +189,8 @@ def plot_time(start, end):
 
 		 
 		# Add xticks on the middle of the group bars
-		plt.xticks([r + barWidth*3 for r in range(len(lip_time))], ['Q3.1','Q3.2','Q3.3','Q3.4','Q4.1','Q4.2','Q4.3'])
+		# plt.xticks([r + barWidth*3 for r in range(len(lip_time))], ['Q3.1','Q3.2','Q3.3','Q3.4','Q4.1','Q4.2','Q4.3'])
+		plt.xticks([r + barWidth*3 for r in range(len(lip_time))], ['Q1.1','Q1.2','Q1.3','Q2.1','Q2.2','Q2.3'])
 		 
 		# Create legend & Show graphic
 		plt.gca().legend(tuple(legend_label_list), prop={'size': 12})
@@ -223,7 +198,7 @@ def plot_time(start, end):
 		plt.xlabel("SSB Query", fontweight='bold', fontsize=12)
 		plt.ylabel("Running time (s)", fontweight='bold', fontsize=12)
 		plt.title("Performance of LIP and LIP-k on SSB Query Groups 3 and 4: LINEORDER-" + titles[j], fontweight='bold', fontsize=14)
-		plt.savefig('./doc/pics/lip-and-lipk-' + directory)
+		plt.savefig('./doc/pics/lip-and-lipk-' + directory + '-q1-q2')
 		plt.show()
 
 
@@ -323,6 +298,7 @@ def plot_time_hash(start, end):
 
 
 		plt.show()
+
 
 
 def main():

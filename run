@@ -8,11 +8,53 @@ fi
 
 echo $query
 
+
+# $dir - the directory for different data set
+# $k   - the memory for lip k
+# $i   - each individual run
+
+
+# $dir/lip_$i
+# $dir/lip-$k_$i
+# $dir/hash_$i
+
+declare -a arr=("uniform")
+
 for i in `seq 1 5`;
 do
-    echo $i
-    echo "hash"
-    ./csv_to_arrow 4.3 lip 100 > scripts/data/hash_enum_$i
-done
 
-python3 ./scripts/plot.py
+    for dir in "${arr[@]}"
+    do
+        alg=hash
+        echo "iteration $i $dir $alg"...
+        ./apps/app $query $alg "$dir" 1 > scripts/data/$dir/hash_${i}
+
+        alg=lip
+        echo "iteration $i $dir $alg"...
+        ./apps/app $query $alg "$dir" 1 > scripts/data/$dir/lip_${i}
+
+        alg=lip1
+        echo "iteration $i $dir $alg"...
+        ./apps/app $query $alg "$dir" 1 > scripts/data/$dir/lip-1_${i}
+
+        alg=lip10
+        echo "iteration $i $dir $alg"...
+        ./apps/app $query $alg "$dir" 1 > scripts/data/$dir/lip-10_${i}
+
+        alg=lip20
+        echo "iteration $i $dir $alg"...
+        ./apps/app $query $alg "$dir" 1 > scripts/data/$dir/lip-20_${i}
+
+        alg=lip50
+        echo "iteration $i $dir $alg"...
+        ./apps/app $query $alg "$dir" 1 > scripts/data/$dir/lip-50_${i}
+
+        alg=lip80
+        echo "iteration $i $dir $alg"...
+        ./apps/app $query $alg "$dir" 1 > scripts/data/$dir/lip-80_${i}
+
+        alg=lip100
+        echo "iteration $i $dir $alg"...
+        ./apps/app $query $alg "$dir" 1 > scripts/data/$dir/lip-100_${i}
+    done
+done
