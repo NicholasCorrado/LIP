@@ -8,18 +8,20 @@ Our implementations of LIP and LIP-k only support left-deep join tree plans wher
 
 $$\sigma_F(F) \JOIN \sigma_1(D_1) \JOIN \dots \JOIN \sigma_n(D_n)$$
 
-\noindent projected on the schema of $F$, {\it i.e.}~we output the tuples in $F$ that can be joined with each $D_i$. The supported primitive selectors allow for selection ($=, \leq, \geq, <, >$) on scalar values and ranges, Range selections are executed using \texttt{BETWEEN} ($\ell$, $h$) is to select all $x$ with $\ell \leq x \leq h$. 
+\noindent projected on the schema of $F$, {\it i.e.}~we output the tuples in $F$ that can be joined with each $D_i$. The supported primitive selectors allow for selection ($=, \leq, \geq, <, >$) on scalar values and ranges. Range selections are executed using \texttt{BETWEEN} ($\ell$, $h$), which selects all $x$ with $\ell \leq x \leq h$. 
 
-The selectors for each dimension can be either a primitive selector, 
+The selectors for each dimension can be either a primitive selector consisting of simple predicate ({\it e.g.} \texttt{ORDER DATE} = 1997) 
 or a composition (logical AND/OR) of multiple primitive/composite selectors. 
 This is implemented using the Composite design pattern.
 Apache Arrow does not yet support vectorized string comparison operations nor vectorized range comparison operations.
 For queries involving string and/or range selections, 
 we instead scan along the column, checking which rows satisfy the selection predicate. 
 Such selections are inherently slower than the supported vectorized selections. 
-Because all of our join implementations must implement row-wise selection for string/range predicates, 
+Because all of our join implementations must implement row-wise selection for string and range predicates, 
 all algorithms suffer the same slowdown. 
-This implementation caveat does not preclude us from studying the relative performance of LIP and LIP-$k$.
+Thus, this implementation caveat does not preclude us from studying the relative performance of LIP and LIP-$k$.
+
+We only support string and numeric data types. All numeric data is stored an 64-bit integers by default.
 
 The hash join algorithm first produces a hash table $T_i$ for each $\sigma_i(D_i)$, projected on the $k_i$, and then probe each tuple in the fact table against all $T_i$. We used Sparseepp (accessible at \url{https://github.com/greg7mdp/sparsepp}) as our implementation of the hash table, in which the sparsehash by Google (accessible at \url{https://github.com/sparsehash/sparsehash}) is used as the underlying hash function. All primary keys are regarded as 64-bit integers.
 

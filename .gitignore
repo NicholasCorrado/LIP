@@ -15,6 +15,7 @@
 /scripts/*
 !/scripts/*.py
 !run
+!/src/Makefile
 !/src/CMakeFiles/
 !/apps/CMakeFiles/
 !/util/CMakeFiles/
