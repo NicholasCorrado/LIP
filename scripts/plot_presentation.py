@@ -63,8 +63,8 @@ def get_stdev(hash_file_base, start, end):
 	for q in hash_dict:
 		hash_time.append(np.std(hash_dict[q]) / MSEC_TO_SEC)
 
-	# hash_time = [hash_time[j] for j in range(6,len(hash_time))]
-	hash_time = [hash_time[j] for j in range(6)]
+	hash_time = [hash_time[j] for j in range(6,len(hash_time))]
+	# hash_time = [hash_time[j] for j in range(6)]
 
 	return hash_time
 
@@ -81,8 +81,8 @@ def produce_time_plot(hash_file_base, start, end):
 	error = np.std(hash_time_all, axis=1)
 
 	query = ['Q2.1', 'Q3.2', 'Q4.2']
-	#hash_time = [hash_time[j] for j in range(6,len(hash_time))]
-	hash_time = [hash_time[j] for j in range(6)]
+	hash_time = [hash_time[j] for j in range(6,len(hash_time))]
+	# hash_time = [hash_time[j] for j in range(6)]
 
 	return hash_time
 
@@ -198,7 +198,8 @@ def plot_time(start, end):
 		plt.xlabel("SSB Query", fontweight='bold', fontsize=12)
 		plt.ylabel("Running time (s)", fontweight='bold', fontsize=12)
 		plt.title("Performance of LIP and LIP-k on SSB Query Groups 3 and 4: LINEORDER-" + titles[j], fontweight='bold', fontsize=14)
-		plt.savefig('./doc/pics/lip-and-lipk-' + directory + '-q1-q2')
+		# plt.savefig('./doc/pics/lip-and-lipk-' + directory + '-q1-q2')
+		plt.savefig('./doc/pics/lip-and-lipk-' + directory)
 		plt.show()
 
 
