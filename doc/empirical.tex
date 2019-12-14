@@ -6,23 +6,19 @@ In this section we present the empirical results obtained from running Hash-join
 \label{sec:dataset}
 
 
-
-SSB query groups 1 and 2 do not select on \texttt{DATE.YEAR} and are thus unaffected by this skew.
-Query groups 3 and 4 do select on \texttt{DATE.YEAR}, so this skew can potentially affect the execution of LIP and LIP-$k$ on these queries.
-
 \subsubsection{Skew Datasets}
 
 We modify the normal \texttt{LINEORDER} file produced by the SSB data generator with SF = 1 to produce four skewed \texttt{LINEORDER} tables: 
 
 
 \begin{itemize}
-    \item \texttt{LINEORDER-DATE-50-50}: The first 50 batches have $\sigma_{\texttt{SKEW PRED}} = 1$ while the next 50 batches have $\sigma_{\texttt{SKEW PRED}} = 0$, and so on.
-    In other words, The first 50 batches contain only keys satisfying \texttt{SKEW PRED}, 
-    while the next 50 batches contain only keys not satisying \texttt{SKEW PRED}, 
-    and so on. 
-
     \item \texttt{LINEORDER-DATE-FIRST-HALF}: Let $N$ be the total number of batches in \texttt{LINEORDER}. 
     The first $N/2$ batches have $\sigma_{\texttt{SKEW PRED}} = 1$ while the remaining $N/2$ batches have $\sigma_{\texttt{SKEW PRED}} = 0$.
+    In other words, The first $N/2$ batches contain only keys satisfying \texttt{SKEW PRED}, 
+    while the next $N/2$ batches contain only keys not satisying \texttt{SKEW PRED}, 
+    and so on. 
+
+    \item \texttt{LINEORDER-DATE-50-50}: The first 50 batches have $\sigma_{\texttt{SKEW PRED}} = 1$ while the next 50 batches have $\sigma_{\texttt{SKEW PRED}} = 0$, and so on.
 
     \item \texttt{LINEORDER-DATE-LINEAR}: $\sigma_{\texttt{SKEW PRED}}$ increases linearly from 0 to 1 across the \texttt{LINEORDER} table, 
     {\it i.e.} batch $k$ has $\sigma_{\texttt{SKEW PRED}} = k/N$.
@@ -114,21 +110,24 @@ Hence, after the first batch has been processed, LIP will have worst-case perfor
 We summarize the skew datasets studied in this paper in Table~\ref{tab:skew_datasets}
 
 \begin{center}
-\begin{tabular}{ |>{\ttfamily}r|>{\ttfamily}c|l| } 
+\begin{tabular}{ |>{\ttfamily}l|>{\ttfamily}c|l| } 
 \hline
 {\bf Dataset Name} & {\bf Skewed Foreign Keys} & {\bf Description of Skew} \\
 \hline
 \hline
-lineorder-date-50-50& ORDER DATE & First 50 batches have $\sigma_{\texttt{SKEW PRED}} = 1$ \\
-& & Next 50 batches have $\sigma_{\texttt{SKEW PRED}} = 0$ \\ 
+LINEORDER-UNIFORM& N/A & No skew. Generated from SSB data generator.\\
 \hline
-lineorder-date-first-half& ORDER DATE & First $N/2$ batches have $\sigma_{\texttt{SKEW PRED}} = 1$ \\
-& & Next $N/2$ batches have $\sigma_{\texttt{SKEW PRED}} = 0$, \\
-& & where $N$ is the total number of batches in \text{LINEORDER}\\
+LINEORDER-DATE-FIRST-HALF& ORDER DATE & $\sigma_{\texttt{SKEW PRED}}$ changes from 1 to 0 halfway through\\
+& &  the table.\\
 \hline
-lineorder-date-linear& ORDER DATE & $\sigma_{\texttt{SKEW PRED}}$ increases linearly from 0 to 1 \\
+LINEORDER-DATE-50-50& ORDER DATE & $\sigma_{\texttt{SKEW PRED}}$ changes from 1 to 0 or from 0 to 1 \\
+& & every 50 batches. \\ 
 \hline
-lineorder-date-part-adversary& ORDER DATE & See Section~\ref{sec:ratio}\\
+LINEORDER-DATE-LINEAR& ORDER DATE & $\sigma_{\texttt{SKEW PRED}}$ increases linearly from 0 to 1 \\
+& & through the table. \\
+\hline
+LINEORDER-DATE-PART-ADVERSARY& ORDER DATE & See Section~\ref{sec:ratio}\\
+& PART KEY & \\
 \hline
 \end{tabular}
 \end{center}
@@ -136,9 +135,55 @@ lineorder-date-part-adversary& ORDER DATE & See Section~\ref{sec:ratio}\\
 The adversarial dataset is constructed to make SSB query 4.2 achieve near worst-case performance for LIP. 
 
 
-
 \subsection{Execution Time}
 \label{sec:time}
+
+
+
+SSB query groups 1 and 2 do not join on \texttt{ORDER DATE} and are thus unaffected by the skewed key column. 
+Fig.~\ref{fig:times0} shows execution times for these queries on the \texttt{LINEORDER-DATE-50-50}.
+As expected, we observe that LIP and LIP-$k$ have roughly equal performance for these queries.
+Henceforth, we will exclude query groups 1 and 2 from our analysis, 
+as they provide us no insight. 
+Nevertheless, from these results, we can conclude that the extra overhead associated with LIP-$k$ is negligible.
+
+However, query groups 3 and 4 except for query 4.1 do join on \texttt{ORDER DATE}, so our skew can potentially affect the execution of LIP and LIP-$k$ on these queries.
+
+Fig.~\ref{fig:times1} shows execution times using \texttt{LINEORDER-DATE-FIRST-HALF}. we see that LIP and LIP-$k$ have roughly equal performance on queries 3.2, 3.3, 3.4, and 4.3 
+(and 4.1, but this query does not join on \texttt{ORDER DATE}).
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-date-50-50-q1-q2}
+    \caption{Execution time for SSB query groups 1 and 2 on \texttt{LINEORDER-DATE-50-50}}
+    \label{fig:times0}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \subfloat[]{
+        \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-date-first-half}
+    }\\
+    \subfloat[]{
+        \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-date-50-50}
+    }
+    \caption{Execution time for SSB query groups 3 and 4 on (a) \texttt{LINEORDER-DATE-FIRST-HALF} and (b)~\texttt{LINEORDER-DATE-50-50}}
+    \label{fig:times1}
+\end{figure}
+
+
+\begin{figure}
+    \centering    
+    \subfloat[]{
+        \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-date-linear}
+    }\\
+    \subfloat[]{
+        \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-date-part-adversary}
+    }
+    \caption{Execution time for SSB query groups 3 and 4 on (a) \texttt{LINEORDER-DATE-LINEAR} and (b)~\texttt{LINEORDER-DATE-PART-ADVERSARY}}
+    \label{fig:times2}
+\end{figure}
 
 
 
@@ -184,32 +229,5 @@ LIP performs poorly because it never forgets the first batch.
 
 If $k$ is even, then LIP-k will (after the first $k$ batches have been processed) have $\sigma^A_i = \sigma^B_i = \frac{1}{2}$. Thus,
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-date-50-50}
-    \caption{}
-    \label{fig:cr}
-\end{figure}
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-date-first-half}
-    \caption{}
-    \label{fig:cr}
-\end{figure}
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-date-linear}
-    \caption{}
-    \label{fig:cr}
-\end{figure}
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-date-part-adversary}
-    \caption{}
-    \label{fig:cr}
-\end{figure}
 
 %$k = 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100$ on 

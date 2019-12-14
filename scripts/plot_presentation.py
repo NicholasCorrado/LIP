@@ -3,6 +3,8 @@ import numpy as np
 import sys
 
 
+
+Q3andQ4 = True
 MSEC_TO_SEC = 1000000
 
 def GetQueryName(line):
@@ -64,8 +66,10 @@ def get_stdev(hash_file_base, start, end):
 		hash_time.append(np.std(hash_dict[q]) / MSEC_TO_SEC)
 
 
-	hash_time = [hash_time[j] for j in range(6,len(hash_time))]
-	# hash_time = [hash_time[j] for j in range(6)]
+	if Q3andQ4:
+		hash_time = [hash_time[j] for j in range(6,len(hash_time))]
+	else:
+		hash_time = [hash_time[j] for j in range(6)]
 
 	return hash_time
 
@@ -83,8 +87,11 @@ def produce_time_plot(hash_file_base, start, end):
 	error = np.std(hash_time_all, axis=1)
 
 	query = ['Q2.1', 'Q3.2', 'Q4.2']
-	hash_time = [hash_time[j] for j in range(6,len(hash_time))]
-	# hash_time = [hash_time[j] for j in range(6)]
+
+	if (Q3andQ4):
+		hash_time = [hash_time[j] for j in range(6,len(hash_time))]
+	else:
+		hash_time = [hash_time[j] for j in range(6)]
 
 	return hash_time
 
@@ -192,17 +199,22 @@ def plot_time(start, end):
 
 		 
 		# Add xticks on the middle of the group bars
-		plt.xticks([r + barWidth*3 for r in range(len(lip_time))], ['Q3.1','Q3.2','Q3.3','Q3.4','Q4.1','Q4.2','Q4.3'])
-		# plt.xticks([r + barWidth*3 for r in range(len(lip_time))], ['Q1.1','Q1.2','Q1.3','Q2.1','Q2.2','Q2.3'])
 		 
 		# Create legend & Show graphic
 		plt.gca().legend(tuple(legend_label_list), prop={'size': 12})
 		# plt.ylim(0,1.75)
 		plt.xlabel("SSB Query", fontweight='bold', fontsize=12)
 		plt.ylabel("Running time (s)", fontweight='bold', fontsize=12)
-		plt.title("Performance of LIP and LIP-k on SSB Query Groups 3 and 4: LINEORDER-" + titles[j], fontweight='bold', fontsize=14)
-		# plt.savefig('./doc/pics/lip-and-lipk-' + directory + '-q1-q2')
-		# plt.savefig('./doc/pics/lip-and-lipk-' + directory)
+
+		if (Q3andQ4):
+			plt.xticks([r + barWidth*3 for r in range(len(lip_time))], ['Q3.1','Q3.2','Q3.3','Q3.4','Q4.1','Q4.2','Q4.3'])
+			plt.title("Performance of LIP and LIP-k on SSB Query Groups 3 and 4: LINEORDER-" + titles[j], fontweight='bold', fontsize=14)
+			plt.savefig('./doc/pics/lip-and-lipk-' + directory)
+		else:
+			plt.xticks([r + barWidth*3 for r in range(len(lip_time))], ['Q1.1','Q1.2','Q1.3','Q2.1','Q2.2','Q2.3'])
+			plt.title("Performance of LIP and LIP-k on SSB Query Groups 1 and 2: LINEORDER-" + titles[j], fontweight='bold', fontsize=14)
+			plt.savefig('./doc/pics/lip-and-lipk-' + directory + '-q1-q2')
+		
 		plt.show()
 
 
