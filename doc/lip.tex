@@ -132,7 +132,7 @@ The LIP strategy and its variant LIP-$k$ depicted in Figures \ref{fig:lip} and \
 	Let the $n$ filters be $f_1, f_2, \dots, f_n$, 
 	and let $S_k$ denote the filter sequence that will be used to filter batch $k$. 
 	Let each batch contain $m$ tuples.
-	At each iteration $k$, prior to LIP's probe phase, the adversary observes $S_k$ and produces a batch of tuples $\{t_1, t_2, \dots, t_m\}$, where $t_i \in f_n$ but $t_i \notin f_j$ for any $j < n$. The adversary then feeds this batch into mechanism $\mathcal{M}$. Thus, $\mathcal{M}$ performs $n$ filter probes to eliminate each tuple, whereas the optimal sequence is to apply $f_n$ first. Thus, $\mathcal{M}$ has a competitive ratio of $n$.
+	At each iteration $k$, prior to LIP's probe phase, the adversary observes $S_k$ and produces a batch of tuples $\{t_1, t_2, \dots, t_m\}$, where $t_i \in f_n$ but $t_i \notin f_j$ for any $j < n$. The adversary then feeds this batch into mechanism $\mathcal{M}$. Thus, $\mathcal{M}$ performs $n$ filter probes to eliminate each tuple, whereas the optimal sequence is to apply $f_n$ first. Thus, $\mathcal{M}$ achieves a competitive ratio of $n$.
 \end{proof}
 
 It might be possible to design a randomized mechanism that can achieve a better competitive ratio than $n$. The randomized mechanism would, at the end of each batch, select a sequence of applying the filters from a distribution of all filter permutations, based on the estimated selectivities. However, we have not obtained any algorithmic upper bound on the competitive ratio. Furthermore, a randomized approach creates a new concern of being too computationally heavy.
