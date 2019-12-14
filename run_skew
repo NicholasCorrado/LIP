@@ -18,15 +18,43 @@ echo $query
 # $dir/lip-$k_$i
 # $dir/hash_$i  
 
-declare -a arr=("date-50-50" "date-linear" "date-part-adversary" "date-first-half")
+declare -a arr=("date-linear" "date-part-adversary" "date-first-half")
 
-for i in `seq 1 1`;
+for i in `seq 1 5`;
 do
     
     for dir in "${arr[@]}"
     do
+        alg=hash
+        echo "iteration $i $dir $alg"...
+        ./apps/app $query $alg skew-"$dir" 1 > scripts/data/$dir/hash_${i}
+
         alg=lip
         echo "iteration $i $dir $alg"...
         ./apps/app $query $alg skew-"$dir" 1 > scripts/data/$dir/lip_${i}
+
+        alg=lip1
+        echo "iteration $i $dir $alg"...
+        ./apps/app $query $alg skew-"$dir" 1 > scripts/data/$dir/lip-1_${i}
+
+        alg=lip10
+        echo "iteration $i $dir $alg"...
+        ./apps/app $query $alg skew-"$dir" 1 > scripts/data/$dir/lip-10_${i}
+
+        alg=lip20
+        echo "iteration $i $dir $alg"...
+        ./apps/app $query $alg skew-"$dir" 1 > scripts/data/$dir/lip-20_${i}
+
+        alg=lip50
+        echo "iteration $i $dir $alg"...
+        ./apps/app $query $alg skew-"$dir" 1 > scripts/data/$dir/lip-50_${i}
+
+        alg=lip80
+        echo "iteration $i $dir $alg"...
+        ./apps/app $query $alg skew-"$dir" 1 > scripts/data/$dir/lip-80_${i}
+
+        alg=lip100
+        echo "iteration $i $dir $alg"...
+        ./apps/app $query $alg skew-"$dir" 1 > scripts/data/$dir/lip-100_${i}
     done
 done
