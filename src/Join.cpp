@@ -4,8 +4,8 @@
 #include <chrono>
 
 
-#define DEBUG 1
-#define CR 1
+#define DEBUG 0
+#define CR 0
 
 
 
