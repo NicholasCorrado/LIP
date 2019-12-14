@@ -25,18 +25,18 @@ Let subscripts denote the batch index and superscripts denote the key column (A 
 We start with the first batch having
 $\sigma_1^A = \frac{1}{2} - \varepsilon$ and $\sigma_1^B = \frac{1}{2} + \varepsilon$ where $0 < \varepsilon < \frac{1}{2}$. Then for all $j > 1$, we let
 
-\begin{align*}
-\sigma_j^A &= 
+\begin{equation*}
+\sigma_j^A = 
     \begin{cases}
-    1 & \text{if $j$ is even}, \\[0.5em]
-    0 & \text{if $j$ is odd}; \\
-    \end{cases}\\[0.5em]
-\sigma_j^B &= 
+    1 & \text{if $j$ is even,} \\[0.5em]
+    0 & \text{if $j$ is odd} \\
+    \end{cases} \quad \text{and }
+\sigma_j^B = 
     \begin{cases}
-    0 & \text{if $j$ is even}, \\[0.5em]
+    0 & \text{if $j$ is even,} \\[0.5em]
     1 &  \text{if $j$ is odd}. \\
     \end{cases}
-\end{align*}
+\end{equation*}
 
 Thus, the optimal filter sequence $S^{OPT}$ is 
 
@@ -51,18 +51,18 @@ S^{OPT} &=
 \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 After processing batch $j$,  we have $f_j^A = \frac{\frac{1}{2} - \varepsilon + \floor{\frac{j}{2}}}{j}$ and $f_j^B = \frac{\frac{1}{2} + \varepsilon + \floor{\frac{j}{2}}}{j}$  which can be rewritten as
 
-\begin{align*}
-f_j^A &= 
+\begin{equation*}
+f_j^A = 
     \begin{cases}
     \frac{1}{2} + \frac{\frac{1}{2}-\varepsilon}{j} & \text{if $j$ is even}, \\[0.5em]
     \frac{1}{2} - \frac{\varepsilon}{j} &  \text{if $j$ is odd}; \\
-    \end{cases}\\[0.5em]
-f_j^B &= 
+    \end{cases}  \quad \text{and }
+f_j^B = 
     \begin{cases}
     \frac{1}{2} - \frac{\frac{1}{2}-\varepsilon}{j} & \text{if $j$ is even}, \\[0.5em]
     \frac{1}{2} + \frac{\varepsilon}{j} &  \text{if $j$ is odd}, \\
     \end{cases}\\[0.5em]
-\end{align*}
+\end{equation*}
 
 and thus, LIP's filter ordering will be
 
