@@ -56,7 +56,6 @@ def GetDictionary(data_directories):
 
 	return ret, cr
 
-<<<<<<< HEAD
 def get_stdev(hash_file_base, start, end):
 	hash_dict, cr = GetDictionary([hash_file_base + str(i) for i in range(start, end)])
 	hash_time = []
@@ -101,19 +100,15 @@ def produce_time_plot(hash_file_base, start, end):
 	hash_time = []
 	hash_time_all = []
 	for q in hash_dict:
-		hash_time.append(min(hash_dict[q]) / MSEC_TO_SEC)
+		hash_time.append(np.median(hash_dict[q]) / MSEC_TO_SEC)
 		hash_time_all.append([time / MSEC_TO_SEC for time in hash_dict[q]])
-		print(q)
-		if (q == "2.1"):
-			print(hash_time_all[-1])
 
 	error = np.std(hash_time_all, axis=1)
-	# print(error)
 
 	query = ['Q2.1', 'Q3.2', 'Q4.2']
 	hash_time = [hash_time[j] for j in range(6,len(hash_time))]
 
-	return hash_time, [error[3], error[7], error[11]]
+	return hash_time
 
 	# hash_plot = plt.plot(query, hash_time, '-o')
 
@@ -135,7 +130,11 @@ def plot_time(start, end):
 					"date-first-half"
 					]
 
+
+	titles = ["DATE-50-50", "DATE-LINEAR", "DATE-PART-ADVERSARY", "DATE-FIRST-HALF",]
 	lipK = [1,10,20,50,80,100]
+
+	j = 0
 
 	for directory in directories:
 		dir_base = "./scripts/data/" + directory + "/"
@@ -199,15 +198,15 @@ def plot_time(start, end):
 		# r3 = [x + barWidth for x in r2]
 
 		# Make the plot
-		plt.figure(num=1, figsize=(8, 7))
+		plt.figure(num=1, figsize=(15, 7))
 
-		plt.bar(r1, lip1_time,  	yerr=lip1_err, 		color='tab:red', width=barWidth, edgecolor='black')
-		plt.bar(r10, lip10_time,  	yerr=lip10_err, 	color='tab:orange', width=barWidth, edgecolor='black')
-		plt.bar(r20, lip10_time, 	yerr=lip20_err, 	color='gold',width=barWidth, edgecolor='black')
-		plt.bar(r50, lip20_time,	yerr=lip50_err, 	color='tab:green', width=barWidth, edgecolor='black')
-		plt.bar(r80, lip50_time, 	yerr=lip80_err, 	color='tab:blue', width=barWidth, edgecolor='black')
-		plt.bar(r100, lip80_time, 	yerr=lip100_err, 	color='indigo', width=barWidth, edgecolor='black')
-		plt.bar(rl, lip_time,		yerr=lip_err, 		color='tab:purple', width=barWidth, edgecolor='black')
+		plt.bar(r1, lip1_time,  	yerr=lip1_err, 		color='#feebe2', width=barWidth, edgecolor='black')
+		plt.bar(r10, lip10_time,  	yerr=lip10_err, 	color='#fcc5c0', width=barWidth, edgecolor='black')
+		plt.bar(r20, lip10_time, 	yerr=lip20_err, 	color='#fa9fb5',width=barWidth, edgecolor='black')
+		plt.bar(r50, lip20_time,	yerr=lip50_err, 	color='#f768a1', width=barWidth, edgecolor='black')
+		plt.bar(r80, lip50_time, 	yerr=lip80_err, 	color='#dd3497', width=barWidth, edgecolor='black')
+		plt.bar(r100, lip80_time, 	yerr=lip100_err, 	color='#ae017e', width=barWidth, edgecolor='black')
+		plt.bar(rl, lip_time,		yerr=lip_err, 		color='#7a0177', width=barWidth, edgecolor='black')
 		if (PLOT_HASH): 
 			plt.bar(rh, hash_time,  color='grey', width=barWidth, edgecolor='black')
 		# plt.bar(r1, bars1, color='#7f6d5f', width=barWidth, edgecolor='white', label='var1')
@@ -216,17 +215,19 @@ def plot_time(start, end):
 
 		 
 		# Add xticks on the middle of the group bars
-		plt.xlabel('group', fontweight='bold')
 		plt.xticks([r + barWidth*3 for r in range(len(lip_time))], ['Q3.1','Q3.2','Q3.3','Q3.4','Q4.1','Q4.2','Q4.3'])
 		 
 		# Create legend & Show graphic
 		plt.gca().legend(tuple(legend_label_list), prop={'size': 12})
 		# plt.ylim(0,1.75)
-		plt.xlabel("SSB Query")
-		plt.ylabel("Running time (s)")
-
-
+		plt.xlabel("SSB Query", fontweight='bold', fontsize=12)
+		plt.ylabel("Running time (s)", fontweight='bold', fontsize=12)
+		plt.title("Performance of LIP and LIP-k on SSB Query Groups 3 and 4: LINEORDER-" + titles[j], fontweight='bold', fontsize=14)
+		plt.savefig('./doc/pics/lip-and-lipk-' + directory)
 		plt.show()
+
+
+		j += 1
 
 
 def plot_time_hash(start, end):
@@ -243,7 +244,7 @@ def plot_time_hash(start, end):
 
 
 	for directory in directories:
-		dir_base = "./scripts/data/" + directory + "/"
+		dir_base = "./scripts/data_2019_12_14/" + directory + "/"
 
 		hash_time = produce_time_plot(dir_base + "hash_", start, end)
 		lip_time  = produce_time_plot(dir_base + "lip_", start, end)
@@ -294,7 +295,7 @@ def plot_time_hash(start, end):
 		# r3 = [x + barWidth for x in r2]
 
 		# Make the plot
-		plt.figure(num=1, figsize=(8, 7))
+		plt.figure(num=1, figsize=(9, 7))
 
 		# plt.bar(r1, lip1_time,  color='tab:red', width=barWidth, edgecolor='white')
 		# plt.bar(r10, lip10_time,  color='tab:orange', width=barWidth, edgecolor='white')
@@ -326,7 +327,7 @@ def plot_time_hash(start, end):
 
 def main():
 
-	plot_time(1, 2)
+	plot_time(1, 5)
 	#plot_time_hash(1,5)
 	
 if __name__ == "__main__":
