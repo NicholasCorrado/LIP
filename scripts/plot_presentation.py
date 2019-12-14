@@ -63,6 +63,7 @@ def get_stdev(hash_file_base, start, end):
 	for q in hash_dict:
 		hash_time.append(np.std(hash_dict[q]) / MSEC_TO_SEC)
 
+
 	hash_time = [hash_time[j] for j in range(6,len(hash_time))]
 	# hash_time = [hash_time[j] for j in range(6)]
 
@@ -74,6 +75,7 @@ def produce_time_plot(hash_file_base, start, end):
 	hash_dict, cr = GetDictionary([hash_file_base + str(i) for i in range(start, end)])
 	hash_time = []
 	hash_time_all = []
+
 	for q in hash_dict:
 		hash_time.append(np.median(hash_dict[q]) / MSEC_TO_SEC)
 		hash_time_all.append([time / MSEC_TO_SEC for time in hash_dict[q]])
@@ -98,14 +100,15 @@ def plot_time(start, end):
 	PLOT_HASH = False
 
 
-	directories = [	"date-50-50",
+	directories = [	"uniform",
+					"date-50-50",
 				   	"date-linear",
 					"date-part-adversary",
 					"date-first-half"
 					]
 
 
-	titles = ["DATE-50-50", "DATE-LINEAR", "DATE-PART-ADVERSARY", "DATE-FIRST-HALF"]
+	titles = ["UNIFORM", "DATE-50-50", "DATE-LINEAR", "DATE-PART-ADVERSARY", "DATE-FIRST-HALF"]
 	lipK = [1,10,20,50,80,100]
 
 	j = 0
@@ -199,7 +202,7 @@ def plot_time(start, end):
 		plt.ylabel("Running time (s)", fontweight='bold', fontsize=12)
 		plt.title("Performance of LIP and LIP-k on SSB Query Groups 3 and 4: LINEORDER-" + titles[j], fontweight='bold', fontsize=14)
 		# plt.savefig('./doc/pics/lip-and-lipk-' + directory + '-q1-q2')
-		plt.savefig('./doc/pics/lip-and-lipk-' + directory)
+		# plt.savefig('./doc/pics/lip-and-lipk-' + directory)
 		plt.show()
 
 
