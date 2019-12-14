@@ -2,13 +2,13 @@
 
 \section{Database Implementation}
 
-We have developed a prototype database system supporting basic select and join operations on top of Apache Arrow \textbf{[CITATION NEEDED]}, a column-store format. This minimal prototype is sufficient to benchmark the performance of our Hash join, LIP, and LIP-$k$.
+We have developed a prototype database system supporting basic select and join operations on top of Apache Arrow \cite{apachearrow}, a column-store format. This minimal prototype is sufficient to benchmark the performance of our Hash join, LIP, and LIP-$k$.
 
-Our implementations of LIP and LIP-k only support left-deep join tree plans where the fact table is the "outer table" in every join. We assume that the fact table schema contains foreign keys to all dimension tables, and each dimension table is single-key. Given a star schema fact table $F$ and dimension tables $D_i$ for $1 \leq i \leq n$, a join query in our system specifies selectors $\sigma_F$ for $F$ and $\sigma_i$ for each $D_i$, and executing that query will return 
+Our implementations of LIP and LIP-k only support left-deep join tree plans where the fact table is the ``outer table" in every join. We assume that the fact table schema contains foreign keys to all dimension tables, and each dimension table is single-key. Given a star schema fact table $F$ and dimension tables $D_i$ for $1 \leq i \leq n$, a join query in our system specifies selectors $\sigma_F$ for $F$ and $\sigma_i$ for each $D_i$, and executing that query will return 
 
 $$\sigma_F(F) \JOIN \sigma_1(D_1) \JOIN \dots \JOIN \sigma_n(D_n)$$
 
-\noindent projected on the schema of $F$, {\it i.e.} we output the tuples in $F$ that can be joined with each $D_i$. The supported primitive selectors allow for selection ($=, \leq, \geq, <, >$) on scalar values and ranges, Range selections are executed using \texttt{BETWEEN} ($\ell$, $h$) is to select all $x$ with $\ell \leq x \leq h$. 
+\noindent projected on the schema of $F$, {\it i.e.}~we output the tuples in $F$ that can be joined with each $D_i$. The supported primitive selectors allow for selection ($=, \leq, \geq, <, >$) on scalar values and ranges, Range selections are executed using \texttt{BETWEEN} ($\ell$, $h$) is to select all $x$ with $\ell \leq x \leq h$. 
 
 The selectors for each dimension can be either a primitive selector, 
 or a composition (logical AND/OR) of multiple primitive/composite selectors. 

@@ -94,6 +94,7 @@ initial text=$ $, % sets the text that appears on the start arrow
 
 \section{Future Works}
 
+A huge take-away from this project is that the budget allowed for filtering each filter is very limited, in the magnitude of near 100 CPU cycles. Hence maintaining the statistics that require heavy computation or using randomness that requires much computation cost are not practically beneficial. Given this, we will investigate dynamically start sampling a segment of the fact table to have true estimates of each filters, and then stick to this estimate for the next few batches. This has low maintenance overhead, and once the adaptive policy for dynamical sampling is established, we expect that to have better practical performance than LIP and LIP-$k$. Note that this strategy is still deterministic, still prone to the worst case $n$ competitive ratio bound established by Theorem~\ref{thm:det-n}. 
 
 
 \section{Concluding Remarks}
