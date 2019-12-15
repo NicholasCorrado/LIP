@@ -99,13 +99,8 @@ LINEORDER-DATE-PART-ADVERSARY& ORDER DATE & See Section~\ref{sec:ratio}\\
 
 \begin{figure}
     \centering    
-    \subfloat[]{
-        \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-date-linear}
-    }\\
-    \subfloat[]{
-        \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-date-part-adversary}
-    }
-    \caption{Execution time for SSB query groups 3 and 4 on (a) \texttt{LINEORDER-DATE-LINEAR} and (b)~\texttt{LINEORDER-DATE-PART-ADVERSARY}}
+    \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-date-linear}
+    \caption{Execution time for SSB query groups 3 and 4 on \texttt{LINEORDER-DATE-LINEAR}}
     \label{fig:times2}
 \end{figure}
 
@@ -154,7 +149,7 @@ We see that there is an inherent cost associated with responsiveness that may ou
 % Hence, LIP-1 performs an entire batch of unnecessary probes. 
 % Afterwards, LIP-1 then knows to push the \texttt{DATE} filter to end of the filter sequence. 
 
-Fig.~\ref{fig:times2}(a) shows execution times using \texttt{LINEORDER-DATE-LINEAR}. 
+Fig.~\ref{fig:times2} shows execution times using \texttt{LINEORDER-DATE-LINEAR}. 
 LIP and LIP-$k$ have roughly the same performance for most queries, 
 suggesting that both algorithms can adequately respond to smooth changes in key distributions.
 Again, LIP-$1$ performs worse than all other algorithms on queries 3.3 and 4.3.
