@@ -13,22 +13,18 @@ brew install apache-arrow
 Next clone our project
 
 ```
-git clone 
+git clone https://github.com/NicholasCorrado/CS764.git
 cd CS764
-```
-
-Make the installation files and compile
-
-```
 cmake .
 make
 ```
+
 
 ## Execution
 To run, call
 
 ```
->> ./apps/app <SSB query number> <aglorithm> <skew> <SF> 
+./apps/app <SSB query number> <aglorithm> <skew> <SF> 
 ```
 
 Possible values for <query> are:
@@ -56,7 +52,7 @@ hash
 lip
 lipk
 ```
-
+where k can be substituted by a positive integer.
 where for `lipk`, `k` is any integer.
 
 Possible values for <skew> are:
