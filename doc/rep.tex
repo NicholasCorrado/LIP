@@ -95,11 +95,20 @@ initial text=$ $, % sets the text that appears on the start arrow
 \section{Future Works and Concluding Remarks}
 
 The contributions of this project come in two-folds: We implemented Hash-join and LIP on top of Apache Arrow and thus provided an interface for future integration of Hustle on Apache Arrow; and we proposed LIP-$k$, a variant of LIP, which opens up an area for improving the performance LIP. 
+We find that for certain queries, 
+LIP-$k$ performs better than LIP, 
+while for other queries,
+LIP performs better than LIP-$k$.
 
 The budget allowed for filtering each tuple is limited --- roughly 100 CPU cycles. Hence, computationally-heavy approaches to maintaining filter statistics are not practically beneficial. Therefore, we will investigate dynamically sampling a segment of the fact table to have true estimates of each filters, and then stick to this estimate for the next few batches. This has low maintenance overhead, and once the adaptive policy for dynamic sampling is established, we expect that to have better practical performance than LIP and LIP-$k$. Note that this strategy is still deterministic, still prone to the worst case $n$ competitive ratio bound established by Theorem~\ref{thm:det-n}.  
 It would be interesting to study LIP in the online algorithmic setting to design an efficient mechanism utilizing randomness 
 that offers better worst-case guarantees without burning too many CPU cycles.
 Of course, CPU efficiency and randomness are at odds in such an approach. 
+
+As discussed in Section~\ref{sec:time}, sometimes the inherent cost of aiming for the optimal filter sequence outweighs its benefit.
+In such cases, it is better to simply aim for ``good enough". 
+With this in mind, it would be interesting to develop a variant of LIP that strives for ``good enough" rather than optimality.
+
 
 % Future work below
 
@@ -108,7 +117,7 @@ Of course, CPU efficiency and randomness are at odds in such an approach.
 
 \section*{Acknowledgements}
 
-The authors wish to thank Prof.\ Jignesh Patel for constant feedbacks on this project and Kevin Gaffney for helping us with Apache Arrow specifics. The second author wishes to thank Prof.\ Paris Koutris for the suggestion of working on a practical project when the lemma production pipe is jammed. It works.
+The authors wish to thank Prof.\ Jignesh Patel for providing constant feedback on this project and Kevin Gaffney for helping us with Apache Arrow specifics. The second author wishes to thank Prof.\ Paris Koutris for the suggestion of working on a practical project when the lemma production pipe is jammed. It works.
 
 
 \bibliography{rep}{}
