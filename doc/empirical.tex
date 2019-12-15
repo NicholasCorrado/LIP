@@ -224,10 +224,10 @@ As the number of batches in the fact table increases, the competitve ratio of LI
 
 Following this construction, we generated an adversarial dataset for SSB query 4.2 with A = \texttt{DATE} and B = \texttt{PART},
 excluding the joins on the \texttt{CUSTOMER} and \texttt{SUPPLIER} dimension tables.
-\footnote{In reality, we do not exclude the joins on \texttt{CUSTOMER} and \texttt{SUPPLIER} in query 4.2. 
-Rather, we generate the adversarial dataset such that $\sigma_i^{\texttt{CUSTOMER}}=1$ and $\sigma_i^{\texttt{SUPPLIER}}=1$ for every batch $i$. 
-This achieves the same effect as excluding the joins, though. 
-This was done because it is much easier to generate an adversarial dataset on fewer dimension tables.}
+We exclude these two joins because it is much simpler to generate an adversarial dataset on fewer dimension tables.
+\footnote{In our implementation, we do not explicitly exclude the joins on \texttt{CUSTOMER} and \texttt{SUPPLIER} in query 4.2. 
+Rather, we generate the adversarial dataset such that $\sigma_i^{\texttt{CUSTOMER}}=1$ and $\sigma_i^{\texttt{SUPPLIER}}=1$ for every batch $i$ 
+This achieves the same effect as excluding the joins.}
 
 
 
