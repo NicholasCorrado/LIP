@@ -140,17 +140,18 @@ def plot_time(start, end):
 
 
 def plot_cr(start, end):
-	directories = [	"date-5-5",
-				 	"date-10-10",
-				 	"date-20-20", 
-				 	"date-50-50",
-				 	"date-10-50",
-			  		"date-50-10",
-				   	"date-linear",
-				    "date-linear-part-20-20",
-					"date-linear-part-20-20-supp-10-20",
+	directories = [	
+					# "date-5-5",
+				 # 	"date-10-10",
+				 # 	"date-20-20", 
+				 # 	"date-50-50",
+				 # 	"date-10-50",
+			  # 		"date-50-10",
+				 #   	"date-linear",
+				 #    "date-linear-part-20-20",
+					# "date-linear-part-20-20-supp-10-20",
 					"date-part-adversary",
-					"date-first-half"
+					# "date-first-half"
 					]
 
 	lipK1 = [i for i in range(1, 10)]
@@ -179,7 +180,7 @@ def plot_cr(start, end):
 		
 		overall_cr["lip"] = max(overall_cr["lip"], cr_lip)
 	
-	X = lipK + [2*max(lipK)]
+	X = lipK + [562]
 	Y = list(overall_cr.values())
 	print(X)
 	print(Y)
@@ -196,8 +197,8 @@ def main():
 	# 	plot(1, 2)
 	# else:
 	# 	plot(int(sys.argv[1]), int(sys.argv[2]))
-	plot_time(1, 5)
-	# plot_cr(1, 2)
+	#plot_time(1, 5)
+	plot_cr(1, 2)
 	#ret, cr = GetDictionary(["./scripts/data/date-5-5/lip_1"])
 	#print(ret, cr)
 	

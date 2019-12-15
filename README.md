@@ -1,5 +1,15 @@
-# CS764
+# CS764 Accelerating Joins with Filters
 
+## Dependencies
+
+Apache arrow is required to run this project. One may download Apache Arrow using
+
+```
+brew install apache-arrow
+```
+
+
+## Execution
 To run, call
 
 ```

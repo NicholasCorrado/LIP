@@ -21,7 +21,7 @@ Because all of our join implementations must implement row-wise selection for st
 all algorithms suffer the same slowdown. 
 Thus, this implementation caveat does not preclude us from studying the relative performance of LIP and LIP-$k$.
 
-We only support string and numeric data types. All numeric data is stored an 64-bit integers by default.
+We only support string and numeric data types. All numeric data is stored as 64-bit integers by default.
 
 The hash join algorithm first produces a hash table $T_i$ for each $\sigma_i(D_i)$, projected on the $k_i$, and then probe each tuple in the fact table against all $T_i$. We used Sparseepp (accessible at \url{https://github.com/greg7mdp/sparsepp}) as our implementation of the hash table, in which the sparsehash by Google (accessible at \url{https://github.com/sparsehash/sparsehash}) is used as the underlying hash function. All primary keys are regarded as 64-bit integers.
 

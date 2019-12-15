@@ -11,7 +11,6 @@ In this section we present the empirical results obtained from running Hash-join
 We modify the normal \texttt{LINEORDER} file produced by the SSB data generator with SF = 1 to produce the four skewed \texttt{LINEORDER} tables listed below.
 For simplicity in generating skew tables, we skew the \texttt{ORDER DATE} foreign key in the \texttt{LINEORDER} table, corresponding to the primary key of the \texttt{DATE} table. 
 We alter the distribution of \texttt{ORDER DATE} foreign keys satisfying \texttt{DATE.YEAR = 1997 OR DATE.YEAR = 1998}, which we will shorten to \texttt{SKEW PRED}.
-Let 
 
 \begin{itemize}
     \item \texttt{LINEORDER-DATE-FIRST-HALF}: Let $N$ be the total number of batches in \texttt{LINEORDER}. 
@@ -40,8 +39,9 @@ We then edit the columns we want to skew.
 
 
 
-We summarize the skew datasets studied in this paper in Table~\ref{tab:skew_datasets}
+We summarize the skew datasets studied in this paper in Table~\ref{tab:skew_datasets}.
 
+\begin{table}
 \begin{center}
 \begin{tabular}{ |>{\ttfamily}l|>{\ttfamily}c|l| } 
 \hline
@@ -65,6 +65,10 @@ LINEORDER-DATE-PART-ADVERSARY& ORDER DATE & See Section~\ref{sec:ratio}\\
 \end{tabular}
 \end{center}
 
+\caption{Skewed datasets generated}
+\label{tab:skew_datasets}
+\end{table}
+
 The adversarial dataset is constructed to make SSB query 4.2 achieve near worst-case performance for LIP. 
 
 
@@ -82,16 +86,16 @@ Nevertheless, from these results, we can conclude that the extra overhead associ
 
 
 
-However, query groups 3 and 4 -- except for query 4.1 -- do join on \texttt{ORDER DATE}, so our skew can potentially affect the execution of LIP and LIP-$k$ on these queries.
+However, query groups 3 and 4 --- except for query 4.1 --- do join on \texttt{ORDER DATE}, so our skew can potentially affect the execution of LIP and LIP-$k$ on these queries.
 We include only queries from groups 3 and 4 in our analysis. 
-Query 4.1 is included as well as a "sanity check"; LIP and LIP-$k$ should have roughly equal performance on this query.
+Query 4.1 is included as a ``sanity check"; LIP and LIP-$k$ should have roughly equal performance on this query.
 
 Fig.~\ref{fig:times1}(a) shows execution times using \texttt{LINEORDER-DATE-FIRST-HALF}. 
 We see that LIP and LIP-$k$ have roughly equal performance on queries 3.2, 3.3, 3.4, and 4.3 (in addition to 4.1).
 In such queries, we do not gain much by responding to local changes in the key distribution,
 since one of the \texttt{SUPPLIER} filter is already very selective. 
 LIP applies the \texttt{SUPPLIER} filter first.
-In brief, it is "good enough" to apply a very selective filter first, even if it is not optimal.
+In brief, it is ``good enough" to apply a very selective filter first, even if it is not optimal.
 On the other hand, LIP-$k$ performs better on queries 3.1 and 4.2, 
 since the other filters are not particularly selective. 
 We also observe that smaller $k$ has slightly better performance, 
@@ -99,7 +103,7 @@ because small $k$ can respond much more quickly to the sudden change in selectiv
 
 Fig.~\ref{fig:times1}(b) shows execution times using \texttt{LINEORDER-DATE-50-50}. 
 
-The key observation is that LIP-$k$ must first "miss" before it can respond to a sudden change in selectivity.
+The key observation is that LIP-$k$ must first ``miss" before it can respond to a sudden change in selectivity.
 For example, consider LIP-1 processing the $101^{st}$ batch in \texttt{LINEORDER-DATE-50-50}. 
 At this point, the \text{DATE} filter has selectivity 0, and is thus probed first. 
 However, the \texttt{DATE} filter eliminates no tuples in the current batch, since the current batch has selectivity 1.
@@ -236,20 +240,24 @@ We ran LIP and LIP-$k$ on the uniform dataset and each skewed dataset computed t
 \begin{figure}
     \centering
     \subfloat[]{
-        \includegraphics[width=0.43\textwidth,keepaspectratio]{cr-k-uniform}
+        \includegraphics[width=0.9\textwidth,keepaspectratio]{cr-wide}
+        %\includegraphics[width=0.9\textwidth,keepaspectratio]{cr-k-uniform}
     }   
+
     \quad
+    
     \subfloat[]{
-        \includegraphics[height=0.32\textwidth,keepaspectratio]{cr-k-skewed}
+        \includegraphics[width=0.9\textwidth,keepaspectratio]{cr-adversary-wide}
+        %\includegraphics[width=0.9\textwidth,keepaspectratio]{cr-k-skewed}
     }
-    \caption{The competitive ratios of LIP-$k$ against different $k$ values. We ran LIP-$k$ on uniform data and skewed (and adversarial) dataset to produce (a) and (b) respectively. The data point at $k = 200$ represents LIP (which is essentially LIP-$\infty$).}
+    \caption{The competitive ratios of LIP-$k$ against different $k$ values. We ran LIP-$k$ on uniform data and skewed (and adversarial) dataset to produce (a) and (b) respectively. The data point at $k = 564$ represents LIP (which is essentially LIP-$\infty$).}
     \label{fig:cr}
 \end{figure}
 
 When the keys in the fact table columns are distributed uniformly, the filters need not react to the local changes. Hence for LIP with higher $k$, it remembers more batches in the uniform data, therefore may produce a more accurate estimate of the selectivities than the LIP-$k$ with smaller $k$. Hence, the competitive ratio decreases slightly as $k$ increases, as depicted in Figure \ref{fig:cr}.
 
 %@TODO: Explain the adversarial case using epsilons
-Figure \ref{fig:cr}(b) displays how an adversarial dataset can make LIP-$k$ and LIP perform poorly. Each LIP-$k$ with even $k$ achieves an approximation ratio less than 2; LIP and LIP-$k$ with odd $k$ achieve an approximation ratio of almost 2 precisely at Query 3.2 in dataset \texttt{date-part-adversary}. Query 3.2 has two joins, and thus the performance of LIP-$k$ with even $k$ matches the worst case competitive ratio. By construction of \texttt{date-part-adversary}, the first batch has $\sigma^{1}_{1} = 1/2-\
+Figure \ref{fig:cr}(b) displays how an adversarial dataset can make LIP-$k$ and LIP perform poorly. Each LIP-$k$ with even $k$ achieves an approximation ratio less than 2; LIP and LIP-$k$ with odd $k$ achieve an approximation ratio of almost 2 precisely at Query 4.2 in dataset \texttt{date-part-adversary}. Query 3.2 has two joins, and thus the performance of LIP-$k$ with even $k$ matches the worst case competitive ratio. By construction of \texttt{date-part-adversary}, the first batch has $\sigma^{1}_{1} = 1/2-\
 \varepsilon$ and $\sigma^{1}_{2} = 1/2+\varepsilon$, and  each batch $B_{2i+1}$ is an \textit{odd} batch, with $\sigma^{2i}_{1} = 0$ and $\sigma^{2i}_{2} = 1$; and each batch $B_{2i}$ is an \textit{even} batch, with $\sigma^{2i}_{1} = 1$ and $\sigma^{2i}_{2} = 0$. 
 
 When $i \leq k$, LIP and LIP-$k$ execute identically, since LIP-$k$ has not yet ``forgotten" any previous batches. We now consider the case where $i > k$, {\it i.e.} where LIP-$k$ has forgotten at least the first batch. For odd $k$, LIP-$k$'s selectivity estimates always contains one more odd (or even) batch than the other, and thus the estimated selectivity and filtering sequence are in favor of the majority batch type. This yields a false prediction of the next batch, yielding a competitive ratio of 2. For even $k$, LIP-$k$'s selectivity estimates contain an equal amount of even an odd batches,  and thus estimated selectivities remain the same ($1/2$ by construction) throughout the execution, and the filter sequence does not change. Thus for at most half of the batches it is optimal, and for the other half it is worse, resulting in a competitive ratio of at least \[ \frac{1 \times 1/2 + 2 \times 1/2}{1} = 1.5,\] as depicted in Figure \ref{fig:cr}. For LIP, since it remembers the statistics from the beginning, by construction it would also make the same decision as LIP-$k$ with odd $k$, losing at every batch. 
