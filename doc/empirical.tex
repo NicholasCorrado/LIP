@@ -15,7 +15,8 @@ since it's foreign keys for each tuple are sampled from a uniform distribution o
 We modify the \texttt{LINEORDER-UNIFORM} table to produce four additional skewed \texttt{LINEORDER} tables.
 For simplicity in generating skew tables, we skew the \texttt{ORDER DATE} foreign key in the origin \texttt{LINEORDER} table, corresponding to the primary key of the \texttt{DATE} table. 
 We alter the distribution of \texttt{ORDER DATE} foreign keys satisfying \texttt{DATE.YEAR = 1997 OR DATE.YEAR = 1998}, which we shorten to \texttt{SKEW PRED}.
-All datasets are summarized in Table~\ref{tab:skew_datasets}.
+The skewed tables are as follows:
+
 
 \begin{itemize}
     \item \texttt{LINEORDER-DATE-FIRST-HALF}: Let $N$ be the total number of batches in \texttt{LINEORDER}. 
@@ -34,6 +35,8 @@ All datasets are summarized in Table~\ref{tab:skew_datasets}.
 
 \end{itemize} 
 
+
+All datasets are summarized in Table~\ref{tab:skew_datasets}. All datasets use the same dimension tables originally produced from the SSB generator with SF = 1.
 
 \begin{table}
 \begin{center}
@@ -68,51 +71,6 @@ LINEORDER-DATE-PART-ADVERSARY& ORDER DATE & See Section~\ref{sec:ratio}\\
 \subsection{Execution Time}
 \label{sec:time}
 
-
-SSB query groups 1 and 2 do not join on \texttt{ORDER DATE} and are thus unaffected by the skewed key column. 
-Fig.~\ref{fig:times0} shows execution times for these queries on the \texttt{LINEORDER-DATE-50-50}.
-As expected, we observe that LIP and LIP-$k$ have roughly equal performance for these queries.
-Henceforth, we will exclude query groups 1 and 2 from our analysis, 
-as they provide us no insight. 
-Nevertheless, from these results, we can conclude that the extra overhead associated with LIP-$k$ is negligible.
-
-
-
-However, query groups 3 and 4 --- except for query 4.1 --- do join on \texttt{ORDER DATE}, so our skew can potentially affect the execution of LIP and LIP-$k$ on these queries.
-We include only queries from groups 3 and 4 in our analysis. 
-Query 4.1 is included as a ``sanity check"; LIP and LIP-$k$ should have roughly equal performance on this query.
-
-Fig.~\ref{fig:times1}(a) shows execution times using \texttt{LINEORDER-DATE-FIRST-HALF}. 
-We see that LIP and LIP-$k$ have roughly equal performance on queries 3.2, 3.3, 3.4, and 4.3 (in addition to 4.1).
-In such queries, we do not gain much by responding to local changes in the key distribution,
-since one of the \texttt{SUPPLIER} filter is already very selective. 
-LIP applies the \texttt{SUPPLIER} filter first.
-In brief, it is ``good enough" to apply a very selective filter first, even if it is not optimal.
-On the other hand, LIP-$k$ performs better on queries 3.1 and 4.2, 
-since the other filters are not particularly selective. 
-We also observe that smaller $k$ has slightly better performance, 
-because small $k$ can respond much more quickly to the sudden change in selectivity.
-
-Fig.~\ref{fig:times1}(b) shows execution times using \texttt{LINEORDER-DATE-50-50}. 
-
-The key observation is that LIP-$k$ must first ``miss" before it can respond to a sudden change in selectivity.
-For example, consider LIP-1 processing the $101^{st}$ batch in \texttt{LINEORDER-DATE-50-50}. 
-At this point, the \text{DATE} filter has selectivity 0, and is thus probed first. 
-However, the \texttt{DATE} filter eliminates no tuples in the current batch, since the current batch has selectivity 1.
-Hence, LIP-1 performs an entire batch of unnecessary probes. 
-Afterwards, LIP-1 then knows to push the \texttt{DATE} filter to end of the filter sequence. 
-In general, every time the batch selectivity switches from 0 to 1, 
-LIP-1 performs an entire batch of unnecessary probes. 
-
-Because these queries already have a very selective \texttt{SUPPLIER} filter, 
-
-The cost associated with responsiveness may outweigh its benefit. 
-
-Fig.~\ref{fig:times2}(a) shows execution times using \texttt{LINEORDER-DATE-LINEAR}. 
-The key difference between this dataset and the others is that the skew is smooth. 
-We observe that LIP-$k$ performs worse than LIP on queries 3.3 and 4.3. 
-The argument we applied to explain L
-
 \begin{figure}
     \centering
     \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-date-50-50-q1-q2}
@@ -145,13 +103,57 @@ The argument we applied to explain L
     \label{fig:times2}
 \end{figure}
 
+SSB query groups 1 and 2 do not join on \texttt{ORDER DATE}, 
+and thus their execution times are unaffected by the skewed key column. 
+Fig.~\ref{fig:times0} shows execution times for these queries on the \texttt{LINEORDER-DATE-50-50} table.
+As expected, we observe that LIP and LIP-$k$ have roughly equal performance for these queries.
+Henceforth, we will exclude query groups 1 and 2 from our analysis, 
+as they provide us no insight into the relative performance of LIP and LIP-$k$. 
+Nevertheless, from these results, we see that the extra overhead associated with LIP-$k$ is negligible.
 
+Query groups 3 and 4 --- except for query 4.1 --- join on \texttt{ORDER DATE}, 
+so our skew can potentially affect the execution of LIP and LIP-$k$ on these queries.
+Thus, we include only queries from groups 3 and 4 in our analysis. 
+Query 4.1 is included as a "sanity check", since LIP and LIP-$k$ should have roughly equal performance on this query.
+
+Fig.~\ref{fig:times1}(a) shows execution times using \texttt{LINEORDER-DATE-FIRST-HALF}. 
+We see that LIP and LIP-$k$ have roughly equal performance on queries 3.2, 3.3, 3.4, and 4.3 (in addition to 4.1).
+In such queries, we do not gain much by responding to local changes in the key distribution,
+since there exists another filter, {\it e.g.} the \texttt{SUPPLIER} filter, that is very selective. 
+LIP generally will not notice when $\sigma_i^{\texttt{DATE}} = 0$ 
+and instead applies the \texttt{SUPPLIER} filter first.
+We observe that it is ``good enough" to apply a very selective filter first, even if it is not optimal.
+On the other hand, LIP-$k$ performs better on queries 3.1 and 4.2, 
+since the other filters in these queries are not particularly selective. 
+We also observe that smaller $k$ has slightly better performance, 
+because small $k$ can respond much more quickly to the sudden change in selectivity.
+
+Fig.~\ref{fig:times1}(b) shows execution times using \texttt{LINEORDER-DATE-50-50}. 
+LIP-$k$ performs better than LIP on queries 3.1 and 4.2 for the same reasons state in the preceding paragraph.
+However, LIP performs better than LIP-$k$ on queries 3.2 and 3.3.
+The key observation is that LIP-$k$ must first ``miss" before it can respond to a sudden change in selectivity.
+When the batch selectivity for the \texttt{DATE} column switches from 0 to 1, 
+the \texttt{DATE} filter appears first in the filter sequence, 
+and thus LIP-$k$ performs an entire batch of unnecessary probes
+before recognizing that the \texttt{DATE} filter should not be probed first.
+We see that there is an inherent cost associated with responsiveness that may outweigh its benefit. 
+% For example, consider LIP-1 processing the $101^{st}$ batch in \texttt{LINEORDER-DATE-50-50}. 
+% At this point, the \text{DATE} filter has selectivity 0, and is thus probed first. 
+% However, the \texttt{DATE} filter eliminates no tuples in the current batch, since the current batch has selectivity 1.
+% Hence, LIP-1 performs an entire batch of unnecessary probes. 
+% Afterwards, LIP-1 then knows to push the \texttt{DATE} filter to end of the filter sequence. 
+
+Fig.~\ref{fig:times2}(a) shows execution times using \texttt{LINEORDER-DATE-LINEAR}. 
+LIP and LIP-$k$ have roughly the same performance for most queries, 
+suggesting that both algorithms can adequately respond to smooth changes in key distributions.
+LIP-$1$ performs worse than all other algorithms on queries 3.3 and 4.3.
+because it does not compute an accurate selectivity estimate using only one previous batch.
 
 \subsection{Competitive Ratio}
 \label{sec:ratio}
 
 To empirically support \ref{thm:det-n}, we construct an adversarial dataset which forces LIP to perform the maximum number of filter probes possible.
-We now show how to generally construct such a dataset where $n = 2$, mimicking the proof of Theorem \ref{thm:det-n}.
+We now show how to generally construct such a dataset where two dimension tables are joined with the fact table ($n = 2$), mimicking the proof of Theorem \ref{thm:det-n}.
 
 Suppose we are joining our fact table with two dimension tables A and B using LIP.
 Let $f_i^A$ denote the selectivity of the Bloom filter for A after processing the $i^{th}$ batch. 
