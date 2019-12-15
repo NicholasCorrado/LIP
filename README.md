@@ -1,6 +1,8 @@
 # CS764 Accelerating Joins with Filters
 
-## Dependencies
+This document presents the installation guide of our project and its usage. By far we have only tested our project on macOS.
+
+## Installation
 
 Apache arrow is required to run this project. One may download Apache Arrow using
 
@@ -8,6 +10,19 @@ Apache arrow is required to run this project. One may download Apache Arrow usin
 brew install apache-arrow
 ```
 
+Next clone our project
+
+```
+git clone 
+cd CS764
+```
+
+Make the installation files and compile
+
+```
+cmake .
+make
+```
 
 ## Execution
 To run, call
