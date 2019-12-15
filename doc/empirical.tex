@@ -224,12 +224,11 @@ Following this construction, we generated an adversarial dataset for SSB query 4
 excluding the joins on the \texttt{CUSTOMER} and \texttt{SUPPLIER} dimension tables.
 We exclude these two joins because it is much simpler to generate an adversarial dataset on fewer dimension tables.
 \footnote{In our implementation, we do not explicitly exclude the joins on \texttt{CUSTOMER} and \texttt{SUPPLIER} in query 4.2. 
-Rather, we generate the adversarial dataset such that $\sigma_i^{\texttt{CUSTOMER}}=1$ and $\sigma_i^{\texttt{SUPPLIER}}=1$ for every batch $i$ 
+Rather, we generate the adversarial dataset such that $\sigma_i^{\texttt{CUSTOMER}}=1$ and $\sigma_i^{\texttt{SUPPLIER}}=1$ for every batch $i$.
 This achieves the same effect as excluding the joins.}
 
-
-
-We ran LIP and LIP-$k$ on the uniform dataset and each skewed dataset computed the competitive ratio of each algorithm by taking the maximum of the competitive ratios achieved across all queries in all datasets. In fact, the dataset responsible for the greatest competitive ratio for all algorithms is the adversarial dataset.  The results are depicted in Figure \ref{fig:cr}. 
+We ran LIP and LIP-$k$ on the uniform and adversarial datasets and computed the competitive ratio of each algorithm.
+The results are depicted in Figure \ref{fig:cr}. 
 
 \begin{figure}
     \centering
@@ -244,33 +243,34 @@ We ran LIP and LIP-$k$ on the uniform dataset and each skewed dataset computed t
         \includegraphics[width=0.9\textwidth,keepaspectratio]{cr-adversary-wide}
         %\includegraphics[width=0.9\textwidth,keepaspectratio]{cr-k-skewed}
     }
-    \caption{The competitive ratios of LIP-$k$ against different $k$ values. We ran LIP-$k$ on uniform data and skewed (and adversarial) dataset to produce (a) and (b) respectively. The data point at $k = 564$ represents LIP (which is essentially LIP-$\infty$).}
+    \caption{The competitive ratios of LIP-$k$ against different $k$ values. We ran LIP-$k$ on uniform and adversarial datasets to produce (a) and (b) respectively. The data point at $k = 562$ represents LIP (which is essentially LIP-$\infty$).}
     \label{fig:cr}
 \end{figure}
 
-When the keys in the fact table columns are distributed uniformly, the filters need not react to the local changes. Hence for LIP with higher $k$, it remembers more batches in the uniform data, therefore may produce a more accurate estimate of the selectivities than the LIP-$k$ with smaller $k$. Hence, the competitive ratio decreases slightly as $k$ increases, as depicted in Figure \ref{fig:cr}.
+When the keys in the fact table columns are distributed uniformly, the filters need not react to the local changes. LIP-$k$ with higher $k$produces a more accurate estimate of the selectivities than the LIP-$k$ with smaller $k$. Hence, the competitive ratio decreases slightly as $k$ increases, as depicted in Figure \ref{fig:cr}.
 
 %@TODO: Explain the adversarial case using epsilons
-Figure \ref{fig:cr}(b) displays how an adversarial dataset can make LIP-$k$ and LIP perform poorly. Each LIP-$k$ with even $k$ achieves an approximation ratio less than 2; LIP and LIP-$k$ with odd $k$ achieve an approximation ratio of almost 2 precisely at Query 4.2 in dataset \texttt{date-part-adversary}. Query 3.2 has two joins, and thus the performance of LIP-$k$ with even $k$ matches the worst case competitive ratio. By construction of \texttt{date-part-adversary}, the first batch has $\sigma^{1}_{1} = 1/2-\
-\varepsilon$ and $\sigma^{1}_{2} = 1/2+\varepsilon$, and  each batch $B_{2i+1}$ is an \textit{odd} batch, with $\sigma^{2i}_{1} = 0$ and $\sigma^{2i}_{2} = 1$; and each batch $B_{2i}$ is an \textit{even} batch, with $\sigma^{2i}_{1} = 1$ and $\sigma^{2i}_{2} = 0$. 
+Figure \ref{fig:cr}(b) displays how an adversarial dataset can make LIP-$k$ and LIP perform poorly. 
+First, observe that LIP ({\it i.e.} LIP-562) achieves a competitive ratio of nearly 2.
+Our modified query 4.2 has two joins, and thus the performance of LIP matches the worst case competitive ratio. 
 
-When $i \leq k$, LIP and LIP-$k$ execute identically, since LIP-$k$ has not yet ``forgotten" any previous batches. We now consider the case where $i > k$, {\it i.e.} where LIP-$k$ has forgotten at least the first batch. For odd $k$, LIP-$k$'s selectivity estimates always contains one more odd (or even) batch than the other, and thus the estimated selectivity and filtering sequence are in favor of the majority batch type. This yields a false prediction of the next batch, yielding a competitive ratio of 2. For even $k$, LIP-$k$'s selectivity estimates contain an equal amount of even an odd batches,  and thus estimated selectivities remain the same ($1/2$ by construction) throughout the execution, and the filter sequence does not change. Thus for at most half of the batches it is optimal, and for the other half it is worse, resulting in a competitive ratio of at least \[ \frac{1 \times 1/2 + 2 \times 1/2}{1} = 1.5,\] as depicted in Figure \ref{fig:cr}. For LIP, since it remembers the statistics from the beginning, by construction it would also make the same decision as LIP-$k$ with odd $k$, losing at every batch. 
+LIP-$k$ with odd $k$ also achieves a competitive ratio of almost 2. 
+For odd $k$, LIP-$k$'s selectivity estimates always contains one more odd (or even) batch than the other, 
+and thus the estimated selectivity and filtering sequence are in favor of the majority batch type,
+which produces the worst-case filter sequence on the following batch.
 
-LIP performs poorly because it never forgets the first batch.
-%@TODO: I will explain this better!!!!
-\footnote{An astute observer might notice that for $k = 200$, the worst-case competitive ratio of $2$ is achieved even though $k$ is not odd. This is explained by recognizing that LIP-200 is essentially an approximation of LIP. LIP-200 performs just as poorly as LIP up until  the $201^{st}$ batch, after which it estimates both selectivities as 1/2.}
+For even $k$, LIP-$k$'s selectivity estimates contain an equal amount of even an odd batches,  
+and thus estimated selectivities remain the same ($1/2$ by construction) throughout the execution, 
+and the filter sequence does not change. Thus for at most half of the batches it is optimal, 
+and for the other half it is worse, 
+resulting in a competitive ratio of at least \[ \frac{1 \times 1/2 + 2 \times 1/2}{1} = 1.5,\] as depicted in Figure \ref{fig:cr}. 
 
-
-
-\begin{align*}
-\varepsilon_i = 
-    \begin{cases}
-    \frac{\varepsilon}{2k+1} & \text{for odd $i$, where $i = 2k + 1$} \\ 
-    \frac{\frac{1}{2} - \varepsilon}{2k} & \text{for even $i$, where $i = 2k$}
-    \end{cases}
-\end{align*}
-
-If $k$ is even, then LIP-k will (after the first $k$ batches have been processed) have $\sigma^A_i = \sigma^B_i = \frac{1}{2}$. Thus,
+When $i \leq k$, LIP and LIP-$k$ execute identically, since LIP-$k$ has not yet ``forgotten" any previous batches. 
+Thus, when $i \leq k$, LIP-$k$ achieves a competitive ratio of 2 on each batch, regardless of wheter $k$ is even or odd.
+When $i > k$ and $k$ is odd, LIP-$k$ still achieves a competitive ratio of 2 on each batch.
+However, When $i > k$ and $k$ is even, LIP-$k$ forgets to first batch and achieves a competive ratio of 1.5 on the remaining batches.
+This explains why the competitive ratio increases for even $k$ as $k$ increases.
+\footnote{An astute observer might notice that the competitive ratio decreases for $k = 50$ and $k = 90$. This is because the batch size is not constant through execution.}
 
 
 %$k = 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100$ on 
