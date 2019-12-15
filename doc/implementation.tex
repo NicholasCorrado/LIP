@@ -23,6 +23,15 @@ Thus, this implementation caveat does not preclude us from studying the relative
 
 We only support string and numeric data types. All numeric data is stored as 64-bit integers by default.
 
+We do not fix the batch size but rather let Arrow determine the batch size.
+Arrow ddetermines the size of each individual batch at run-time, 
+equal to the length of the smallest contiguous Arrow Array over all columns in the table.
+Thus, batch size is determined by 
+(1) the size of the data in each column and
+(2) how Arrow chunks the underlying Arrays.
+Empircally, we find that the first ~100 tend to contain ~500 more tuples than later batches.
+The later batches contain roughly 10600 tuples.
+
 The hash join algorithm first produces a hash table $T_i$ for each $\sigma_i(D_i)$, projected on the $k_i$, and then probe each tuple in the fact table against all $T_i$. We used Sparseepp (accessible at \url{https://github.com/greg7mdp/sparsepp}) as our implementation of the hash table, in which the sparsehash by Google (accessible at \url{https://github.com/sparsehash/sparsehash}) is used as the underlying hash function. All primary keys are regarded as 64-bit integers.
 
 For LIP and LIP-$k$, the succinct filter structure we choose is the Bloom filters. 
