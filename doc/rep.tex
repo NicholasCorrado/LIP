@@ -92,17 +92,14 @@ initial text=$ $, % sets the text that appears on the start arrow
 \input{empirical}
 
 
-\section{Future Works}
+\section{Future Works and Concluding Remarks}
 
-A huge take-away from this project is that the budget allowed for filtering each filter is very limited, in the magnitude of near 100 CPU cycles. Hence maintaining the statistics that require heavy computation or using randomness that requires much computation cost are not practically beneficial. Given this, we will investigate dynamically start sampling a segment of the fact table to have true estimates of each filters, and then stick to this estimate for the next few batches. This has low maintenance overhead, and once the adaptive policy for dynamical sampling is established, we expect that to have better practical performance than LIP and LIP-$k$. Note that this strategy is still deterministic, still prone to the worst case $n$ competitive ratio bound established by Theorem~\ref{thm:det-n}. 
+The contributions of this project come in two-folds: We implemented Hash-join and LIP on top of Apache Arrow and thus provided an interface for future integration of Hustle on Apache Arrow; and we proposed LIP-$k$, a variant of LIP, which opens up an area for improving the performance LIP. 
 
-
-\section{Concluding Remarks}
-
-% concluding remarks below
-
-The contributions of this project come in two-folds: We implemented Hash-join and LIP on top of Apache Arrow and thus provided an interface for future integration of Hustle on Apache Arrow; and we proposed LIP-$k$, a variant of LIP, which opens up an area for improving the performance LIP. It would also be interesting to study the problem of LIP in the online algorithmic setting to design an efficient mechanism utilizing randomness with better worst case guarantees. 
-
+The budget allowed for filtering each tuple is limited --- roughly 100 CPU cycles. Hence, computationally-heavy approaches to maintaining filter statistics are not practically beneficial. Therefore, we will investigate dynamically sampling a segment of the fact table to have true estimates of each filters, and then stick to this estimate for the next few batches. This has low maintenance overhead, and once the adaptive policy for dynamic sampling is established, we expect that to have better practical performance than LIP and LIP-$k$. Note that this strategy is still deterministic, still prone to the worst case $n$ competitive ratio bound established by Theorem~\ref{thm:det-n}.  
+It would be interesting to study LIP in the online algorithmic setting to design an efficient mechanism utilizing randomness 
+that offers better worst-case guarantees without burning too many CPU cycles.
+Of course, CPU efficiency and randomness are at odds in such an approach. 
 
 % Future work below
 
