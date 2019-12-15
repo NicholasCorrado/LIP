@@ -73,8 +73,14 @@ LINEORDER-DATE-PART-ADVERSARY& ORDER DATE & See Section~\ref{sec:ratio}\\
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-date-50-50-q1-q2}
-    \caption{Execution time for SSB query groups 1 and 2 on \texttt{LINEORDER-DATE-50-50}}
+    \subfloat[]{
+        \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-date-50-50-q1-q2}
+
+    }\\
+    \subfloat[]{
+        \includegraphics[width=0.9\textwidth,keepaspectratio]{lip-and-lipk-uniform}
+    }
+    \caption{Execution time for SSB query groups 1 and 2 on (a) \texttt{LINEORDER-DATE-50-50} and query group 3 and 4 on (b)~\texttt{LINEORDER-UNIFORM}}
     \label{fig:times0}
 \end{figure}
 
@@ -105,7 +111,7 @@ LINEORDER-DATE-PART-ADVERSARY& ORDER DATE & See Section~\ref{sec:ratio}\\
 
 SSB query groups 1 and 2 do not join on \texttt{ORDER DATE}, 
 and thus their execution times are unaffected by the skewed key column. 
-Fig.~\ref{fig:times0} shows execution times for these queries on the \texttt{LINEORDER-DATE-50-50} table.
+Fig.~\ref{fig:times0}(a) shows execution times for these queries on the \texttt{LINEORDER-DATE-50-50} table.
 As expected, we observe that LIP and LIP-$k$ have roughly equal performance for these queries.
 Henceforth, we will exclude query groups 1 and 2 from our analysis, 
 as they provide us no insight into the relative performance of LIP and LIP-$k$. 
@@ -115,6 +121,11 @@ Query groups 3 and 4 --- except for query 4.1 --- join on \texttt{ORDER DATE},
 so our skew can potentially affect the execution of LIP and LIP-$k$ on these queries.
 Thus, we include only queries from groups 3 and 4 in our analysis. 
 Query 4.1 is included as a "sanity check", since LIP and LIP-$k$ should have roughly equal performance on this query.
+
+Fig.~\ref{fig:times0}(a) shows execution times for these queries on the \texttt{LINEORDER-UNIFORM} table.
+We see that LIP-$1$ performs worse than all other algorithms on queries 3.3 and 4.3.
+because it does not compute an accurate selectivity estimate using only one previous batch.
+Otherwise, there is little difference between LIP and LIP-$k$ on uniform data.
 
 Fig.~\ref{fig:times1}(a) shows execution times using \texttt{LINEORDER-DATE-FIRST-HALF}. 
 We see that LIP and LIP-$k$ have roughly equal performance on queries 3.2, 3.3, 3.4, and 4.3 (in addition to 4.1).
@@ -146,8 +157,8 @@ We see that there is an inherent cost associated with responsiveness that may ou
 Fig.~\ref{fig:times2}(a) shows execution times using \texttt{LINEORDER-DATE-LINEAR}. 
 LIP and LIP-$k$ have roughly the same performance for most queries, 
 suggesting that both algorithms can adequately respond to smooth changes in key distributions.
-LIP-$1$ performs worse than all other algorithms on queries 3.3 and 4.3.
-because it does not compute an accurate selectivity estimate using only one previous batch.
+Again, LIP-$1$ performs worse than all other algorithms on queries 3.3 and 4.3.
+because of its inaccurate selectivity estimates.
 
 \subsection{Competitive Ratio}
 \label{sec:ratio}
