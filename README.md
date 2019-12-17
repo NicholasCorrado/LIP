@@ -1,16 +1,7 @@
 # CS764 Accelerating Joins with Filters
 
 This document presents the installation guide of our project and its usage. By far we have only tested our project on macOS.
-
-## Overview
-
-* Our final report can be found at `docs/rep.pdf`.
-* All code can is in `src` (library code), `apps` (executable code), and `util` (helper code) directories.
-* `benchmarks/benchmark-1` contains SSB data generated from [here](https://github.com/UWQuickstep/SQL-benchmark-data-generator/tree/master/ssbgen) with SF = 1.
-* `benchmarks/benchmark-skew` contains all skew LINEORDER tables discussed in the report as well as several more.
-* `scripts` contains bash/python scripts used to collect, analyze, and plot results.
-
-Note that you do not need to generate any of the data necessary to demo the project, since we provide it in `benchmarks` directory.
+Our final report can be found at `docs/rep.pdf`.
 
 ## Installation
 
@@ -21,8 +12,6 @@ brew install apache-arrow
 ```
 
 Next clone our project and build our project. 
-Note that this repository contains all of our experimental datasets (several GB),
-so this will take a minute or so to clone.
 
 ```
 git clone https://github.com/NicholasCorrado/LIP.git
@@ -30,7 +19,29 @@ cd LIP
 cmake .
 make
 ```
+## Generating Datasets
 
+1. SSB data can generated from [here](https://github.com/UWQuickstep/SQL-benchmark-data-generator/tree/master/ssbgen). See the README.md file for instructions. Please use SF = 1. Once the SSB data is generated, you should have the following files:
+```
+customer.tbl
+date.tbl
+lineorder.tbl
+part.tbl
+supplier.tbl
+```
+2. Move/Copy all SSB `*.tbl` files to the `benchmarks/benchmark-1` directory. 
+3. Once the uniform benchmark data is generated, you can generate the skew datasets *from the project's root directory* using
+```
+python scripts/skew.py
+```
+This will generate the following files in the `benchmarks/benchmarks-skew` directory:
+
+```
+lineorder-date-50-50.tbl
+lineorder-date-first-half.tbl
+lineorder-date-linear.tbl
+lineorder-date-part-adversary.tbl
+```
 
 ## Execution
 To run, call
@@ -90,7 +101,7 @@ Possible values for `<SF>` depends on how you generated the SSB dataset. You can
 Here is how you would run query 4.2 using LIP-42 on dataset skew-date-50-50 with SF = 1:
 
 ```
->> ./apps/main 4.2 lip42 skew-date-50-50 1
+./apps/main 4.2 lip42 skew-date-50-50 1
 ```
 
 The output will look something like 
