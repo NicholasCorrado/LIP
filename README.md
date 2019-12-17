@@ -21,7 +21,7 @@ $ make
 ```
 ## Generating Datasets
 
-1. SSB data can generated from [here](https://github.com/UWQuickstep/SQL-benchmark-data-generator/tree/master/ssbgen). See the README.md file for instructions. Please use SF = 1. Once the SSB data is generated, you should have the following files:
+1. SSB data can generated from [here](https://github.com/UWQuickstep/SQL-benchmark-data-generator/tree/master/ssbgen). See the README.md file for instructions. Use SF = 1. Once the SSB data is generated, you should have the following files:
 ```
 customer.tbl
 date.tbl
@@ -115,7 +115,7 @@ $ ./apps/main 4.2 lip4 skew-date-50-50 1
 Running query 4.2 ...
 CR 1.12406
 Rows 48141
-
+RunningTime 1241378
 ```
 ```
 $ ./apps/main 4.2 lip skew-date-50-50 1
