@@ -5,7 +5,7 @@
 
 
 #define DEBUG 0
-#define CR 0
+#define CR 1
 
 
 
