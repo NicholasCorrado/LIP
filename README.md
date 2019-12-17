@@ -48,10 +48,6 @@ supplier.tbl
 
 ## Generating Skew Datasets
 
-```
-- If you have LIP.tar.gz, then you can start from here. The previous steps are unnecessary.
-```
-
 Once the uniform benchmark data is generated, you can generate the skew datasets *from the project's root directory* using
 ```
 $ python scripts/skew.py
@@ -110,7 +106,7 @@ skew-date-linear
 skew-date-date-part-adversary
 ```
 
-Because you generated SSB for SF = 1, you must use 1 as the `<SF>` argument.
+Because the SBB data has SF = 1, you must use 1 as the `<SF>` argument.
 
 ## Execution Examples
 
