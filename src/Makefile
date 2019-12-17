@@ -124,7 +124,6 @@ src: src/CMakeFiles/src.dir/rule
 src/fast:
 	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/build
 .PHONY : src/fast
-
 # target to build an object file
 BloomFilter.o:
 	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/BloomFilter.o
@@ -243,7 +242,13 @@ select.i:
 # target to generate assembly for a file
 select.s:
 	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/select.s
+>>>>>>> 8ea0bc28a40d40527de355164285cda69547fd4f
 .PHONY : select.s
+
+# target to generate assembly for a file
+select.cpp.s:
+	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/select.cpp.s
+.PHONY : select.cpp.s
 
 # Help Target
 help:
