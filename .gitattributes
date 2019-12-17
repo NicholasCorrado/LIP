@@ -3,3 +3,14 @@ benchmarks/benchmark-1/part.tbl filter=lfs diff=lfs merge=lfs -text
 benchmarks/benchmark-1/supplier.tbl filter=lfs diff=lfs merge=lfs -text
 benchmarks/benchmark-1/customer.tbl filter=lfs diff=lfs merge=lfs -text
 benchmarks/benchmark-1/date.tbl filter=lfs diff=lfs merge=lfs -text
+benchmarks/benchmark-skew/lineorder-date-linear.tbl filter=lfs diff=lfs merge=lfs -text
+benchmarks/benchmark-skew/lineorder-date-part-adversary.tbl filter=lfs diff=lfs merge=lfs -text
+benchmarks/benchmark-skew/lineorder-date-5-5.tbl filter=lfs diff=lfs merge=lfs -text
+benchmarks/benchmark-skew/lineorder-date-50-10.tbl filter=lfs diff=lfs merge=lfs -text
+benchmarks/benchmark-skew/lineorder-date-first-half.tbl filter=lfs diff=lfs merge=lfs -text
+benchmarks/benchmark-skew/lineorder-date-linear-part-20-20.tbl filter=lfs diff=lfs merge=lfs -text
+benchmarks/benchmark-skew/lineorder-date-linear-part-20-20-supp-10-20.tbl filter=lfs diff=lfs merge=lfs -text
+benchmarks/benchmark-skew/lineorder-date-10-10.tbl filter=lfs diff=lfs merge=lfs -text
+benchmarks/benchmark-skew/lineorder-date-10-50.tbl filter=lfs diff=lfs merge=lfs -text
+benchmarks/benchmark-skew/lineorder-date-20-20.tbl filter=lfs diff=lfs merge=lfs -text
+benchmarks/benchmark-skew/lineorder-date-50-50.tbl filter=lfs diff=lfs merge=lfs -text
