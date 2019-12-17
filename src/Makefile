@@ -39,19 +39,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake
+CMAKE_COMMAND = /usr/local/Cellar/cmake/3.15.5/bin/cmake
 
 # The command to remove a file.
-RM = /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E remove -f
+RM = /usr/local/Cellar/cmake/3.15.5/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/corrado/CLionProjects/CS764
+CMAKE_SOURCE_DIR = /Users/corrado/CLionProjects/tmp/LIP
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/corrado/CLionProjects/CS764
+CMAKE_BINARY_DIR = /Users/corrado/CLionProjects/tmp/LIP
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -59,7 +59,7 @@ CMAKE_BINARY_DIR = /Users/corrado/CLionProjects/CS764
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/local/Cellar/cmake/3.15.5/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -69,8 +69,8 @@ rebuild_cache/fast: rebuild_cache
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/local/Cellar/cmake/3.15.4/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/usr/local/Cellar/cmake/3.15.5/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -80,14 +80,14 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /Users/corrado/CLionProjects/CS764 && $(CMAKE_COMMAND) -E cmake_progress_start /Users/corrado/CLionProjects/CS764/CMakeFiles /Users/corrado/CLionProjects/CS764/src/CMakeFiles/progress.marks
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f CMakeFiles/Makefile2 src/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/corrado/CLionProjects/CS764/CMakeFiles 0
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(CMAKE_COMMAND) -E cmake_progress_start /Users/corrado/CLionProjects/tmp/LIP/CMakeFiles /Users/corrado/CLionProjects/tmp/LIP/src/CMakeFiles/progress.marks
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f CMakeFiles/Makefile2 src/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/corrado/CLionProjects/tmp/LIP/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f CMakeFiles/Makefile2 src/clean
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f CMakeFiles/Makefile2 src/clean
 .PHONY : clean
 
 # The main clean target
@@ -97,22 +97,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /Users/corrado/CLionProjects/CS764 && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 src/CMakeFiles/src.dir/rule:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f CMakeFiles/Makefile2 src/CMakeFiles/src.dir/rule
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f CMakeFiles/Makefile2 src/CMakeFiles/src.dir/rule
 .PHONY : src/CMakeFiles/src.dir/rule
 
 # Convenience name for target.
@@ -122,127 +122,127 @@ src: src/CMakeFiles/src.dir/rule
 
 # fast build rule for target.
 src/fast:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/build
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/build
 .PHONY : src/fast
 
 # target to build an object file
 BloomFilter.o:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/BloomFilter.o
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/BloomFilter.o
 .PHONY : BloomFilter.o
 
 # target to preprocess a source file
 BloomFilter.i:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/BloomFilter.i
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/BloomFilter.i
 .PHONY : BloomFilter.i
 
 # target to generate assembly for a file
 BloomFilter.s:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/BloomFilter.s
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/BloomFilter.s
 .PHONY : BloomFilter.s
 
 # target to build an object file
 BuildFilter.o:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/BuildFilter.o
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/BuildFilter.o
 .PHONY : BuildFilter.o
 
 # target to preprocess a source file
 BuildFilter.i:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/BuildFilter.i
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/BuildFilter.i
 .PHONY : BuildFilter.i
 
 # target to generate assembly for a file
 BuildFilter.s:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/BuildFilter.s
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/BuildFilter.s
 .PHONY : BuildFilter.s
 
 # target to build an object file
 Join.o:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/Join.o
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/Join.o
 .PHONY : Join.o
 
 # target to preprocess a source file
 Join.i:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/Join.i
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/Join.i
 .PHONY : Join.i
 
 # target to generate assembly for a file
 Join.s:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/Join.s
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/Join.s
 .PHONY : Join.s
 
 # target to build an object file
 JoinExecutor.o:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/JoinExecutor.o
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/JoinExecutor.o
 .PHONY : JoinExecutor.o
 
 # target to preprocess a source file
 JoinExecutor.i:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/JoinExecutor.i
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/JoinExecutor.i
 .PHONY : JoinExecutor.i
 
 # target to generate assembly for a file
 JoinExecutor.s:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/JoinExecutor.s
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/JoinExecutor.s
 .PHONY : JoinExecutor.s
 
 # target to build an object file
 Queries.o:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/Queries.o
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/Queries.o
 .PHONY : Queries.o
 
 # target to preprocess a source file
 Queries.i:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/Queries.i
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/Queries.i
 .PHONY : Queries.i
 
 # target to generate assembly for a file
 Queries.s:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/Queries.s
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/Queries.s
 .PHONY : Queries.s
 
 # target to build an object file
 __/util/BloomFilterTest.o:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/__/util/BloomFilterTest.o
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/__/util/BloomFilterTest.o
 .PHONY : __/util/BloomFilterTest.o
 
 # target to preprocess a source file
 __/util/BloomFilterTest.i:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/__/util/BloomFilterTest.i
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/__/util/BloomFilterTest.i
 .PHONY : __/util/BloomFilterTest.i
 
 # target to generate assembly for a file
 __/util/BloomFilterTest.s:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/__/util/BloomFilterTest.s
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/__/util/BloomFilterTest.s
 .PHONY : __/util/BloomFilterTest.s
 
 # target to build an object file
 __/util/util.o:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/__/util/util.o
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/__/util/util.o
 .PHONY : __/util/util.o
 
 # target to preprocess a source file
 __/util/util.i:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/__/util/util.i
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/__/util/util.i
 .PHONY : __/util/util.i
 
 # target to generate assembly for a file
 __/util/util.s:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/__/util/util.s
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/__/util/util.s
 .PHONY : __/util/util.s
 
 # target to build an object file
 select.o:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/select.o
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/select.o
 .PHONY : select.o
 
 # target to preprocess a source file
 select.i:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/select.i
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/select.i
 .PHONY : select.i
 
 # target to generate assembly for a file
 select.s:
-	cd /Users/corrado/CLionProjects/CS764 && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/select.s
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(MAKE) -f src/CMakeFiles/src.dir/build.make src/CMakeFiles/src.dir/select.s
 .PHONY : select.s
 
 # Help Target
@@ -289,6 +289,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /Users/corrado/CLionProjects/CS764 && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /Users/corrado/CLionProjects/tmp/LIP && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 
