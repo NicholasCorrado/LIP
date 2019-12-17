@@ -9,7 +9,6 @@ This document presents the installation guide of our project and its usage. By f
 * `benchmarks/benchmark-1` contains SSB data generated from [here](https://github.com/UWQuickstep/SQL-benchmark-data-generator/tree/master/ssbgen) with SF = 1.
 * `benchmarks/benchmark-skew` contains all skew LINEORDER tables discussed in the report as well as several more.
 * `scripts` contains bash/python scripts used to collect, analyze, and plot results.
-* 
 
 ## Installation
 
