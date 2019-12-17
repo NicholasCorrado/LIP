@@ -10,7 +10,9 @@ Apache arrow is required to run this project. One may download Apache Arrow usin
 brew install apache-arrow
 ```
 
-Next clone our project
+Next clone our project and build our project. 
+Note that this repository contains all of our experimental datasets (several GB),
+so this will take a minute or so to clone.
 
 ```
 git clone https://github.com/NicholasCorrado/LIP.git
@@ -78,3 +80,14 @@ Here is how you would run query 4.2 using LIP-42 on dataset skew-date-50-50 with
 ```
 >> ./apps/main 4.2 lip42 skew-date-50-50 1
 ```
+
+The output will look something like 
+
+```
+Running query 4.2 ...
+CR 1.22494
+Rows 48141
+RunningTime 1374760
+```
+
+Where CR is the competitive ratio (defined in the report), Rows is the number of rows in the LINEORDER table that would be joined, and RunningTime is the running time in milliseconds.
