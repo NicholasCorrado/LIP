@@ -1,3 +1,4 @@
-add_executable(app main.cpp)
+add_executable(main main.cpp)
 
-target_link_libraries(app PUBLIC src)
+target_include_directories(main PUBLIC src)
+target_link_libraries(main PUBLIC src)
