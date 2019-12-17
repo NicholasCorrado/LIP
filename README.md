@@ -19,7 +19,7 @@ $ cd LIP
 $ cmake .
 $ make
 ```
-## Generating Datasets
+## Generating the SSB Dataset
 
 1. SSB data can generated from [here](https://github.com/UWQuickstep/SQL-benchmark-data-generator/tree/master/ssbgen). See the README.md file for instructions. Use SF = 1. Once the SSB data is generated, you should have the following files:
 ```
@@ -30,7 +30,14 @@ part.tbl
 supplier.tbl
 ```
 2. Move/Copy all SSB `*.tbl` files to the `benchmarks/benchmark-1` directory. 
-3. Once the uniform benchmark data is generated, you can generate the skew datasets *from the project's root directory* using
+
+## Generating Skew Datasets
+
+```
+- If you have LIP.tar.gz, then you can start from here. The previous steps are unnecessary.
+```
+
+Once the uniform benchmark data is generated, you can generate the skew datasets *from the project's root directory* using
 ```
 $ python scripts/skew.py
 ```
@@ -106,7 +113,7 @@ CR 1.22494
 Rows 48141
 RunningTime 1374760
 ```
-Where CR is the competitive ratio (defined in the report), Rows is the number of rows in the LINEORDER table that would be joined, and RunningTime is the running time in milliseconds. If you specify `hash` as the algorithm, then no competitive ratio will be printed.
+Where CR is the competitive ratio (defined in the report), Rows is the number of rows in the LINEORDER table that would be joined, and RunningTime is the running time in microseconds. If you specify `hash` as the algorithm, then no competitive ratio will be printed.
 
 Now lets run try other algorithms --- lip-4, lip, and hash -- on the same query and the same dataset:
 
