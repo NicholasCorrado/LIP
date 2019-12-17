@@ -3,15 +3,30 @@
 This document presents the installation guide of our project and its usage. By far we have only tested our project on macOS.
 Our final report can be found at `docs/rep.pdf`.
 
-## Installation
+## Dependencies
 
-Apache arrow is required to run this project. One may download Apache Arrow using
+Apache arrow is required to run this project. You can download Apache Arrow using
 
 ```
 $ brew install apache-arrow
 ```
 
-Next clone our project and build our project. 
+## Installation 
+
+### From LIP.tar.gz
+
+If you are lucky enough to get your hands on a tarball of our project, you can extract and build as follows:
+
+```
+$ tar -zxvf LIP.tar.gz
+$ cd LIP
+$ cmake .
+$ make
+```
+
+### From Github
+
+You can clone and then build our project. 
 
 ```
 $ git clone https://github.com/NicholasCorrado/LIP.git
