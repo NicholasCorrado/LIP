@@ -258,7 +258,7 @@ void AlgorithmSwitcher(std::shared_ptr <arrow::Table> lineorder, std::vector<Joi
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     
     int numOfRows = result_table != nullptr ? result_table -> num_rows() : 0;
-//PrintTable(result_table, 0);
+//    PrintTable(result_table, 0);
     std::cout << "Rows " << numOfRows << std::endl;
     std::cout << "RunningTime " << duration.count() << std::endl;
     //std::cout << duration.count() << std::endl;

@@ -696,7 +696,7 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
             }
             std::cout << std::endl;
 
-           std::cout << "misses = " << alg-prev_alg << std::endl;
+//           std::cout << "misses = " << alg-prev_alg << std::endl;
         }
 
         arrow::Int64Builder indices_builder;
@@ -731,8 +731,8 @@ std::shared_ptr<arrow::Table> EvaluateJoinTreeLIPK(std::shared_ptr<arrow::Table>
     if(CR){
         double cr = opt == 0 ? 1 : 1.0 * alg / opt;
         std::cout << "CR " <<  cr << std::endl;
-        std::cout << "alg " << alg << std::endl;
-        std::cout << "opt " << opt << std::endl;
+//        std::cout << "alg " << alg << std::endl;
+//        std::cout << "opt " << opt << std::endl;
     }
     EvaluateStatus(status, __PRETTY_FUNCTION__, __LINE__);
     //return result_table;
