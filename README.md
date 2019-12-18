@@ -24,9 +24,12 @@ $ cmake .
 $ make
 ```
 
+The tarball contains the SSB and skew datasets discussed in the report, 
+so you can skip the "Generating the SSB Dataset" and "Generating Skew Datasets" sections.
+
 ### From Github
 
-You can clone and then build our project. 
+You can clone and then build our project as follows: 
 
 ```
 $ git clone https://github.com/NicholasCorrado/LIP.git
