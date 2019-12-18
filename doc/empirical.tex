@@ -249,7 +249,7 @@ The results are depicted in Figure \ref{fig:cr}.
         \includegraphics[width=0.9\textwidth,keepaspectratio]{cr-adversary-wide}
         %\includegraphics[width=0.9\textwidth,keepaspectratio]{cr-k-skewed}
     }
-    \caption{The competitive ratios of LIP-$k$ against different $k$ values. We ran LIP-$k$ on uniform and adversarial datasets to produce (a) and (b) respectively. The data point at $k = 562$ represents LIP (which is essentially LIP-$\infty$).}
+    \caption{The competitive ratios of LIP-$k$ against different $k$ values. We ran LIP-$k$ on uniform and adversarial datasets to produce (a) and (b) respectively. We plot $k = 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 562$. The data point at $k = 562$ represents LIP (which is essentially LIP-$\infty$).}
     \label{fig:cr}
 \end{figure}
 
@@ -276,7 +276,7 @@ Thus, when $i \leq k$, LIP-$k$ achieves a competitive ratio of 2 on each batch, 
 When $i > k$ and $k$ is odd, LIP-$k$ still achieves a competitive ratio of 2 on each batch.
 However, When $i > k$ and $k$ is even, LIP-$k$ forgets to first batch and achieves a competive ratio of 1.5 on the remaining batches.
 This explains why the competitive ratio increases for even $k$ as $k$ increases.
-\footnote{An astute observer might notice that the competitive ratio decreases for $k = 50$ and $k = 90$. This is because the batch size is not constant through execution.}
+\footnote{An astute observer might notice that the competitive ratio decreases for $k = 50$ and $k = 90$. This is because the batch size is not constant throughout execution (see Section~\ref{sec:implementation}).}
 
 
 %$k = 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100$ on 
